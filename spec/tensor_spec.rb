@@ -2,10 +2,17 @@ require 'spec_helper'
 describe "Tensorflow::Tensor" do
   context 'adding integer tensors' do
     it "Should Give correct results for adding two tensors." do
+     # This also demonstrates how you can run a save protobuf file.
       graph = Tensorflow::Graph.new
       graph.read(File.dirname(__FILE__)+'/example_graphs/example_int64.pb')
       session = Tensorflow::Session.new
       session.extend_graph(graph)
+
+      tensor_1 = Tensorflow::Tensor.new([[1,2],[3,4]])
+      tensor_2 = Tensorflow::Tensor.new([[7,3],[4,21]])
+
+
+
       inputs = {
         'input1' => Tensorflow::Tensor.new([[1,2],[3,4]]).tensor,
         'input2' => Tensorflow::Tensor.new([[7,3],[4,21]]).tensor,

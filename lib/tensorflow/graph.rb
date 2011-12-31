@@ -111,7 +111,7 @@ class Tensorflow::Graph
             # consider adding a TF_DeleteOperationDescription
             # function to the C API.
         end
-
+        puts cdesc
         Tensorflow::Operation.new(Tensorflow::TF_FinishOperation(cdesc, status.c), self)
     end
 
