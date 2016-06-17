@@ -4,10 +4,22 @@ require 'tensorflow/core/framework/tensor'
 require 'tensorflow/core/framework/graph'
 
 class Tensor
-  attr_accessor :shape, :type , :tens
-  def initialize(data ,shape)
-  	self.shape = shape
-    self.type = type_check(data)
+  attr_accessor :dimensions, :type , :rank
+  def initialize(data)
+  	self.dimensions = dimension_finder(data)  if data.is_a?(Array) 
+  	raise("Incorrect dimensions specified in the input.") if self.dimensions == nil && data.is_a?(Array) 
+  	self.rank = 0
+  	self.rank = self.dimensions.size if data.is_a?(Array)
+    self.type = type_check(data) if data.is_a?(Array)
+  end
+
+  def dimension_finder(m)
+    if m.any? { |e| e.is_a?(Array) }
+      d = m.group_by { |e| e.is_a?(Array) && dimension_finder(e) }.keys
+      [m.size] + d.first if d.size == 1 && d.first
+    else
+      [m.size]
+    end
   end
   
   def type_check(data)
@@ -26,8 +38,10 @@ class Tensor
      	raise "Data type not supported."
      end
      data.each do |i|
-     	raise "Different data types in array." if !(i.is_a?  (type))
+     #	raise "Different data types in array." if !(i.is_a?  (type))
      end
      type
   end
 end
+a = Tensor.new([[[2,3,4,5,6,8],[2,3,4,5,6,8]],[[2,3,4,5,6,8],[2,3,4,5,6,8]],[[2,3,4,5,6,8],[2,3,4,5,6,8]],[[2,3,4,5,6,8],[2,3,4,5,6,8]]])
+print a.dimensions,"\n",a.rank,"\n"
