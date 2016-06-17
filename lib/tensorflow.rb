@@ -10,21 +10,21 @@ class Tensor
   	raise("Incorrect dimensions specified in the input.") if self.dimensions == nil && data.is_a?(Array) 
   	self.rank = 0
   	self.rank = self.dimensions.size if data.is_a?(Array)
-    self.type = type_check(data) if data.is_a?(Array)
+    self.type = type_check(data) 
   end
 
-  def dimension_finder(m)
-    if m.any? { |e| e.is_a?(Array) }
-      d = m.group_by { |e| e.is_a?(Array) && dimension_finder(e) }.keys
-      [m.size] + d.first if d.size == 1 && d.first
+  def dimension_finder(array)
+    if array.any? { |nested_array| nested_array.is_a?(Array) }
+      dim = array.group_by { |nested_array| nested_array.is_a?(Array) && dimension_finder(nested_array) }.keys
+      [array.size] + dim.first if dim.size == 1 && dim.first
     else
-      [m.size]
+      [array.size]
     end
   end
   
   def type_check(data)
-  	data_flatten = data.flatten
-    start = data_flatten[0]
+  	start = data  if self.rank == 0 
+    start = data.flatten[0]  if self.rank != 0 
      # Take care of boolean and complex numbers too
     if start.is_a? Integer
       type = Integer
@@ -35,7 +35,8 @@ class Tensor
     else 
       raise "Data type not supported."
     end
-    data_flatten.each do |i|
+    return type if self.rank == 0 
+    data.flatten.each do |i|
       raise "Different data types in array." if !(i.is_a?  (type))
     end
     type
