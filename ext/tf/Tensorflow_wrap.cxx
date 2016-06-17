@@ -14732,22 +14732,6 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_bitch(int argc, VALUE *argv, VALUE self) {
-  int result;
-  VALUE vresult = Qnil;
-  
-  if ((argc < 0) || (argc > 0)) {
-    rb_raise(rb_eArgError, "wrong # of arguments(%d for 0)",argc); SWIG_fail;
-  }
-  result = (int)tensorflow::bitch();
-  vresult = SWIG_From_int(static_cast< int >(result));
-  return vresult;
-fail:
-  return Qnil;
-}
-
-
-SWIGINTERN VALUE
 _wrap_TF_Run_wrapper(int argc, VALUE *argv, VALUE self) {
   TF_Session *arg1 = (TF_Session *) 0 ;
   std::vector< std::string,std::allocator< std::string > > arg2 ;
@@ -16663,7 +16647,6 @@ SWIGEXPORT void Init_Tensorflow(void) {
   rb_define_module_function(mTensorflow, "TF_LoadLibrary", VALUEFUNC(_wrap_TF_LoadLibrary), -1);
   rb_define_module_function(mTensorflow, "TF_GetOpList", VALUEFUNC(_wrap_TF_GetOpList), -1);
   rb_define_module_function(mTensorflow, "TF_NewTensor_wrapper", VALUEFUNC(_wrap_TF_NewTensor_wrapper), -1);
-  rb_define_module_function(mTensorflow, "bitch", VALUEFUNC(_wrap_bitch), -1);
   rb_define_module_function(mTensorflow, "TF_Run_wrapper", VALUEFUNC(_wrap_TF_Run_wrapper), -1);
   
   SwigClassLong_long.klass = rb_define_class_under(mTensorflow, "Long_long", rb_cObject);
