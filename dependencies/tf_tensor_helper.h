@@ -21,9 +21,6 @@ namespace tensorflow {
 
 TF_Tensor* TF_NewTensor_wrapper(TF_DataType dtype, long long *dims, int num_dims,
                    void* data, size_t len);
-int bitch(){
-	return 23;
-}
 }  // namespace tensorflow
 
 #endif  // TENSORFLOW_GO_CLIENT_TF_TENSOR_HELPER_H_
