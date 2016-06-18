@@ -1,8 +1,5 @@
 require_relative 'tensorflow'
 
-ere=File.read('ops.pb')
-encoded=Tensorflow::OpList.decode(ere)
-
 class GraphNode
   attr_accessor :node_def
 end
@@ -30,4 +27,5 @@ class Graph
 end
 
 a = Graph.new()
-puts a.graph_def_from_reader('graph.pb')
+puts a.availableOps["addn"].input_arg[0]
+puts a.availableOps["addn"]
