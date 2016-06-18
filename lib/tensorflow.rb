@@ -85,7 +85,9 @@ class Tensor
   end
 end
 
+'''
 a = Tensor.new([[[1,2,4,5,67,8],[1,2,4,5,67,8]],[[1,2,4,5,67,8],[1,2,4,5,67,8]],[[1,2,4,5,67,8],[1,2,4,5,67,8]]])
 print a.dimensions,"\n",a.type,"\n",a.rank,"\n",a.type_num,"\n", a.serialized,"\n", a.dimensions.length ,"\n",a.tensor,"\n"
 puts a.getval([3,2,1])
 puts Tensorflow::TF_TensorType(a.tensor)
+'''
