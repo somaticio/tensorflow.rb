@@ -28,7 +28,7 @@ After you have cloned the repository, run the next commands at the root of the
 tree:
 
 ```sh
-
+$ gem install google-protoc --pre
 $ bazel build //tensorflow:libtensorflow.so
 $ sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
 ```
