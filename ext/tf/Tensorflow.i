@@ -32,3 +32,4 @@ namespace std {
 %array_class(float, Float);
 %array_class(double, Double);
 %array_class(char, Character );
+

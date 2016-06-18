@@ -29,3 +29,4 @@ TF_Tensor* TF_NewTensor_wrapper(TF_DataType dtype, long long* dims, int num_dims
 }
 
 }  // namespace tensorflow
+

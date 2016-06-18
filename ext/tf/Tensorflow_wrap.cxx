@@ -14732,6 +14732,30 @@ fail:
 
 
 SWIGINTERN VALUE
+_wrap_arw(int argc, VALUE *argv, VALUE self) {
+  TF_Tensor *arg1 = (TF_Tensor *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *result = 0 ;
+  VALUE vresult = Qnil;
+  
+  if ((argc < 1) || (argc > 1)) {
+    rb_raise(rb_eArgError, "wrong # of arguments(%d for 1)",argc); SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0], &argp1,SWIGTYPE_p_TF_Tensor, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "TF_Tensor *","tensorflow::arw", 1, argv[0] )); 
+  }
+  arg1 = reinterpret_cast< TF_Tensor * >(argp1);
+  result = (void *)tensorflow::arw(arg1);
+  vresult = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  return vresult;
+fail:
+  return Qnil;
+}
+
+
+SWIGINTERN VALUE
 _wrap_TF_Run_wrapper(int argc, VALUE *argv, VALUE self) {
   TF_Session *arg1 = (TF_Session *) 0 ;
   std::vector< std::string,std::allocator< std::string > > arg2 ;
@@ -16647,6 +16671,7 @@ SWIGEXPORT void Init_Tensorflow(void) {
   rb_define_module_function(mTensorflow, "TF_LoadLibrary", VALUEFUNC(_wrap_TF_LoadLibrary), -1);
   rb_define_module_function(mTensorflow, "TF_GetOpList", VALUEFUNC(_wrap_TF_GetOpList), -1);
   rb_define_module_function(mTensorflow, "TF_NewTensor_wrapper", VALUEFUNC(_wrap_TF_NewTensor_wrapper), -1);
+  rb_define_module_function(mTensorflow, "arw", VALUEFUNC(_wrap_arw), -1);
   rb_define_module_function(mTensorflow, "TF_Run_wrapper", VALUEFUNC(_wrap_TF_Run_wrapper), -1);
   
   SwigClassLong_long.klass = rb_define_class_under(mTensorflow, "Long_long", rb_cObject);
