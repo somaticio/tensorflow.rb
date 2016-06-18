@@ -31,6 +31,8 @@ tree:
 $ bazel build //tensorflow:libtensorflow.so
 $ sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
 ```
+Clone ruby-tensorflow 
+``` git clone https://github.com/Arafatk/ruby-tensorflow.git```
 Copy the cloned tensorflow directory to the dependencies folder.
 In ext/tf 
 ```
