@@ -11,7 +11,7 @@ This repository contains Ruby API for utilizing (Tensorflow)[https://github.com/
 
 - [Bazel](http://www.bazel.io/docs/install.html) 
 - [Tensorflow](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/g3doc/get_started/os_setup.md)
-- [Google-Protobuf] (https://github.com/google/protobuf/tree/master/ruby) (Currently you can install this manually I am going to upload a gem soon.)
+- [Google-Protobuf] (https://github.com/google/protobuf/tree/master/ruby) ( for installation do  ```gem install google-protoc --pre ```)
 - [Swig] (http://www.swig.org/download.html) 
 
 ## Installation
@@ -28,7 +28,6 @@ After you have cloned the repository, run the next commands at the root of the
 tree:
 
 ```sh
-$ gem install google-protoc --pre
 $ bazel build //tensorflow:libtensorflow.so
 $ sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
 ```
