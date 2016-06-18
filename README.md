@@ -32,6 +32,14 @@ tree:
 $ bazel build //tensorflow:libtensorflow.so
 $ sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
 ```
+Copy the cloned tensorflow directory to the dependencies folder.
+In ext/tf 
+```
+ruby extconf.rb
+make
+make install
+```
+You can run tensor.rb in lib folder directly.
 The rest of the instructions are yet to be written 
 ## License
 
