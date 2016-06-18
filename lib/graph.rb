@@ -26,6 +26,14 @@ class Graph
   end
 end
 
+def placeholder()
+
+
+end
 a = Graph.new()
 puts a.availableOps["addn"].input_arg[0]
 puts a.availableOps["addn"]
+
+availableOps = Hash.new
+availableOps["rwewer"] = Tensorflow::AttrValue.new
+b = Tensorflow::NodeDef.new(:name => "wqeq",:op=>"rd", :attr => availableOps)
