@@ -1,4 +1,4 @@
-require_relative 'tensorflow'
+require_relative 'tensor'
 
 class GraphNode
   attr_accessor :def, :ref, :outDataTypes

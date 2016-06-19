@@ -36,7 +36,7 @@ void doer(std::vector<TF_Tensor*> output)
     auto size = TF_TensorByteSize(c);
     auto readed = TF_TensorData(c);
 
-    float* tensor_data = static_cast<float*>(TF_TensorData(c));
+    long long* tensor_data = static_cast<long long*>(TF_TensorData(c));
     long long total_elements = 1;
     for (int i = 0; i < dims; ++i) {
     total_elements *= TF_Dim(c, i);
