@@ -7,7 +7,7 @@ class GraphNode
 end
 
 class Graph
-  attr_accessor :availableOps, :constants, :variables, :graph_def, :op, :placeholder
+  attr_accessor :availableOps, :constants, :variables, :graph_def, :op, :placeholder, :graph_def_raw
   def initialize()
   	self.availableOps = loadAvailableOps()
   end
@@ -25,6 +25,7 @@ class Graph
   def graph_def_from_reader(filename)
   	reader = File.read(filename)
   	self.graph_def = Tensorflow::GraphDef.decode(reader)
+    self.graph_def_raw = reader
   end
 
 
@@ -67,9 +68,11 @@ class Graph
 end
 
 
+'''
 a = Graph.new()
 
 d = Graph.new()
 inpt = [d.placeholder("input1", 4, [3])]
 inpt.push(d.placeholder("input2", 4, [3]))
 a.op_definer("Add","Output", inpt, "", nil)
+'''
