@@ -9,7 +9,7 @@ class Session
   	self.session = Tensorflow::TF_NewSession(self.ops, self.status)
   end
 
-def ruby_array_to_c(array, type)
+  def ruby_array_to_c(array, type)
    c_array = 23
    if type == "long_long"
       c_array = Tensorflow::Long_long.new(array.length)
@@ -46,7 +46,7 @@ def ruby_array_to_c(array, type)
       end
    end
    c_array
-end
+  end
 
   def run(inputs, outputs, targets)
   	inputNames = Tensorflow::String_Vector.new()
@@ -66,6 +66,7 @@ end
   	outputValues = Tensorflow::Tensor_Vector.new()
 	status = Tensorflow::TF_NewStatus()
 	Tensorflow::TF_Run_wrapper(self.session , inputNames, inputValues, outputNames, outputValues, targetNames, status)
+  Tensorflow::doer(outputValues)
   end
 
   def extend_graph(graph)

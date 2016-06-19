@@ -26,7 +26,27 @@ TF_Tensor* TF_NewTensor_wrapper(TF_DataType dtype, long long* dims, int num_dims
 
   return TF_NewTensor(dtype, dims, num_dims, cData, len, [](void *cData, size_t len, void* arg){
       }, nullptr);
+};
+
+void doer(std::vector<TF_Tensor*> output)
+{
+	auto c = output[0];
+    auto type = TF_TensorType(c);
+    auto dims = TF_NumDims(c);
+    auto size = TF_TensorByteSize(c);
+    auto readed = TF_TensorData(c);
+
+    float* tensor_data = static_cast<float*>(TF_TensorData(c));
+    long long total_elements = 1;
+    for (int i = 0; i < dims; ++i) {
+    total_elements *= TF_Dim(c, i);
 }
+
+// Print every element of the tensor:
+for (int i = 0; i < total_elements; ++i) {
+    std::cout << tensor_data[i];std::cout << "  \n";
+}
+};
 
 }  // namespace tensorflow
 
