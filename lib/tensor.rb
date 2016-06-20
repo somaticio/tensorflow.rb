@@ -93,7 +93,8 @@ class Tensor
   end
 end
 
-a = Tensor.new([[[2.4,2.3,45.6],[31.23,4.4,5.32]],[[2.4,2.3,45.6],[31.23,4.4,5.32]],[[2.4,2.3,45.6],[31.23,4.4,5.32]]])
+a = Tensor.new([[1,2],[3,4]])
+
 outputValues = Tensorflow::Tensor_Vector.new()
 outputValues.push(a.tensor)
 #d = Tensorflow::print_tensor(a.tensor)

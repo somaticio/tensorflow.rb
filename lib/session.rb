@@ -68,28 +68,17 @@ class Session
 
   	outputValues = Tensorflow::Tensor_Vector.new()
    	status = Tensorflow::TF_NewStatus()
-    Tensorflow::doer(inputValues)
 	  Tensorflow::TF_Run_wrapper(self.session , inputNames, inputValues, outputNames, outputValues, targetNames, self.status)
-    puts Tensorflow::TF_GetCode(status) == Tensorflow::TF_OK
+    raise ("Incorrect specifications passed.")  if Tensorflow::TF_GetCode(status) != Tensorflow::TF_OK
+    Tensorflow::print_tensor(outputValues[0])
     #make sure you can take out your stuff from here so that You can verfiy some results
   end
 
   def extend_graph(graph)
   	self.status = Tensorflow::TF_NewStatus()
-  	ere = File.read('test_graph.pb')
-  	Tensorflow::TF_ExtendGraph(self.session, ruby_array_to_c(ere, "char"), ere.length, self.status)
+  	Tensorflow::TF_ExtendGraph(self.session, ruby_array_to_c(graph.graph_def_raw, "char"), graph.graph_def_raw.length, self.status)
   	self.graph = graph
   end
 end
-a = Session.new()
-b = Tensor.new([[[1,2],[3,4]],[[5,6],[7,8]]])
-c = Tensor.new([[[9,10],[11,12]],[[13,14],[15,16]]])
-input = Hash.new
-input["input1"] = c.tensor
-input["input2"] = b.tensor
 
-a = Graph.new()
-a.graph_def_from_reader("test_graph.pb")
-b = Session.new()
-b.extend_graph(a)
-b.run(input,["output"],["tas"])
+

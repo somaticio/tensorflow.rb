@@ -22,7 +22,7 @@ class Graph
     availableOps
   end
 
-  def graph_def_from_reader(filename)
+  def graph_from_reader(filename)
   	reader = File.read(filename)
   	self.graph_def = Tensorflow::GraphDef.decode(reader)
     self.graph_def_raw = reader
