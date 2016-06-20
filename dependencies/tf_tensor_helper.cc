@@ -28,25 +28,25 @@ TF_Tensor* TF_NewTensor_wrapper(TF_DataType dtype, long long* dims, int num_dims
       }, nullptr);
 };
 
-void doer(std::vector<TF_Tensor*> output)
+void print_tensor(TF_Tensor* tensor)
 {
-	auto c = output[0];
-    auto type = TF_TensorType(c);
-    auto dims = TF_NumDims(c);
-    auto size = TF_TensorByteSize(c);
-    auto readed = TF_TensorData(c);
-
-    long long* tensor_data = static_cast<long long*>(TF_TensorData(c));
+    auto dimension_num = TF_NumDims(tensor);
+    auto size = TF_TensorByteSize(tensor);
+    auto type = TF_TensorType(tensor);
     long long total_elements = 1;
-    for (int i = 0; i < dims; ++i) {
-    total_elements *= TF_Dim(c, i);
-}
-
-// Print every element of the tensor:
-for (int i = 0; i < total_elements; ++i) {
-    std::cout << tensor_data[i];std::cout << "  \n";
-}
+    for (int i = 0; i < dimension_num; ++i) total_elements *= TF_Dim(tensor, i);
+    if (type == 9) {long long* tensor_data = static_cast<long long *>(TF_TensorData(tensor));
+    for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
+    }
+    else if (type == 2 ){ double* tensor_data = static_cast<double *>(TF_TensorData(tensor));
+    for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
+    }
+    else if (type == 7 ){ std::string* tensor_data = static_cast<std::string *>(TF_TensorData(tensor));
+    for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
+    }
+    std::cout << "\n";
 };
+
 
 }  // namespace tensorflow
 

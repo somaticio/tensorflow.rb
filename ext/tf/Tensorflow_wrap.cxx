@@ -14732,22 +14732,20 @@ fail:
 
 
 SWIGINTERN VALUE
-_wrap_doer(int argc, VALUE *argv, VALUE self) {
-  std::vector< TF_Tensor *,std::allocator< TF_Tensor * > > arg1 ;
+_wrap_print_tensor(int argc, VALUE *argv, VALUE self) {
+  TF_Tensor *arg1 = (TF_Tensor *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
   
   if ((argc < 1) || (argc > 1)) {
     rb_raise(rb_eArgError, "wrong # of arguments(%d for 1)",argc); SWIG_fail;
   }
-  {
-    std::vector< TF_Tensor*,std::allocator< TF_Tensor * > > *ptr = (std::vector< TF_Tensor*,std::allocator< TF_Tensor * > > *)0;
-    int res = swig::asptr(argv[0], &ptr);
-    if (!SWIG_IsOK(res) || !ptr) {
-      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), Ruby_Format_TypeError( "", "std::vector< TF_Tensor *,std::allocator< TF_Tensor * > >","tensorflow::doer", 1, argv[0] )); 
-    }
-    arg1 = *ptr;
-    if (SWIG_IsNewObj(res)) delete ptr;
+  res1 = SWIG_ConvertPtr(argv[0], &argp1,SWIGTYPE_p_TF_Tensor, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "TF_Tensor *","tensorflow::print_tensor", 1, argv[0] )); 
   }
-  tensorflow::doer(arg1);
+  arg1 = reinterpret_cast< TF_Tensor * >(argp1);
+  tensorflow::print_tensor(arg1);
   return Qnil;
 fail:
   return Qnil;
@@ -16670,7 +16668,7 @@ SWIGEXPORT void Init_Tensorflow(void) {
   rb_define_module_function(mTensorflow, "TF_LoadLibrary", VALUEFUNC(_wrap_TF_LoadLibrary), -1);
   rb_define_module_function(mTensorflow, "TF_GetOpList", VALUEFUNC(_wrap_TF_GetOpList), -1);
   rb_define_module_function(mTensorflow, "TF_NewTensor_wrapper", VALUEFUNC(_wrap_TF_NewTensor_wrapper), -1);
-  rb_define_module_function(mTensorflow, "doer", VALUEFUNC(_wrap_doer), -1);
+  rb_define_module_function(mTensorflow, "print_tensor", VALUEFUNC(_wrap_print_tensor), -1);
   rb_define_module_function(mTensorflow, "TF_Run_wrapper", VALUEFUNC(_wrap_TF_Run_wrapper), -1);
   
   SwigClassLong_long.klass = rb_define_class_under(mTensorflow, "Long_long", rb_cObject);

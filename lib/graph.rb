@@ -29,10 +29,9 @@ class Graph
   end
 
 
-
   def placeholder(name, type_enum, dims)
     op = GraphNode.new()
-    op.def = Tensorflow::NodeDef.new(:name => name,:op=> "Placeholder", :attr => Hash.new)
+    op.def = Tensorflow::NodeDef.new(:name => name,:op => "Placeholder", :attr => Hash.new)
     op.outDataTypes = Hash.new
     op.def.attr["dtype"] =  Tensorflow::AttrValue.new(:type => type_enum)
     dim_array = []
@@ -40,6 +39,8 @@ class Graph
       dim_array.push(Tensorflow::TensorShapeProto::Dim.new(:size => i))
     end
     op.def.attr["shape"] = Tensorflow::AttrValue.new(:shape => Tensorflow::TensorShapeProto.new(:dim => dim_array))
+    self.graph_def = Tensorflow::GraphDef.new()  if !self.graph_def
+    self.graph_def.node.push(op.def)
     op
   end
 
@@ -50,7 +51,7 @@ class Graph
     raise ("Invalid number of inputs.") if op.input_arg.length != input.length
     inputs = []
     input.each do |node|
-       inputs.push(node.def.name)
+      inputs.push(node.def.name)
     end
     node = GraphNode.new()
     node.def = Tensorflow::NodeDef.new(:name => name, :op => opName, :input => inputs, :device => device , :attr => Hash.new)
@@ -62,17 +63,15 @@ class Graph
   def matchTypes(input, outnode, attrs, op)
     (0..op.input_arg.length - 1).each do |i|
       inType = input[i].outDataTypes[input[i].def.name]
-      #if inTypeDefined && inType != DTInvalid && arg.TypeAttr != "" { attrs[arg.TypeAttr] = inType }
+      attrs[op.input_arg[i].type_attr] = inType   if inType and op.input_arg[i].type_attr
+    end
+    (0..op.output_arg.length - 1).each do |i|
+      argType = op.output_arg[i].type
     end
   end
 end
 
-
-'''
 a = Graph.new()
-
-d = Graph.new()
-inpt = [d.placeholder("input1", 4, [3])]
-inpt.push(d.placeholder("input2", 4, [3]))
-a.op_definer("Add","Output", inpt, "", nil)
-'''
+inp1 = a.placeholder("input1", Tensorflow::TF_INT64, [3])
+inp2 = a.placeholder("input2", Tensorflow::TF_INT64, [3])
+a.op_definer("Add","Output",[inp1, inp2], "", nil)
