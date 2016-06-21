@@ -2699,12 +2699,12 @@ SWIG_From_ptrdiff_t  (ptrdiff_t value)
 #include <vector>
 
 
-#include "./../../dependencies/tensorflow/tensorflow/core/public/tensor_c_api.h"     
-#include "./../../dependencies/tensorflow/tensorflow/core/public/version.h"
-#include "./../../dependencies/tf_tensor_helper.h"
-#include "./../../dependencies/tf_tensor_helper.cc"
-#include "./../../dependencies/tf_session_helper.h"
-#include "./../../dependencies/tf_session_helper.cc"
+#include "./files/tensor_c_api.h"     
+#include "./files/version.h"
+#include "./files/tf_tensor_helper.h"
+#include "./files/tf_tensor_helper.cc"
+#include "./files/tf_session_helper.h"
+#include "./files/tf_session_helper.cc"
 
 
 SWIGINTERN swig_type_info*

@@ -1,3 +1,8 @@
-require_relative 'graph'
-require_relative 'session'
-require_relative 'tensor'
+class Hola
+  def self.hi
+    puts "Hello world!"
+  end
+end
+require 'tensorflow/core/framework/tensor'
+require 'tensorflow/core/framework/graph'
+require 'tf/Tensorflow'
