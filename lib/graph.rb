@@ -1,15 +1,18 @@
-class GraphNode
-  attr_accessor :def, :ref, :outDataTypes
-  def initialize
-  end
-end
-
+# A TensorFlow computation, represented as a dataflow graph.
+# A Graph contains a set of Operation objects, which represent units of computation; and Tensor objects, which represent the units of data that flow between operations.
+# 
 class Graph
   attr_accessor :availableOps, :constants, :variables, :graph_def, :op, :placeholder, :graph_def_raw
   def initialize()
   	self.availableOps = loadAvailableOps()
   end
 
+  #
+  # Loads the available ops from ops.pb file and then decodes into a list of operations. 
+  #
+  # * *Returns* :
+  #   - A hashmap with name of the op as key and value as the op.
+  #
   def loadAvailableOps()
   	ops_reader = File.read(File.dirname(__FILE__)+'/ops.pb')
     op_list = Tensorflow::OpList.decode(ops_reader)
@@ -20,13 +23,18 @@ class Graph
     availableOps
   end
 
+  #
+  # Loads a graph stored in pb file into a graph def. This way you can define the graph
+  # in python, save it in pb file and load it in ruby.
+  #
   def graph_from_reader(filename)
   	reader = File.read(filename)
   	self.graph_def = Tensorflow::GraphDef.decode(reader)
     self.graph_def_raw = reader
   end
 
-
+  # adds a placeholder to the Graph, a placeholder is an 
+  # operation that must be fed with data on execution.
   def placeholder(name, type_enum, dims)
     op = GraphNode.new()
     op.def = Tensorflow::NodeDef.new(:name => name,:op => "Placeholder", :attr => Hash.new)
@@ -66,5 +74,12 @@ class Graph
     (0..op.output_arg.length - 1).each do |i|
       argType = op.output_arg[i].type
     end
+  end
+end
+
+
+class GraphNode
+  attr_accessor :def, :ref, :outDataTypes
+  def initialize
   end
 end
