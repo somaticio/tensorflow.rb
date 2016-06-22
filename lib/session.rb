@@ -77,5 +77,3 @@ class Session
   	self.graph = graph
   end
 end
-
-

@@ -5,15 +5,15 @@ This gem is currently a work in progress and is not functional.
 However very soon the whole project will be uploaded on ruby gems.   
 
 ## Description
-This repository contains Ruby API for utilizing (Tensorflow) [https://github.com/tensorflow/tensorflow].
+This repository contains Ruby API for utilizing (Tensorflow)[https://github.com/tensorflow/tensorflow].
 
 ## Dependencies 
 
 - [Bazel](http://www.bazel.io/docs/install.html) 
 - [Tensorflow](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/g3doc/get_started/os_setup.md)
-- [Google-Protoc gem] (https://github.com/google/protobuf/tree/master/ruby) ( for installation do  ```gem install google-protoc --pre ```)
-- [Protobuf] (https://github.com/google/protobuf)
-- [Swig] (http://www.swig.org/download.html) 
+- [Google-Protoc gem](https://github.com/google/protobuf/tree/master/ruby) ( for installation do  ```gem install google-protoc --pre ```)
+- [Protobuf](https://github.com/google/protobuf)
+- [Swig](http://www.swig.org/download.html) 
 
 ## Installation
 

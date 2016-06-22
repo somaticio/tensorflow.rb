@@ -68,8 +68,3 @@ class Graph
     end
   end
 end
-
-a = Graph.new()
-inp1 = a.placeholder("input1", Tensorflow::TF_INT64, [3])
-inp2 = a.placeholder("input2", Tensorflow::TF_INT64, [3])
-a.op_definer("Add","Output",[inp1, inp2], "", nil)

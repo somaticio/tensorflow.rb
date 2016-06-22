@@ -1,5 +1,36 @@
+# Tensor is an n-dimensional array or list which represents a value produced by an Operation.
+# A tensor has a rank, and a shape.
+# A Tensor is a symbolic handle to one of the outputs of an Operation. It does not hold the values of that 
+# operation's output, but instead provides a means of computing those values in a TensorFlow Session.
+# This class has two primary purposes:
+# * *Description* :
+#   - A Tensor can be passed as an input to another Operation. This builds a dataflow connection between 
+#   operations, which enables TensorFlow to execute an entire Graph that represents a large, multi-step 
+#   computation.
+#
+#   - After the graph has been launched in a session, the value of the Tensor can be computed by passing it to
+#   Session.run(). t.eval() is a shortcut for calling tf.get_default_session().run(t).
+# The Tensor class takes array as input and creates a Tensor from it usng SWIG. 
+# * *Arguments* :
+#   - +*dimensions*+ -> Contains the dimensions of the tensor in an array.
+#   - +*type*+ -> Data type of the tensor. (It is best if proper design decision is made regarding this. Because Currently data type support is limited to int64 and double.)
+#   - +*rank*+ -> Rank of the Tensor.
+#   - +*type_num*+ -> The enum value of data type.
+#   - +*serialized*+ -> Flattened data array.
+#   - +*tensor_data*+ -> Serialized data in the form of a c array.
+#   - +*dimension_data*+ -> Dimensions of the tensor in the form of a c array.
+#   - +*tensor_shape_proto*+ -> The shape of the Tensor in Ruby protocol buffers.(To be used later with ops).
+#
+# * *Examples* :
+#     x, y = NMatrix::meshgrid([[1, [2, 3]], [4, 5]])
+#     x.to_a #<= [[1, 2, 3], [1, 2, 3]]
+#     y.to_a #<= [[4, 4, 4], [5, 5, 5]]
+#
+
 class Tensor
   attr_accessor :dimensions, :type , :rank, :type_num, :serialized, :tensor_data, :dimension_data, :tensor, :data_size, :tensor_shape_proto
+  # @!attribute dimensions
+  #  Contains the dimensions of the tensor in an array.
   def initialize(data)
     self.dimensions = dimension_finder(data)  if data.is_a?(Array) 
     raise("Incorrect dimensions specified in the input.") if self.dimensions == nil && data.is_a?(Array) 
@@ -12,7 +43,22 @@ class Tensor
     self.dimension_data = ruby_array_to_c(self.dimensions, Tensorflow::TF_INT64)
     self.tensor = Tensorflow::TF_NewTensor_wrapper(self.type_num, self.dimension_data, self.dimensions.length, self.tensor_data , self.data_size * self.serialized.length)
   end
-
+  #
+  # call-seq:
+  #     invert -> NMatrix
+  #
+  # Make a copy of the matrix, then invert using Gauss-Jordan elimination.
+  # Works without LAPACK.
+  #
+  # * *Returns* :
+  #   - A dense NMatrix. Will be the same type as the input NMatrix,
+  #   except if the input is an integral dtype, in which case it will be a
+  #   :float64 NMatrix.
+  #
+  # * *Raises* :
+  #   - +StorageTypeError+ -> only implemented on dense matrices.
+  #   - +ShapeError+ -> matrix must be square.
+  #
   def shape_proto(array)
     dimensions = []
     array.each do |i|
@@ -73,10 +119,20 @@ class Tensor
     c_array
   end
 
+  #
+  # Returns the value of the element contained in the specified position in the tensor.
+  #
+  # * *Returns* :
+  #   - value of the element contained in the specified position in the tensor.
+  #
+  # * *Raises* :
+  #   - +StorageTypeError+ -> only implemented on dense matrices.
+  #   - +ShapeError+ -> matrix must be square.
+  #
   def getval(dimension)
-    raise("Invalid array passed as input.") if dimension.length != self.dimensions.length
+    raise("Invalid array passed as input.",ShapeError) if dimension.length != self.dimensions.length
     (0..dimension.length-1).each do |i|
-      raise("Invalid array passed as input.") if dimension[i] > self.dimensions[i] || dimension[i] < 1
+      raise("Invalid array passed as input.",ShapeError) if dimension[i] > self.dimensions[i] || dimension[i] < 1
     end
     sum = dimension[dimension.length - 1]  - 1
     prod = self.dimensions[self.dimensions.length - 1]
