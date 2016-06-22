@@ -1,9 +1,5 @@
 # Ruby-Tensorflow
 
-## Disclaimer
-This gem is currently a work in progress and is not properly functional.   
-However very soon the whole project will be uploaded on ruby gems.   
-
 ## Description
 This repository contains Ruby API for utilizing (Tensorflow) [https://github.com/tensorflow/tensorflow].
 
@@ -35,16 +31,17 @@ sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
 Clone ruby-tensorflow 
 ``` git clone https://github.com/Arafatk/ruby-tensorflow.git```
 Copy the cloned tensorflow directory to the dependencies folder.
-In ext/
+The in the root directory of the gem do 
+```
+bundle exec rake install
+```
+If you still recieve some errors then go to ext/ in the cloned gem and do.
 ```
 ruby extconf.rb
 make
 make install
 ```
-The in the root directory of the gem do 
-```
-bundle install
-```
+
 
 ## License
 

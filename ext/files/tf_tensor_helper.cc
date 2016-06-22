@@ -47,6 +47,25 @@ void print_tensor(TF_Tensor* tensor)
     std::cout << "\n";
 };
 
+long long tensor_size(TF_Tensor* tensor)
+{
+  auto dimension_num = TF_NumDims(tensor);
+  long long total_elements = 1;
+  for (auto i = 0; i < dimension_num; ++i) total_elements *= TF_Dim(tensor, i);
+  return total_elements;
+};
+
+void long_long_reader(TF_Tensor* tensor, long long* array, int size_we)
+{
+    long long* tensor_data = static_cast<long long *>(TF_TensorData(tensor));
+    for (int i = 0; i < size_we; ++i) array[i] = tensor_data[i];
+};
+
+void double_reader(TF_Tensor* tensor, double* array, int size_we)
+{
+    double* tensor_data = static_cast<double *>(TF_TensorData(tensor));
+    for (int i = 0; i < size_we; ++i) array[i] = tensor_data[i];
+};
 
 }  // namespace tensorflow
 

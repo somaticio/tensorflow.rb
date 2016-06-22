@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe "Tensor" do 
 	it "Should Give correct results." do 
-	  err = 1e-4
+	err = 1e-4
       input1 = Tensor.new([[1,2],[3,4]])
       input2 = Tensor.new([[7,3],[4,21]])
       graph = Graph.new()
@@ -10,9 +10,9 @@ describe "Tensor" do
       session = Session.new()
       session.extend_graph(graph)
       inputs = Hash.new
- 	  inputs['input1'] = input1.tensor
-	  inputs['input2'] = input2.tensor
-	  session.run(inputs, ['output'], [])
-	  expect(1).to be_within(err).of(1)
+      inputs['input1'] = input1.tensor
+	inputs['input2'] = input2.tensor
+	result = session.run(inputs, ['output'], [])
+	expect(result ).to match_array([[8,5,7,25]])
 	end
 end

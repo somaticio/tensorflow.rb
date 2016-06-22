@@ -95,7 +95,21 @@ class Session
    	status = Tensorflow::TF_NewStatus()
 	  Tensorflow::TF_Run_wrapper(self.session , inputNames, inputValues, outputNames, outputValues, targetNames, self.status)
     raise ("Incorrect specifications passed.")  if Tensorflow::TF_GetCode(status) != Tensorflow::TF_OK
-    Tensorflow::print_tensor(outputValues[0])
+    output_array = []
+    (0..outputValues.size - 1).each do |i|
+      size = Tensorflow::tensor_size(outputValues[i])
+      type = Tensorflow::TF_TensorType(outputValues[i])
+      c_array = Tensorflow::Double.new(size)    if type == 2
+      Tensorflow::double_reader(outputValues[i], c_array, size) if type == 2
+      c_array = Tensorflow::Long_long.new(size) if type == 9
+      Tensorflow::long_long_reader(outputValues[i], c_array, size) if type == 9
+      output = []
+      (0..size - 1).each do |j|
+         output.push(c_array[j])
+       end
+       output_array.push(output)
+    end
+    output_array
     #make sure you can take out your stuff from here so that You can verfiy some results
   end
 
