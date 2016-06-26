@@ -76,10 +76,12 @@ class Session
   def run(inputs, outputs, targets)
   	inputNames = Tensorflow::String_Vector.new()
   	inputValues = Tensorflow::Tensor_Vector.new()
-  	inputs.each do |key, value|
-  		inputValues.push(value)
-  		inputNames.push(key)
-  	end
+    if inputs != nil
+  	  inputs.each do |key, value|
+  		  inputValues.push(value)
+  		  inputNames.push(key)
+  	  end
+    end
 
   	outputNames = Tensorflow::String_Vector.new()
   	outputs.each do |name|
@@ -87,9 +89,11 @@ class Session
   	end
 
   	targetNames = Tensorflow::String_Vector.new()
-  	targets.each do |name|
-  		targetNames.push(name)
-  	end
+    if targets != nil
+  	  targets.each do |name|
+  		  targetNames.push(name)
+  	  end
+    end
 
   	outputValues = Tensorflow::Tensor_Vector.new()
    	status = Tensorflow::TF_NewStatus()

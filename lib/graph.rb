@@ -71,9 +71,14 @@ class Graph
       inType = input[i].outDataTypes[input[i].def.name]
       attrs[op.input_arg[i].type_attr] = inType   if inType and op.input_arg[i].type_attr
     end
+
     (0..op.output_arg.length - 1).each do |i|
       argType = op.output_arg[i].type
+      if op.output_arg[i].type_attr
+         attrs[op.output_arg[i].type_attr] = argType
+      end
     end
+
   end
 end
 
