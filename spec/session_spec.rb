@@ -1,13 +1,5 @@
 require 'spec_helper'
 
-def loadAndExtendGraphFromFile(filename)
-  session = Session.new()
-  graph = Graph.new()
-  graph.graph_from_reader(File.dirname(__FILE__)+'/example_graphs/'+filename)
-  session.extend_graph(graph)
-  session
-end
-
 describe "Session" do 
   it "Should give correct results for adding two arrays." do 
     s = loadAndExtendGraphFromFile('add_three_dim_graph.pb')
