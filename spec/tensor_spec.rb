@@ -11,6 +11,6 @@ describe "Tensor" do
     inputs['input1'] = input1.tensor
     inputs['input2'] = input2.tensor
     result = session.run(inputs, ['output'], [])
-    expect(result ).to match_array([[8,5,7,25]])
+    expect(result[0]).to match_array([[8, 5], [7, 25]])
   end
 end

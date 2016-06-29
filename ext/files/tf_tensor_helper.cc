@@ -41,6 +41,9 @@ void print_tensor(TF_Tensor* tensor)
     else if (type == 2 ){ double* tensor_data = static_cast<double *>(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
     }
+    else if (type == 3 ){ int* tensor_data = static_cast<int *>(TF_TensorData(tensor));
+    for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
+    }
     else if (type == 7 ){ std::string* tensor_data = static_cast<std::string *>(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
     }
@@ -58,6 +61,12 @@ long long tensor_size(TF_Tensor* tensor)
 void long_long_reader(TF_Tensor* tensor, long long* array, int size_we)
 {
     long long* tensor_data = static_cast<long long *>(TF_TensorData(tensor));
+    for (int i = 0; i < size_we; ++i) array[i] = tensor_data[i];
+};
+
+void int_reader(TF_Tensor* tensor, int* array, int size_we)
+{
+    int* tensor_data = static_cast<int *>(TF_TensorData(tensor));
     for (int i = 0; i < size_we; ++i) array[i] = tensor_data[i];
 };
 

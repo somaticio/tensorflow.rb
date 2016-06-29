@@ -14814,6 +14814,43 @@ fail:
 
 
 SWIGINTERN VALUE
+_wrap_int_reader(int argc, VALUE *argv, VALUE self) {
+  TF_Tensor *arg1 = (TF_Tensor *) 0 ;
+  int *arg2 = (int *) 0 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  
+  if ((argc < 3) || (argc > 3)) {
+    rb_raise(rb_eArgError, "wrong # of arguments(%d for 3)",argc); SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0], &argp1,SWIGTYPE_p_TF_Tensor, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), Ruby_Format_TypeError( "", "TF_Tensor *","tensorflow::int_reader", 1, argv[0] )); 
+  }
+  arg1 = reinterpret_cast< TF_Tensor * >(argp1);
+  res2 = SWIG_ConvertPtr(argv[1], &argp2,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), Ruby_Format_TypeError( "", "int *","tensorflow::int_reader", 2, argv[1] )); 
+  }
+  arg2 = reinterpret_cast< int * >(argp2);
+  ecode3 = SWIG_AsVal_int(argv[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), Ruby_Format_TypeError( "", "int","tensorflow::int_reader", 3, argv[2] ));
+  } 
+  arg3 = static_cast< int >(val3);
+  tensorflow::int_reader(arg1,arg2,arg3);
+  return Qnil;
+fail:
+  return Qnil;
+}
+
+
+SWIGINTERN VALUE
 _wrap_double_reader(int argc, VALUE *argv, VALUE self) {
   TF_Tensor *arg1 = (TF_Tensor *) 0 ;
   double *arg2 = (double *) 0 ;
@@ -16769,6 +16806,7 @@ SWIGEXPORT void Init_Tensorflow(void) {
   rb_define_module_function(mTensorflow, "print_tensor", VALUEFUNC(_wrap_print_tensor), -1);
   rb_define_module_function(mTensorflow, "tensor_size", VALUEFUNC(_wrap_tensor_size), -1);
   rb_define_module_function(mTensorflow, "long_long_reader", VALUEFUNC(_wrap_long_long_reader), -1);
+  rb_define_module_function(mTensorflow, "int_reader", VALUEFUNC(_wrap_int_reader), -1);
   rb_define_module_function(mTensorflow, "double_reader", VALUEFUNC(_wrap_double_reader), -1);
   rb_define_module_function(mTensorflow, "TF_Run_wrapper", VALUEFUNC(_wrap_TF_Run_wrapper), -1);
   

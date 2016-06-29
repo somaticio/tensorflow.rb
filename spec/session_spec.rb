@@ -9,7 +9,7 @@ describe "Session" do
     input["input1"] = input1.tensor
     input["input2"] = input2.tensor
     result = s.run(input, ["output"], nil)
-    expect(result).to match_array([[4,6,8]])
+    expect(result[0]).to match_array([4,6,8])
   end
 
   it "Should give correct results for adding two multi dimensional tensors." do 
@@ -20,6 +20,6 @@ describe "Session" do
     input["input1"] = input1.tensor
     input["input2"] = input2.tensor
     result = s.run(input, ["output"], nil)
-    expect(result).to match_array([[52, 47, 86, 83, 112, 66, 16, 86]])
+    expect(result[0]).to match_array([[[52, 47], [86, 83]], [[112, 66], [16, 86]]])
   end
 end

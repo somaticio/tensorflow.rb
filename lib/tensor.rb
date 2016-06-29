@@ -40,13 +40,14 @@ class Tensor
   # @attribute tensor_shape_proto
   #  Returns the shape of the Tensor in Ruby protocol buffers.(To be used later with ops).
 
-  def initialize(data)
+  def initialize(data, type = nil)
     self.dimensions = dimension_finder(data)  if data.is_a?(Array) 
     raise("Incorrect dimensions specified in the input.") if self.dimensions == nil && data.is_a?(Array) 
     self.rank = 0
     self.rank = self.dimensions.size if data.is_a?(Array)
     self.tensor_shape_proto = shape_proto(self.dimensions) if self.dimensions.is_a?(Array)
-    self.type = type_finder(data) 
+    self.type = type_setter(type) if type != nil
+    self.type = type_finder(data) if type == nil
     self.serialized = data.flatten
     self.tensor_data = ruby_array_to_c(self.serialized, self.type_num)
     self.dimension_data = ruby_array_to_c(self.dimensions, Tensorflow::TF_INT64)
@@ -67,6 +68,24 @@ class Tensor
     Tensorflow::TensorShapeProto.new(:dim => dimensions)
   end
 
+  def type_setter(type)
+    case type
+    when :float64
+      self.type_num = Tensorflow::TF_DOUBLE
+      self.data_size = 8
+      self.type = Float
+    when :int64
+      self.type_num = Tensorflow::TF_INT64
+      self.data_size = 8
+      self.type = Integer
+    when :int32
+      self.type_num = Tensorflow::TF_INT32
+      self.data_size = 4
+      self.type = Integer
+    else
+      raise "Data type not supported."
+    end
+  end
   #
   # Recursively finds the dimensions of the input array. 
   #
@@ -109,8 +128,22 @@ class Tensor
       raise "Data type not supported."
     end
     return type if self.rank == 0 
-    data.flatten.each do |i|
-      raise "Different data types in array." if !(i.is_a?  (type)) 
+    if type == Integer  || type == Float
+      float_flag = 0
+      float_flag = 1 if type == Float
+      data.flatten.each do |i|
+        raise "Different data types in array." if !(i.is_a? (Float) or i.is_a? (Integer))
+        float_flag = 1 if i.is_a? (Float)
+      end
+      if float_flag == 1
+        type = Float
+        self.type_num = Tensorflow::TF_DOUBLE
+        self.data_size = 8
+      end
+    else
+      data.flatten.each do |i|
+        raise "Different data types in array." if !(i.is_a?  (type))
+      end
     end
     type
   end
@@ -129,8 +162,12 @@ class Tensor
       c_array = Tensorflow::Long_long.new(array.length)
       (0..array.length-1).each do |i|
         c_array[i] = array[i]
-    end
-    # Take care of strings and characters and float
+      end
+    elsif type == Tensorflow::TF_INT32
+      c_array = Tensorflow::Int.new(array.length)
+      (0..array.length-1).each do |i|
+        c_array[i] = array[i]
+      end
     else
       c_array = Tensorflow::Double.new(array.length)
       (0..array.length-1).each do |i|

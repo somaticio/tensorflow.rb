@@ -19,7 +19,7 @@ class Graph
     op_list = Tensorflow::OpList.decode(ops_reader)
     availableOps = Hash.new
     (0..op_list.op.length - 1).each do |i|
-      availableOps[op_list.op[i].name.downcase!] = op_list.op[i]
+      availableOps[op_list.op[i].name.downcase] = op_list.op[i]
     end
     availableOps
   end
@@ -55,9 +55,19 @@ class Graph
     op
   end
 
+  #
+  # TensorFlow represents computations as graphs. Nodes in the graph are called ops (short for operations).
+  # An op takes zero or more Tensors, performs some computation, and produces zero or
+  # more Tensors. This function helps to define ops directly in ruby and
+  # uses the support of google protoc gem.
+  #
+  # * *Returns* :
+  #   - Graph with ops defined
+  #
   def op_definer(opName, name , input, device, attrs)
     op = self.availableOps[opName.downcase]
-    raise ("Operation not found.") if !op 
+    raise ("Operation does not exist.") if !op
+    opName = op.name   # This ensures that case-sensitivity does not become an issue
     raise ("Invalid number of inputs.") if op.input_arg.length != input.length
     inputs = []
     input.each do |node|
@@ -66,57 +76,60 @@ class Graph
     node = GraphNode.new()
     node.def = Tensorflow::NodeDef.new(:name => name, :op => opName, :input => inputs, :device => device , :attr => Hash.new)
     attrs = Hash.new if attrs == nil
-    op.attr.each do |i|
-      node.def.attr[i.name] = Tensorflow::AttrValue.new(:type => 9)
+    matchTypes(input, node, attrs, op)
+    op.attr.each do |attribute|
+      if attrs[attribute.name]
+        node.def.attr[attribute.name] = make_attr_value(attribute.name, attrs[attribute.name]) #make_attr_value(attribute.type, attrs[attribute.name])
+      elsif attribute.default_value
+        node.def.attr[attribute.name] = attribute.default_value
+      end
     end
     self.graph_def.node.push(node.def)
     node
   end
 
-  # we pass 4 things into the input a set of passed as placeholder input 
-  # node is a new graphnode class with the names of the inputs 
-  # attrs is a has of the possible attributes 
-  # op is the name of operation that you wish to load 
-  # input You pass a group of grahnodes as inputs and these could be the tensors to be added to get the resutls
-  # input type is the type enum which in this case is for int 64 so 
-  # I am saying that the output data type for the input is int 64 
+  def make_attr_value(attribute_type, value)
+      # TODO -> Add support for all types
+      result = nil
+      if attribute_type == "T"
+        result = Tensorflow::AttrValue.new(:type => value)
+      end
+      result
+  end
+
+  def type_to_enum(type)
+    type_val = 0
+    type_val = Tensorflow::TF_FLOAT if type == :DT_FLOAT
+    type_val = Tensorflow::TF_DOUBLE if type == :DT_DOUBLE
+    type_val = Tensorflow::TF_INT64 if type == :DT_INT64
+    type_val
+  end
+
+  # Matches input/output parameters with corresponding data types.
   def matchTypes(input, outnode, attrs, op)
-  #  	puts op.name
     (0..op.input_arg.length - 1).each do |i|
-      inType = input[i].outDataTypes[input[i].def.name] 
-  #      puts op.input_arg[i].type_attr  => Type attribute     T of addition op
-  #      puts inType                     => this is the type enum 9
+      inType = input[i].outDataTypes[input[i].def.name]
       attrs[op.input_arg[i].type_attr] = inType   if inType != 0 and op.input_arg[i].type_attr
     end
 
     (0..op.output_arg.length - 1).each do |i|
-      argType = op.output_arg[i].type
-  #   print argType, "This is arg\n" , op.input_arg[i].type, " This is another\n"
-  #   Look closesly at all the code up until now and you will see that 
-  #   All the data type here is not defined in ops anywhere So atleast in this case 
-  #    of addition it says that the type is undefined which is understandable
-  #  if op.output_arg[i].type_attr 
-  #     attrs[op.output_arg[i].type_attr] = argType 
-  #  end
-  # in this case since the output HAS TO BE INVALID YOU CAN JUST IGNORE IT
+      argType = type_to_enum(op.output_arg[i].type)
+      if op.output_arg[i].type_attr != ""  and argType != 0
+        attrs[op.output_arg[i].type_attr] = argType  # TODO
+      end
     end
-  #    puts "This shows that the types are not really valid as input and output arg don't have a type"
 
-  #    puts op.summary 
     op.attr.each do |attribute|
       if attribute.type == "type"
         isTypeProvided = attrs[attribute.name]
-        # In this case nothing happens as itypeprovided is already defined no true
-          # This is still to be understood in a better way 
-#        puts isTypeProvided
+        attrs[attribute.name] = type_to_enum(attribute.default_value)  if !isTypeProvided
       end
     end
 
     op.output_arg.each do |arg|
- #     puts attrs[arg.type_attr] # => this gives the result 9 which is cool
- #     puts arg.type_attr
+      argType = type_to_enum(arg.type)
       outnode.outDataTypes[outnode.def.name] = attrs[arg.type_attr]
- 	  #puts arg.name
+      # TODO
     end
     nil
   end
