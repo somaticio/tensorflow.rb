@@ -1,7 +1,7 @@
 # Ruby-Tensorflow
 
 ## Description
-This repository contains Ruby API for utilizing (Tensorflow) [https://github.com/tensorflow/tensorflow].
+This repository contains Ruby API for utilizing [Tensorflow](https://github.com/tensorflow/tensorflow).
 
 ## Dependencies 
 
@@ -13,35 +13,39 @@ This repository contains Ruby API for utilizing (Tensorflow) [https://github.com
 
 ## Installation
 
-All the dependencies mentioned above must be installed in your system other than that.   
+All the dependencies mentioned above must be installed in your system before you proceed further.   
 This package depends on the TensorFlow shared libraries, in order to compile
 this libraries follow the [Installing fromsources](https://www.tensorflow.org/versions/r0.8/get_started/os_setup.html#installing-from-sources)
 guide to clone and configure the repository. So you can do.
 ```
 git clone --recurse-submodules https://github.com/tensorflow/tensorflow
+cd tensorflow
 ```
-
-After you have cloned the repository, run the next commands at the root of the
-tree:
-
+This command clones the repository and a few sub modules. After this you should do.
 ```
 bazel build //tensorflow:libtensorflow.so
+```
+This command takes some time atleast 10-15 minutes to run. And helps to create a shared build.
+```
 sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
 ```
 Clone ruby-tensorflow 
-``` git clone https://github.com/Arafatk/ruby-tensorflow.git```
-Copy the cloned tensorflow directory to the dependencies folder.
-The in the root directory of the gem do 
+``` git clone https://github.com/Arafatk/ruby-tensorflow.git```   
+Then do 
 ```
-bundle exec rake install
-```
-If you still recieve some errors then go to ext/ in the cloned gem and do.
-```
+cd ruby-tensorflow
+cd ext 
 ruby extconf.rb
 make
 make install
+cd ./..
+bundle exec rake install
+``` 
+This command is for installing the gem.
 ```
-
+bundle exec rake spec
+```
+This command is to run the tests.
 
 ## License
 
