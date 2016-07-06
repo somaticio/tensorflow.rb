@@ -29,10 +29,9 @@ This command takes some time atleast 10-15 minutes to run. And helps to create a
 ```
 sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
 ```
-Clone ruby-tensorflow 
-``` git clone https://github.com/Arafatk/ruby-tensorflow.git```   
-Then do 
+The copy the generate libtensorflow.so. Then do 
 ```
+git clone https://github.com/Arafatk/ruby-tensorflow.git
 cd ruby-tensorflow
 cd ext 
 ruby extconf.rb
