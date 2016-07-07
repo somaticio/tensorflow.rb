@@ -18,8 +18,7 @@ All the dependencies mentioned above must be installed in your system before you
 ### Clone and Install TensorFlow
 
 This package depends on the TensorFlow shared libraries, in order to compile
-these libraries follow the [Installing from sources](https://www.tensorflow.org/versions/r0.8/get_started/os_setup.html#installing-from-sources)
-guide to clone and configure the repository. So do the following:
+these libraries do the following:
 ```
 git clone --recurse-submodules https://github.com/tensorflow/tensorflow
 cd tensorflow
@@ -28,9 +27,13 @@ This command clones the repository and a few sub modules. After this you should 
 ```
 bazel build //tensorflow:libtensorflow.so
 ```
-This command takes some time at least 10-15 minutes to run. And helps to create a shared build. Then copy the newly generated libtensorflow.so shared build:
+This command takes in the order of 10-15 minutes to run and creates a shared library. When finished, copy the newly generated libtensorflow.so shared library:
 ```
+# Linux
 sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
+
+# OSX
+sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/local/lib
 ```
 ### Install `ruby-tensorflow`
 
@@ -41,7 +44,7 @@ cd ruby-tensorflow
 cd ext
 ruby extconf.rb
 make
-make install
+make install # Creates ../lib/ruby/site_ruby/X.X.X/<arch>/tf/Tensorflow.bundle (.so Linux)
 cd ./..
 bundle exec rake install
 ```
