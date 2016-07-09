@@ -8,8 +8,10 @@ GEM
   specs:
     ast (2.2.0)
     backports (3.6.8)
+    coderay (1.1.1)
     diff-lcs (1.2.5)
     google-protoc (3.0.0.alpha.6.0.0)
+    method_source (0.8.2)
     nmatrix (0.2.1)
       packable (~> 1.3, >= 1.3.5)
     packable (1.3.8)
@@ -17,6 +19,10 @@ GEM
     parser (2.3.1.2)
       ast (~> 2.2)
     powerpack (0.1.1)
+    pry (0.10.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
     rainbow (2.0.0)
     rake (10.5.0)
     rspec (3.4.0)
@@ -39,6 +45,7 @@ GEM
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.0, >= 1.0.1)
     ruby-progressbar (1.7.5)
+    slop (3.6.0)
     unicode-display_width (1.0.5)
     yard (0.8.7.6)
 
@@ -49,6 +56,7 @@ DEPENDENCIES
   bundler (~> 1.8, >= 1.8.4)
   google-protoc
   nmatrix
+  pry
   rake (~> 10.0)
   rspec (~> 3.0)
   rubocop
