@@ -2,6 +2,7 @@ $LOAD_PATH.unshift File.expand_path('./../lib', __FILE__)
 require 'tensorflow'
 require 'nmatrix/nmatrix'
 require 'pry'
+Dir[File.dirname(__FILE__) + "/support/**/*.rb"].each {|f| require f}
 
 def loadAndExtendGraphFromFile(filename)
   session = Session.new()

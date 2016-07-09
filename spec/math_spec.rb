@@ -1,4 +1,5 @@
 require 'spec_helper'
+
 describe "Math" do
   it "Add two tensors." do
   	graph = Graph.new()
@@ -41,7 +42,7 @@ describe "Math" do
       { 'input1' => tensor1, 'input2' => tensor2 },
       ['output'],
       nil)
-    expect(result[0]).to match_array([[ 6.0, 1.8, 0.5], [-6.0, 1.7, 3.9]])
+    expect(result[0]).to all_be_close([[ 6.0, 1.8, 0.5], [-6.0, 1.7, 3.9]])
   end
 
   it "Multiply two tensors element wise." do
@@ -318,7 +319,9 @@ describe "Math" do
     input = Hash.new
     input["input1"] = input1.tensor
     result = s.run(input, ["output"], nil)
-    expect(result[0]).to match_array([[-0.34912599479558276, 0.8427007929497149, 0.9999883513426328, 0.9999999999984626, 1.0]])
+    expect(result[0]).to all_be_close(
+      [[-0.34912599479558276, 0.8427007929497149, 
+      0.9999883513426328, 0.9999999999984626, 1.0]])
   end
 
   it "Returns MatrixInverse." do
