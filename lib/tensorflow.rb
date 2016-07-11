@@ -8,3 +8,4 @@ end
 require 'tensor'
 require 'graph'
 require 'session'
+require 'sciruby/Tensorflow'
