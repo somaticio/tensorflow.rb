@@ -3,6 +3,8 @@
 ## Description
 This repository contains Ruby API for utilizing [TensorFlow](https://github.com/tensorflow/tensorflow).
 
+[![Code Climate](https://codeclimate.com/github/Arafatk/tensorflow.rb/badges/gpa.svg)](https://codeclimate.com/github/Arafatk/tensorflow.rb)
+
 ## Dependencies
 
 - [Bazel](http://www.bazel.io/docs/install.html)
