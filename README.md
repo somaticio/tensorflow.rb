@@ -3,6 +3,9 @@
 ## Description
 This repository contains Ruby API for utilizing [TensorFlow](https://github.com/tensorflow/tensorflow).
 
+[![Code Climate](https://codeclimate.com/github/Arafatk/tensorflow.rb/badges/gpa.svg)](https://codeclimate.com/github/Arafatk/tensorflow.rb)
+[![Join the chat at https://gitter.im/Arafatk/tensorflow.rb](https://badges.gitter.im/Arafatk/tensorflow.rb.svg)](https://gitter.im/Arafatk/tensorflow.rb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## Docker
 
 Launch:
@@ -23,11 +26,16 @@ For details, see: https://hub.docker.com/r/nethsix/ruby-tensorflow-ubuntu/
 
 ## Dependencies
 
+### Explicit Install
+
 - [Bazel](http://www.bazel.io/docs/install.html)
 - [TensorFlow](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/g3doc/get_started/os_setup.md)
+- [Swig](http://www.swig.org/download.html)
+
+### Implicit Install (No Action Required)
+
 - [Google-Protoc gem](https://github.com/google/protobuf/tree/master/ruby) ( for installation do  ```gem install google-protoc --pre ```)
 - [Protobuf](https://github.com/google/protobuf)
-- [Swig](http://www.swig.org/download.html)
 
 ## Installation
 

@@ -21,7 +21,7 @@
 #     input.type       =>  Integer
 #
 
-class Tensor
+class Tensorflow::Tensor
   attr_accessor :dimensions, :type , :rank, :type_num, :serialized, :tensor_data, :dimension_data, :tensor, :data_size, :tensor_shape_proto
   # @!attribute dimensions
   #  Return the dimensions of the tensor in an array.
