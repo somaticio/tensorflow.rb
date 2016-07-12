@@ -82,10 +82,15 @@ class Tensorflow::Tensor
       self.type_num = Tensorflow::TF_INT32
       self.data_size = 4
       self.type = Integer
+    when :string
+      self.type_num = Tensorflow::TF_STRING
+      self.data_size = 8
+      self.type = String
     else
       raise "Data type not supported."
     end
   end
+
   #
   # Recursively finds the dimensions of the input array. 
   #
@@ -111,7 +116,7 @@ class Tensorflow::Tensor
   #   - Data type
   #
   def type_finder(data)
-    start = data  if self.rank == 0 
+    start = data if self.rank == 0
     start = data.flatten[0]  if self.rank != 0 
     self.type_num = Tensorflow::TF_INT64
     if start.is_a? Integer
@@ -168,6 +173,12 @@ class Tensorflow::Tensor
       (0..array.length-1).each do |i|
         c_array[i] = array[i]
       end
+    elsif type == Tensorflow::TF_STRING
+      c_array = Tensorflow::String_Vector.new
+      (0..array.length-1).each do |i|
+        c_array.push(array[i])
+      end
+      c_array = Tensorflow::string_array_from_string_vector(c_array)
     else
       c_array = Tensorflow::Double.new(array.length)
       (0..array.length-1).each do |i|

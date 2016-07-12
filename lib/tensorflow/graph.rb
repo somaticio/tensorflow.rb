@@ -45,7 +45,7 @@ class Tensorflow::Graph
     op.def = Tensorflow::NodeDef.new(:name => name,:op => "Placeholder", :attr => Hash.new)
     op.outDataTypes = Hash.new
     op.outDataTypes[name] = type_enum
-    op.def.attr["dtype"] =  Tensorflow::AttrValue.new(:type => type_enum)
+    op.def.attr["dtype"] = Tensorflow::AttrValue.new(:type => type_enum)
     dim_array = []
     dims.each do |i|
       dim_array.push(Tensorflow::TensorShapeProto::Dim.new(:size => i))
@@ -102,6 +102,7 @@ class Tensorflow::Graph
     type_val = Tensorflow::TF_FLOAT if type == :DT_FLOAT
     type_val = Tensorflow::TF_DOUBLE if type == :DT_DOUBLE
     type_val = Tensorflow::TF_INT64 if type == :DT_INT64
+    type_val = Tensorflow::TF_STRING if type == :DT_STRING
     type_val
   end
 

@@ -76,5 +76,26 @@ void double_reader(TF_Tensor* tensor, double* array, int size_we)
     for (int i = 0; i < size_we; ++i) array[i] = tensor_data[i];
 };
 
+std::vector<std::string> string_reader(TF_Tensor* tensor)
+{
+    auto dimensions = TF_NumDims(tensor);
+    long long total_elements = 1;
+    for (int i = 0; i < dimensions; ++i) total_elements *= TF_Dim(tensor, i);
+    std::vector<std::string> string_vector;
+    std::string* tensor_data = static_cast<std::string *>(TF_TensorData(tensor));
+    for (int i = 0; i < total_elements; ++i) string_vector.push_back(tensor_data[i]);
+    return string_vector;
+};
+
+std::string* string_array_from_string_vector(std::vector<std::string> string_vector)
+{
+    int vector_size = string_vector.size();
+    static std::string *string_array;
+    string_array = new std::string[vector_size];
+    for (int i = 0; i < vector_size; ++i)
+      string_array[i] = string_vector[i];
+    return string_array;
+};
+
 }  // namespace tensorflow
 
