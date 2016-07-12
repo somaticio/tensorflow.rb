@@ -5,11 +5,16 @@ This repository contains Ruby API for utilizing [TensorFlow](https://github.com/
 
 ## Dependencies
 
+### Explicit Install
+
 - [Bazel](http://www.bazel.io/docs/install.html)
 - [TensorFlow](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/g3doc/get_started/os_setup.md)
+- [Swig](http://www.swig.org/download.html)
+
+### Implicit Install (No Action Required)
+
 - [Google-Protoc gem](https://github.com/google/protobuf/tree/master/ruby) ( for installation do  ```gem install google-protoc --pre ```)
 - [Protobuf](https://github.com/google/protobuf)
-- [Swig](http://www.swig.org/download.html)
 
 ## Installation
 
