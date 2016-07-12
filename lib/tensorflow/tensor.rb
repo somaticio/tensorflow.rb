@@ -86,6 +86,10 @@ class Tensorflow::Tensor
       self.type_num = Tensorflow::TF_STRING
       self.data_size = 8
       self.type = String
+    when :complex
+      self.type_num = Tensorflow::TF_COMPLEX128
+      self.data_size = 16
+      self.type = Complex
     else
       raise "Data type not supported."
     end
@@ -129,6 +133,11 @@ class Tensorflow::Tensor
     elsif start.is_a? String
       type = String
       self.type_num = Tensorflow::TF_STRING
+      self.data_size = 8
+    elsif start.is_a? Complex
+      type = Complex
+      self.type_num = Tensorflow::TF_COMPLEX128
+      self.data_size = 16
     else 
       raise "Data type not supported."
     end
@@ -179,6 +188,12 @@ class Tensorflow::Tensor
         c_array.push(array[i])
       end
       c_array = Tensorflow::string_array_from_string_vector(c_array)
+    elsif type == Tensorflow::TF_COMPLEX128
+      c_array = Tensorflow::Complex_Vector.new
+      (0..array.length-1).each do |i|
+        c_array.push(array[i])
+      end
+      c_array = Tensorflow::complex_array_from_complex_vector(c_array)
     else
       c_array = Tensorflow::Double.new(array.length)
       (0..array.length-1).each do |i|

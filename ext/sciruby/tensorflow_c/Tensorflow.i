@@ -2,6 +2,7 @@
 %include "typemaps.i"
 %include "std_vector.i"
 %include "std_string.i"
+%include "std_complex.i"
 
 %{
 #include "./files/tensor_c_api.h"     
@@ -13,9 +14,10 @@
 %}
 
 namespace std {
-   %template(String_Vector) vector<string>;
+   %template(String_Vector)  vector<string>;
    %template(Integer_Vector) vector<long long>;
-   %template(Tensor_Vector) vector<TF_Tensor *>;
+   %template(Tensor_Vector)  vector<TF_Tensor *>;
+   %template(Complex_Vector) vector<std::complex<double> >;
 }
 
 %include "./files/version.h"
@@ -31,5 +33,4 @@ namespace std {
 %array_class(int, Int);
 %array_class(float, Float);
 %array_class(double, Double);
-%array_class(char, Character );
-
+%array_class(char, Character);

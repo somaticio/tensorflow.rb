@@ -102,12 +102,13 @@ class Tensorflow::Session
       size = Tensorflow::tensor_size(outputValues[i])
       type = Tensorflow::TF_TensorType(outputValues[i])
 
-      c_array = Tensorflow::Double.new(size)    if type == Tensorflow::TF_DOUBLE
-      Tensorflow::double_reader(outputValues[i], c_array, size) if type == Tensorflow::TF_DOUBLE
-      c_array = Tensorflow::Long_long.new(size) if type == Tensorflow::TF_INT64
+      c_array = Tensorflow::Double.new(size)                       if type == Tensorflow::TF_DOUBLE
+      Tensorflow::double_reader(outputValues[i], c_array, size)    if type == Tensorflow::TF_DOUBLE
+      c_array = Tensorflow::Long_long.new(size)                    if type == Tensorflow::TF_INT64
       Tensorflow::long_long_reader(outputValues[i], c_array, size) if type == Tensorflow::TF_INT64
-      c_array = Tensorflow::Int.new(size) if type == Tensorflow::TF_INT32
-      Tensorflow::int_reader(outputValues[i], c_array, size) if type == Tensorflow::TF_INT32
+      c_array = Tensorflow::Int.new(size)                          if type == Tensorflow::TF_INT32
+      Tensorflow::int_reader(outputValues[i], c_array, size)       if type == Tensorflow::TF_INT32
+      c_array = Tensorflow::complex_reader(outputValues[i])        if type == Tensorflow::TF_COMPLEX128
 
       num_dimensions = Tensorflow::TF_NumDims(outputValues[i])
       out_dimension = []
@@ -126,7 +127,7 @@ class Tensorflow::Session
           (0..total_dim - 1).each do |ind|
             temp_array.push(output[ind])
             dim_array.push(temp_array) if (temp_array.length == out_dimension[k])
-            temp_array = []          if (temp_array.length == out_dimension[k])
+            temp_array = []            if (temp_array.length == out_dimension[k])
           end
           output = dim_array
        end

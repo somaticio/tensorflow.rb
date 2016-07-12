@@ -38,16 +38,19 @@ void print_tensor(TF_Tensor* tensor)
     if (type == 9) {long long* tensor_data = static_cast<long long *>(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
     }
-    else if (type == 2 ){ double* tensor_data = static_cast<double *>(TF_TensorData(tensor));
+    else if (type == 2){ double* tensor_data = static_cast<double *>(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
     }
-    else if (type == 3 ){ int* tensor_data = static_cast<int *>(TF_TensorData(tensor));
+    else if (type == 3){ int* tensor_data = static_cast<int *>(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
     }
-    else if (type == 7 ){ std::string* tensor_data = static_cast<std::string *>(TF_TensorData(tensor));
+    else if (type == 7){ std::string* tensor_data = static_cast<std::string *>(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
     }
-    std::cout << "\n";
+    else if (type == 18){ std::complex<double>* tensor_data = static_cast<std::complex<double>* >(TF_TensorData(tensor));
+    for (int i = 0; i < total_elements; ++i) std::cout << std::real(tensor_data[i]) << " " << std::imag(tensor_data[i]) << std::endl;
+    }
+    std::cout << std::endl;
 };
 
 long long tensor_size(TF_Tensor* tensor)
@@ -87,14 +90,35 @@ std::vector<std::string> string_reader(TF_Tensor* tensor)
     return string_vector;
 };
 
+std::vector<std::complex<double> > complex_reader(TF_Tensor* tensor)
+{
+    auto dimensions = TF_NumDims(tensor);
+    long long total_elements = 1;
+    for (int i = 0; i < dimensions; ++i) total_elements *= TF_Dim(tensor, i);
+    std::vector<std::complex<double> > complex_vector;
+    std::complex<double>* tensor_data = static_cast<std::complex<double> *>(TF_TensorData(tensor));
+    for (int i = 0; i < total_elements; ++i) complex_vector.push_back(tensor_data[i]);
+    return complex_vector;
+};
+
 std::string* string_array_from_string_vector(std::vector<std::string> string_vector)
 {
-    int vector_size = string_vector.size();
+    auto vector_size = string_vector.size();
     static std::string *string_array;
     string_array = new std::string[vector_size];
-    for (int i = 0; i < vector_size; ++i)
+    for (auto i = 0; i < vector_size; ++i)
       string_array[i] = string_vector[i];
     return string_array;
+};
+
+std::complex<double>* complex_array_from_complex_vector(std::vector<std::complex<double> > complex_vector)
+{
+    auto vector_size = complex_vector.size();
+    static std::complex<double> *complex_array;
+    complex_array = new std::complex<double> [vector_size];
+    for (auto i = 0; i < vector_size; ++i)
+      complex_array[i] = complex_vector[i];
+    return complex_array;
 };
 
 }  // namespace tensorflow

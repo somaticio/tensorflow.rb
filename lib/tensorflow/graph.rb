@@ -99,10 +99,11 @@ class Tensorflow::Graph
 
   def type_to_enum(type)
     type_val = 0
-    type_val = Tensorflow::TF_FLOAT if type == :DT_FLOAT
-    type_val = Tensorflow::TF_DOUBLE if type == :DT_DOUBLE
-    type_val = Tensorflow::TF_INT64 if type == :DT_INT64
-    type_val = Tensorflow::TF_STRING if type == :DT_STRING
+    type_val = Tensorflow::TF_FLOAT      if type == :DT_FLOAT
+    type_val = Tensorflow::TF_DOUBLE     if type == :DT_DOUBLE
+    type_val = Tensorflow::TF_INT64      if type == :DT_INT64
+    type_val = Tensorflow::TF_STRING     if type == :DT_STRING
+    type_val = Tensorflow::TF_COMPLEX128 if type == :DT_COMPLEX128
     type_val
   end
 

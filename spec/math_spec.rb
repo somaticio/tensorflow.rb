@@ -23,6 +23,27 @@ describe "Math" do
     expect(result[0]).to match_array([[-4.0, 4.2, 9.5], [10.0, 6.3, 10.1]])
   end
 
+  it "Add two complex tensors." do
+    graph = Tensorflow::Graph.new()
+    input1 = graph.placeholder('input1', Tensorflow::TF_COMPLEX128, [1])
+    input2 = graph.placeholder('input2', Tensorflow::TF_COMPLEX128, [1])
+    graph.op_definer("Add",'output',[input1,input2],"",nil)
+    encoder = Tensorflow::GraphDef.encode(graph.graph_def)
+    session = Tensorflow::Session.new()
+    graph = Tensorflow::Graph.new()
+    graph.graph_def = Tensorflow::GraphDef.decode(encoder)
+    graph.graph_def_raw = encoder
+    session.extend_graph(graph)
+    s = session
+    input1 = Tensorflow::Tensor.new([Complex(23,42)])
+    input2 = Tensorflow::Tensor.new([Complex(214,42)])
+    input = Hash.new
+    input["input1"] = input1.tensor
+    input["input2"] = input2.tensor
+    result = s.run(input, ["output"], nil)
+    expect(result[0]).to all_be_close([(237.0+84.0i)])
+  end
+
   it "Subtract two tensors." do
     graph = Tensorflow::Graph.new
     input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [2,3])
@@ -445,5 +466,26 @@ describe "Math" do
     result = s.run(input, ["output"], nil)
     expect(result[0]).to match_array([[58.0, 64.0],
                                       [139.0, 154.0]])
+  end
+
+  it "Multiplies two matrices." do
+    graph = Tensorflow::Graph.new()
+    input1 = graph.placeholder('input1', Tensorflow::TF_COMPLEX128, [2,2])
+    input2 = graph.placeholder('input2', Tensorflow::TF_COMPLEX128, [2,2])
+    graph.op_definer("matmul",'output',[input1,input2],"",nil)
+    encoder = Tensorflow::GraphDef.encode(graph.graph_def)
+    session = Tensorflow::Session.new()
+    graph = Tensorflow::Graph.new()
+    graph.graph_def = Tensorflow::GraphDef.decode(encoder)
+    graph.graph_def_raw = encoder
+    session.extend_graph(graph)
+    s = session
+    input1 = Tensorflow::Tensor.new([[Complex(9,-2),Complex(0,8)], [Complex(3,7),Complex(5,2)]])
+    input2 = Tensorflow::Tensor.new([[Complex(-1,7),Complex(6,4)], [Complex(8,9),Complex(1,0)]])
+    input = Hash.new
+    input["input1"] = input1.tensor
+    input["input2"] = input2.tensor
+    result = s.run(input, ["output"], nil)
+    expect(result[0]).to match_array([[(-67.0+129.0i), (62.0+32.0i)], [(-30.0+75.0i), (-5.0+56.0i)]])
   end
 end
