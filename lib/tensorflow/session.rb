@@ -6,7 +6,7 @@
 # session to perform computation described in the GraphDef. After extending the session
 # with a graph, the caller uses the Run() API to perform the computation and potentially 
 # fetch outputs as Tensors. Protocol buffer exposes various configuration options for a session. The Op definations are stored in ops.pb file. 
-class Session
+class Tensorflow::Session
   attr_accessor :status, :ops, :session, :graph
   # @!attribute dimensions
   #  Create a success status.
