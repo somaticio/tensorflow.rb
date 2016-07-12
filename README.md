@@ -3,6 +3,24 @@
 ## Description
 This repository contains Ruby API for utilizing [TensorFlow](https://github.com/tensorflow/tensorflow).
 
+## Docker
+
+Launch:
+
+```
+docker run -it nethsix/ruby-tensorflow-ubuntu:0.0.1 /bin/bash -c "source /usr/local/rvm/scripts/rvm; /bin/bash"
+```
+
+Try:
+
+```
+ruby /repos/ruby-tensorflow/examples/tf_ex1.rb
+```
+
+Location: `/repos/ruby-tensorflow/`
+
+For details, see: https://hub.docker.com/r/nethsix/ruby-tensorflow-ubuntu/
+
 ## Dependencies
 
 - [Bazel](http://www.bazel.io/docs/install.html)
