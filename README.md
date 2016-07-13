@@ -86,5 +86,6 @@ This command is to run the tests.
 ## License
 
 Copyright (c) 2016, Arafat Dad Khan.
+[somatic](http://somatic.io)
 
 All rights reserved.
