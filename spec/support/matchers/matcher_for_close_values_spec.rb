@@ -2,19 +2,38 @@ require 'spec_helper'
 
 RSpec::Matchers.define :all_be_close do |expected|
   match do |actual|
+    # Wrap in Array to also use for scalars
+    actual, expected = [actual], [expected]
+
     return false unless _same_shape?(actual, expected)
 
     # TODO: allow custom absolute tolerance. For now using TensorFlow default.
-    a_tol ||= 1e-6
-    _element_wise_compare(actual, expected, a_tol)
+    a_tol = 1e-6
+    _all_close?(actual, expected, a_tol)
 
-    # TODO: allow relative tolerance 
-    # r_tol = opts[:r_tol] || 1e-6
-    # expect(a).to be_within(r_tol).percent_of(e)
+    # TODO: allow relative/percent tolerance compare, r_tol = 1e-6
   end
 end
 
 describe 'all_be_close' do
+  context 'scalars' do
+    it 'is the same scalar' do
+      expect(5.0).to all_be_close(5.0)
+    end
+
+    it 'is within tolerance' do
+      expect(5.0).to all_be_close(5.0 + 1e-7)
+    end
+
+    it 'is outside tolerance' do
+      expect(0.4).not_to all_be_close(0.4 + 2e-6)
+    end
+
+    it 'is the same scalar' do
+      expect(12000).not_to all_be_close([12000])
+    end
+  end
+
   context '1D array' do
     it 'is the same array' do
       expect([1.0, -2.0, 3.4e5])
@@ -108,22 +127,23 @@ end
 private
 
 def _same_shape?(a, b)
-  return false unless a.is_a?(Array) && b.is_a?(Array)
   return false unless a.size == b.size
 
   same_shape = true
-  a.each_with_index do |obj, index|
-    if obj.is_a? Array
-      same_shape = _same_shape?(obj, b[index])
+  a.zip(b) do |ael, bel|
+    same_shape = if ael.is_a?(Array) && bel.is_a?(Array)
+      _same_shape?(ael, bel)
+    else
+      !ael.is_a?(Array) && !bel.is_a?(Array)
     end
   end
 
   same_shape
 end
 
-def _element_wise_compare(a, b, a_tol = 1e-6)
-  a.flatten.zip(b.flatten).each do |a_el, b_el|
-    break unless (a_el - b_el).abs <= a_tol
+def _all_close?(a, b, a_tol = 1e-6)
+  a.flatten.zip(b.flatten).each do |ael, bel|
+    break unless (ael - bel).abs <= a_tol
   end
 end
 
