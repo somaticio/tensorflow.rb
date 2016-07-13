@@ -131,7 +131,7 @@ def _same_shape?(a, b)
 
   same_shape = true
   a.zip(b) do |ael, bel|
-    same_shape = if ael.is_a?(Array) && bel.is_a?(Array)
+    break unless same_shape = if ael.is_a?(Array) && bel.is_a?(Array)
       _same_shape?(ael, bel)
     else
       !ael.is_a?(Array) && !bel.is_a?(Array)
