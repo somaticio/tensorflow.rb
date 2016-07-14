@@ -7,7 +7,7 @@ This repository contains Ruby API for utilizing [TensorFlow](https://github.com/
 [![Join the chat at https://gitter.im/Arafatk/tensorflow.rb](https://badges.gitter.im/Arafatk/tensorflow.rb.svg)](https://gitter.im/Arafatk/tensorflow.rb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Documentation
-Everything is at [RubyDoc](http://www.rubydoc.info/github/Arafatk/tensorflow.rb).   
+Everything is at [RubyDoc](http://www.rubydoc.info/github/Arafatk/tensorflow.rb).
 You can also generate docs by 
 ```bundle exec rake doc```.
 
