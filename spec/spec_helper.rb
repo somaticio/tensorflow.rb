@@ -1,6 +1,5 @@
 $LOAD_PATH.unshift File.expand_path('./../lib', __FILE__)
 require 'tensorflow'
-require 'nmatrix/nmatrix'
 require 'pry'
 
 def loadAndExtendGraphFromFile(filename)

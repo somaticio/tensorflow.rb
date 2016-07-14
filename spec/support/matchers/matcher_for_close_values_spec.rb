@@ -2,26 +2,38 @@ require 'spec_helper'
 
 RSpec::Matchers.define :all_be_close do |expected|
   match do |actual|
-    actual   = _get_nmatrix(actual)
-    expected = _get_nmatrix(expected)
-    return false unless actual.shape == expected.shape
+    # Wrap in Array to also use for scalars
+    actual, expected = [actual], [expected]
 
-    # Using custom rspec matcher from
-    # https://github.com/SciRuby/nmatrix/blob/master/lib/nmatrix/rspec.rb
+    return false unless _same_shape?(actual, expected)
+
     # TODO: allow custom absolute tolerance. For now using TensorFlow default.
-    a_tol ||= 1e-6
-    res = RSpec::Matchers::BuiltIn::BeWithin.new(a_tol)
-                                            .of(expected)
-                                            .matches?(actual)
-    res.is_a?(NMatrix) ? res.all? : res
+    a_tol = 1e-6
+    _all_close?(actual, expected, a_tol)
 
-    # TODO: allow relative tolerance, e.g. look at NMatrix > percent_of
-    # r_tol = opts[:r_tol] || 1e-6
-    # expect(a).to be_within(r_tol).percent_of(e)
+    # TODO: allow relative/percent tolerance compare, r_tol = 1e-6
   end
 end
 
 describe 'all_be_close' do
+  context 'scalars' do
+    it 'is the same scalar' do
+      expect(5.0).to all_be_close(5.0)
+    end
+
+    it 'is within tolerance' do
+      expect(5.0).to all_be_close(5.0 + 1e-7)
+    end
+
+    it 'is outside tolerance' do
+      expect(0.4).not_to all_be_close(0.4 + 2e-6)
+    end
+
+    it 'is the same scalar' do
+      expect(12000).not_to all_be_close([12000])
+    end
+  end
+
   context '1D array' do
     it 'is the same array' do
       expect([1.0, -2.0, 3.4e5])
@@ -114,10 +126,25 @@ end
 
 private
 
-def _get_nmatrix(a)
-  a = N[a] unless a.instance_of?(NMatrix)
+def _same_shape?(a, b)
+  return false unless a.size == b.size
 
-  a
+  same_shape = true
+  a.zip(b) do |ael, bel|
+    break unless same_shape = if ael.is_a?(Array) && bel.is_a?(Array)
+      _same_shape?(ael, bel)
+    else
+      !ael.is_a?(Array) && !bel.is_a?(Array)
+    end
+  end
+
+  same_shape
+end
+
+def _all_close?(a, b, a_tol = 1e-6)
+  a.flatten.zip(b.flatten).each do |ael, bel|
+    break unless (ael - bel).abs <= a_tol
+  end
 end
 
 def three_d_array
