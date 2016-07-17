@@ -73,7 +73,7 @@ Clone and install this Ruby API:
 ```
 git clone https://github.com/Arafatk/ruby-tensorflow.git
 cd ruby-tensorflow
-cd ext
+cd ext/sciruby/tensorflow_c
 ruby extconf.rb
 make
 make install # Creates ../lib/ruby/site_ruby/X.X.X/<arch>/tf/Tensorflow.bundle (.so Linux)
