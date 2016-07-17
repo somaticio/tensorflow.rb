@@ -77,7 +77,6 @@ cd ext/sciruby/tensorflow_c
 ruby extconf.rb
 make
 make install # Creates ../lib/ruby/site_ruby/X.X.X/<arch>/tf/Tensorflow.bundle (.so Linux)
-             # Creates ${GEM_HOME}/gems/tensorflow-0.0.1/lib/tf/Tensorflow.bundle (.so with rvm)
 cd ./..
 bundle exec rake install
 ```
