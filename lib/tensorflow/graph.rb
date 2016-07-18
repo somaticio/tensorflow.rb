@@ -1,6 +1,6 @@
 # A TensorFlow computation, represented as a dataflow graph.
 # A Graph contains a set of Operation objects, which represent units of computation; and Tensor objects, which represent the units of data that flow between operations.
-# 
+# Official documentation of {graph}[https://www.tensorflow.org/versions/r0.9/api_docs/python/framework.html#Graph].
 class Tensorflow::Graph
   attr_accessor :availableOps, :constants, :variables, :graph_def, :op, :placeholder, :graph_def_raw
   def initialize()

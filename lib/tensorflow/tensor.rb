@@ -2,6 +2,7 @@
 # A tensor has a rank, and a shape.
 # A Tensor is a symbolic handle to one of the outputs of an Operation. It does not hold the values of that 
 # operation's output, but instead provides a means of computing those values in a TensorFlow Session.
+# Official documentation of {tensor}[https://www.tensorflow.org/versions/r0.9/api_docs/python/framework.html#Tensor].
 # This class has two primary purposes:
 # * *Description* :
 #   - A Tensor can be passed as an input to another Operation. This builds a dataflow connection between 
@@ -9,7 +10,7 @@
 #   computation.
 #   - After the graph has been launched in a session, the value of the Tensor can be computed by passing it to
 #   a Session.
-# The Tensor class takes array as input and creates a Tensor from it usng SWIG. 
+# The Tensor class takes array as input and creates a Tensor from it using SWIG.
 #
 # * *Arguments* :
 #   - +Data+ -> A Ruby array to be converted to tensor.
