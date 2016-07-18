@@ -42,15 +42,13 @@ class Tensorflow::Graph
   # operation that must be fed with data on execution.
   def placeholder(name, type_enum, dims)
     op = GraphNode.new
-    op.definition = Tensorflow::NodeDef.new(:name => name,:op => "Placeholder", :attr => {})
+    op.definition = Tensorflow::NodeDef.new(name: name, op: "Placeholder", attr: {})
     op.outdatatypes = {}
     op.outdatatypes[name] = type_enum
-    op.definition.attr["dtype"] = Tensorflow::AttrValue.new(:type => type_enum)
+    op.definition.attr["dtype"] = Tensorflow::AttrValue.new(type: type_enum)
     dim_array = []
-    dims.each do |i|
-      dim_array.push(Tensorflow::TensorShapeProto::Dim.new(:size => i))
-    end
-    op.definition.attr["shape"] = Tensorflow::AttrValue.new(:shape => Tensorflow::TensorShapeProto.new(:dim => dim_array))
+    dims.each_with_index { |value, i| dim_array[i] = Tensorflow::TensorShapeProto::Dim.new(size: value) }
+    op.definition.attr["shape"] = Tensorflow::AttrValue.new(shape: Tensorflow::TensorShapeProto.new(dim: dim_array))
     self.graph_def.node.push(op.definition)
     op
   end
@@ -64,7 +62,7 @@ class Tensorflow::Graph
   # * *Returns* :
   #   - Graph with ops defined
   #
-  def op_definer(opName, name , input, device, attrs)
+  def define_op(opName, name , input, device, attrs)
     op = self.availableOps[opName.downcase]
     raise ("Operation does not exist.") if !op
     opName = op.name   # This ensures that case-sensitivity does not become an issue
@@ -74,9 +72,9 @@ class Tensorflow::Graph
       inputs.push(node.definition.name)
     end
     node = GraphNode.new
-    node.definition = Tensorflow::NodeDef.new(:name => name, :op => opName, :input => inputs, :device => device , :attr => {})
+    node.definition = Tensorflow::NodeDef.new(name: name, op: opName, input: inputs, device: device , attr: {})
     attrs = {} if attrs == nil
-    matchTypes(input, node, attrs, op)
+    match_types(input, node, attrs, op)
     op.attr.each do |attribute|
       if attrs[attribute.name]
         node.definition.attr[attribute.name] = make_attr_value(attribute.name, attrs[attribute.name]) #make_attr_value(attribute.type, attrs[attribute.name])
@@ -92,23 +90,25 @@ class Tensorflow::Graph
       # TODO -> Add support for all types
       result = nil
       if attribute_type == "T"
-        result = Tensorflow::AttrValue.new(:type => value)
+        result = Tensorflow::AttrValue.new(type: value)
       end
       result
   end
 
+  TYPE2ENUM = {
+    DT_FLOAT: Tensorflow::TF_FLOAT,
+    DT_DOUBLE: Tensorflow::TF_DOUBLE,
+    DT_INT64: Tensorflow::TF_INT64,
+    DT_STRING: Tensorflow::TF_STRING,
+    DT_COMPLEX128: Tensorflow::TF_COMPLEX128
+  }
+
   def type_to_enum(type)
-    type_val = 0
-    type_val = Tensorflow::TF_FLOAT      if type == :DT_FLOAT
-    type_val = Tensorflow::TF_DOUBLE     if type == :DT_DOUBLE
-    type_val = Tensorflow::TF_INT64      if type == :DT_INT64
-    type_val = Tensorflow::TF_STRING     if type == :DT_STRING
-    type_val = Tensorflow::TF_COMPLEX128 if type == :DT_COMPLEX128
-    type_val
+    TYPE2ENUM[type] || 0
   end
 
   # Matches input/output parameters with corresponding data types.
-  def matchTypes(input, outnode, attrs, op)
+  def match_types(input, outnode, attrs, op)
     (0..op.input_arg.length - 1).each do |i|
       inType = input[i].outdatatypes[input[i].definition.name]
       attrs[op.input_arg[i].type_attr] = inType   if inType != 0 and op.input_arg[i].type_attr

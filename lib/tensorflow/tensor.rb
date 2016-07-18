@@ -19,20 +19,20 @@
 #     input = Tensor.new([[[2,3,4],[2,3,4],[2,3,4]],[[2,3,4],[2,3,4],[2,3,4]]])
 #     input.dimensions =>  [2, 3, 3]
 #     input.rank       =>  3
-#     input.type       =>  Integer
+#     input.element_type       =>  Integer
 #
 
 class Tensorflow::Tensor
-  attr_accessor :dimensions, :type , :rank, :type_num, :serialized, :tensor_data, :dimension_data, :tensor, :data_size, :tensor_shape_proto
+  attr_accessor :dimensions, :element_type , :rank, :type_num, :flatten, :tensor_data, :dimension_data, :tensor, :data_size, :tensor_shape_proto
   # @!attribute dimensions
   #  Return the dimensions of the tensor in an array.
-  # @!attribute type
-  #  Return data type of the tensor. (It is best if proper design decision is made regarding this. Because Currently data type support is limited to int64 and double.)
+  # @!attribute element_type
+  #  Return data type of the tensor element. (It is best if proper design decision is made regarding this. Because Currently data type support is limited to int64 and double.)
   # @!attribute rank
   #  Return the Rank of the Tensor.
   # @!attribute type_num
   #  Return the enum value of data type.
-  # @!attribute serialized
+  # @!attribute flatten
   #  Returns data array after flattening it.
   # @!attribute tensor_data
   #  Returns serialized data in the form of a c array.
@@ -47,12 +47,12 @@ class Tensorflow::Tensor
     self.rank = 0
     self.rank = self.dimensions.size if data.is_a?(Array)
     self.tensor_shape_proto = shape_proto(self.dimensions) if self.dimensions.is_a?(Array)
-    self.type = type_setter(type) if type != nil
-    self.type = type_finder(data) if type == nil
-    self.serialized = data.flatten
-    self.tensor_data = ruby_array_to_c(self.serialized, self.type_num)
+    self.element_type = set_type(type) if type != nil
+    self.element_type = find_type(data) if type == nil
+    self.flatten = data.flatten
+    self.tensor_data = ruby_array_to_c(self.flatten, self.type_num)
     self.dimension_data = ruby_array_to_c(self.dimensions, Tensorflow::TF_INT64)
-    self.tensor = Tensorflow::TF_NewTensor_wrapper(self.type_num, self.dimension_data, self.dimensions.length, self.tensor_data , self.data_size * self.serialized.length)
+    self.tensor = Tensorflow::TF_NewTensor_wrapper(self.type_num, self.dimension_data, self.dimensions.length, self.tensor_data , self.data_size * self.flatten.length)
   end
 
   #
@@ -63,36 +63,34 @@ class Tensorflow::Tensor
   #
   def shape_proto(array)
     dimensions = []
-    array.each do |i|
-      dimensions.push(Tensorflow::TensorShapeProto::Dim.new(:size => i))
-    end
-    Tensorflow::TensorShapeProto.new(:dim => dimensions)
+    array.each_with_index { |value, i| dimensions[i] = Tensorflow::TensorShapeProto::Dim.new(size: value) }
+    Tensorflow::TensorShapeProto.new(dim: dimensions)
   end
 
-  def type_setter(type)
+  def set_type(type)
     case type
     when :float64
       self.type_num = Tensorflow::TF_DOUBLE
       self.data_size = 8
-      self.type = Float
+      self.element_type = Float
     when :int64
       self.type_num = Tensorflow::TF_INT64
       self.data_size = 8
-      self.type = Integer
+      self.element_type = Integer
     when :int32
       self.type_num = Tensorflow::TF_INT32
       self.data_size = 4
-      self.type = Integer
+      self.element_type = Integer
     when :string
       self.type_num = Tensorflow::TF_STRING
       self.data_size = 8
-      self.type = String
+      self.element_type = String
     when :complex
       self.type_num = Tensorflow::TF_COMPLEX128
       self.data_size = 16
-      self.type = Complex
+      self.element_type = Complex
     else
-      raise "Data type not supported."
+      raise ArgumentError, "Data type #{type} not supported"
     end
   end
 
@@ -120,7 +118,7 @@ class Tensorflow::Tensor
   # * *Returns* :
   #   - Data type
   #
-  def type_finder(data)
+  def find_type(data)
     start = data if self.rank == 0
     start = data.flatten[0]  if self.rank != 0 
     self.type_num = Tensorflow::TF_INT64
@@ -175,31 +173,21 @@ class Tensorflow::Tensor
     c_array = []
     if type == Tensorflow::TF_INT64
       c_array = Tensorflow::Long_long.new(array.length)
-      (0..array.length-1).each do |i|
-        c_array[i] = array[i]
-      end
+      array.each_with_index { |value, i| c_array[i] = value }
     elsif type == Tensorflow::TF_INT32
       c_array = Tensorflow::Int.new(array.length)
-      (0..array.length-1).each do |i|
-        c_array[i] = array[i]
-      end
+      array.each_with_index { |value, i| c_array[i] = value }
     elsif type == Tensorflow::TF_STRING
       c_array = Tensorflow::String_Vector.new
-      (0..array.length-1).each do |i|
-        c_array.push(array[i])
-      end
+      array.each_with_index { |value, i| c_array[i] = value }
       c_array = Tensorflow::string_array_from_string_vector(c_array)
     elsif type == Tensorflow::TF_COMPLEX128
       c_array = Tensorflow::Complex_Vector.new
-      (0..array.length-1).each do |i|
-        c_array.push(array[i])
-      end
+      array.each_with_index { |value, i| c_array[i] = value }
       c_array = Tensorflow::complex_array_from_complex_vector(c_array)
     else
       c_array = Tensorflow::Double.new(array.length)
-      (0..array.length-1).each do |i|
-        c_array[i] = array[i]
-      end
+      array.each_with_index { |value, i| c_array[i] = value }
     end
     c_array
   end
@@ -221,6 +209,6 @@ class Tensorflow::Tensor
        sum += (dimension[dimension.length - 2 - i] - 1) * prod
        prod *= self.dimensions[self.dimensions.length - 2 - i]
     end
-    self.serialized[sum]
+    self.flatten[sum]
   end
 end

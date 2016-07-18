@@ -4,7 +4,7 @@ describe "Graph" do
     graph = Tensorflow::Graph.new
     input1 = graph.placeholder('input1', Tensorflow::TF_INT32, [2,3])
     input2 = graph.placeholder('input2', Tensorflow::TF_INT32, [2,3])
-    graph.op_definer("Add",'output',[input1,input2],"",nil)
+    graph.define_op("Add",'output',[input1,input2],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
     session = Tensorflow::Session.new

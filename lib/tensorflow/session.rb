@@ -30,39 +30,10 @@ class Tensorflow::Session
   # * *Returns* :
   #   - A c array.
   #
-  def ruby_array_to_c(array, type)
-   c_array = 23
-   if type == "long_long"
-      c_array = Tensorflow::Long_long.new(array.length)
-      (0..array.length-1).each do |i|
-        c_array[i] = array[i]
-      end
-   elsif type == "long"
-      c_array = Tensorflow::Long.new(array.length)
-      (0..array.length-1).each do |i|
-        c_array[i] = array[i]
-      end
-   elsif type == "int"
-      c_array = Tensorflow::Int.new(array.length)
-      (0..array.length-1).each do |i|
-        c_array[i] = array[i]
-      end
-
-   elsif type == "float"
-      c_array = Tensorflow::Float.new(array.length)
-      (0..array.length-1).each do |i|
-        c_array[i] = array[i]
-      end
-   elsif type == "char"
-      c_array = Tensorflow::Character.new(array.length)
-      (0..array.length-1).each do |i|
-        c_array[i] = array[i]
-      end
-   else
-      c_array = Tensorflow::Double.new(array.length)
-      (0..array.length-1).each do |i|
-        c_array[i] = array[i]
-      end
+  def graph_def_to_c_array(array)
+   c_array = Tensorflow::Character.new(array.length)
+   (0..array.length-1).each do |i|
+     c_array[i] = array[i]
    end
    c_array
   end
@@ -103,13 +74,21 @@ class Tensorflow::Session
       size = Tensorflow::tensor_size(outputValues[i])
       type = Tensorflow::TF_TensorType(outputValues[i])
 
-      c_array = Tensorflow::Double.new(size)                       if type == Tensorflow::TF_DOUBLE
-      Tensorflow::double_reader(outputValues[i], c_array, size)    if type == Tensorflow::TF_DOUBLE
-      c_array = Tensorflow::Long_long.new(size)                    if type == Tensorflow::TF_INT64
-      Tensorflow::long_long_reader(outputValues[i], c_array, size) if type == Tensorflow::TF_INT64
-      c_array = Tensorflow::Int.new(size)                          if type == Tensorflow::TF_INT32
-      Tensorflow::int_reader(outputValues[i], c_array, size)       if type == Tensorflow::TF_INT32
-      c_array = Tensorflow::complex_reader(outputValues[i])        if type == Tensorflow::TF_COMPLEX128
+      case type
+      when Tensorflow::TF_DOUBLE
+        c_array = Tensorflow::Double.new(size)
+        Tensorflow::double_reader(outputValues[i], c_array, size)
+      when Tensorflow::TF_INT64
+        c_array = Tensorflow::Long_long.new(size)
+        Tensorflow::long_long_reader(outputValues[i], c_array, size)
+      when Tensorflow::TF_INT32
+        c_array = Tensorflow::Int.new(size)
+        Tensorflow::int_reader(outputValues[i], c_array, size)
+      when Tensorflow::TF_COMPLEX128
+        c_array = Tensorflow::complex_reader(outputValues[i])
+      else
+        raise "Data type not supported."
+      end
 
       num_dimensions = Tensorflow::TF_NumDims(outputValues[i])
       out_dimension = []
@@ -139,7 +118,7 @@ class Tensorflow::Session
 
   def extend_graph(graph)
   	self.status = Tensorflow::TF_NewStatus()
-  	Tensorflow::TF_ExtendGraph(self.session, ruby_array_to_c(graph.graph_def_raw, "char"), graph.graph_def_raw.length, self.status)
+  	Tensorflow::TF_ExtendGraph(self.session, graph_def_to_c_array(graph.graph_def_raw), graph.graph_def_raw.length, self.status)
   	self.graph = graph
   end
 end
