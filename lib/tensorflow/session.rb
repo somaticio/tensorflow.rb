@@ -73,8 +73,8 @@ class Tensorflow::Session
   #   - nil
   #
   def run(inputs, outputs, targets)
-  	inputNames = Tensorflow::String_Vector.new()
-  	inputValues = Tensorflow::Tensor_Vector.new()
+  	inputNames = Tensorflow::String_Vector.new
+  	inputValues = Tensorflow::Tensor_Vector.new
     if inputs != nil
   	  inputs.each do |key, value|
   		  inputValues.push(value)
@@ -82,19 +82,19 @@ class Tensorflow::Session
   	  end
     end
 
-  	outputNames = Tensorflow::String_Vector.new()
+  	outputNames = Tensorflow::String_Vector.new
   	outputs.each do |name|
   		outputNames.push(name)
   	end
 
-  	targetNames = Tensorflow::String_Vector.new()
+  	targetNames = Tensorflow::String_Vector.new
     if targets != nil
   	  targets.each do |name|
   		  targetNames.push(name)
   	  end
     end
 
-  	outputValues = Tensorflow::Tensor_Vector.new()
+  	outputValues = Tensorflow::Tensor_Vector.new
    	status = Tensorflow::TF_NewStatus()
 	  Tensorflow::TF_Run_wrapper(self.session , inputNames, inputValues, outputNames, outputValues, targetNames, self.status)
     raise ("Incorrect specifications passed.")  if Tensorflow::TF_GetCode(status) != Tensorflow::TF_OK

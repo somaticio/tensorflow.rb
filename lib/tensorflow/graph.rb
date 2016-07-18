@@ -4,8 +4,8 @@
 class Tensorflow::Graph
   attr_accessor :availableOps, :constants, :variables, :graph_def, :op, :placeholder, :graph_def_raw
   def initialize()
-  	self.availableOps = loadAvailableOps()
-    self.graph_def = Tensorflow::GraphDef.new() 
+  	self.availableOps = load_available_ops
+    self.graph_def = Tensorflow::GraphDef.new
   end
 
   #
@@ -14,10 +14,10 @@ class Tensorflow::Graph
   # * *Returns* :
   #   - A hashmap with name of the op as key and value as the op.
   #
-  def loadAvailableOps()
+  def load_available_ops
   	ops_reader = File.read(File.dirname(__FILE__)+'/ops.pb')
     op_list = Tensorflow::OpList.decode(ops_reader)
-    availableOps = Hash.new
+    availableOps = {}
     (0..op_list.op.length - 1).each do |i|
       availableOps[op_list.op[i].name.downcase] = op_list.op[i]
     end
@@ -32,7 +32,7 @@ class Tensorflow::Graph
   # to a readable form using pb_to_pbtxt.py file in the gem and specifying the file name of 
   # the .pb file to be converted. 
   # 
-  def graph_from_reader(filename)
+  def read(filename)
   	reader = File.read(filename)
   	self.graph_def = Tensorflow::GraphDef.decode(reader)
     self.graph_def_raw = reader
@@ -41,17 +41,17 @@ class Tensorflow::Graph
   # adds a placeholder to the Graph, a placeholder is an 
   # operation that must be fed with data on execution.
   def placeholder(name, type_enum, dims)
-    op = GraphNode.new()
-    op.def = Tensorflow::NodeDef.new(:name => name,:op => "Placeholder", :attr => Hash.new)
-    op.outDataTypes = Hash.new
-    op.outDataTypes[name] = type_enum
-    op.def.attr["dtype"] = Tensorflow::AttrValue.new(:type => type_enum)
+    op = GraphNode.new
+    op.definition = Tensorflow::NodeDef.new(:name => name,:op => "Placeholder", :attr => {})
+    op.outdatatypes = {}
+    op.outdatatypes[name] = type_enum
+    op.definition.attr["dtype"] = Tensorflow::AttrValue.new(:type => type_enum)
     dim_array = []
     dims.each do |i|
       dim_array.push(Tensorflow::TensorShapeProto::Dim.new(:size => i))
     end
-    op.def.attr["shape"] = Tensorflow::AttrValue.new(:shape => Tensorflow::TensorShapeProto.new(:dim => dim_array))
-    self.graph_def.node.push(op.def)
+    op.definition.attr["shape"] = Tensorflow::AttrValue.new(:shape => Tensorflow::TensorShapeProto.new(:dim => dim_array))
+    self.graph_def.node.push(op.definition)
     op
   end
 
@@ -71,20 +71,20 @@ class Tensorflow::Graph
     raise ("Invalid number of inputs.") if op.input_arg.length != input.length
     inputs = []
     input.each do |node|
-      inputs.push(node.def.name)
+      inputs.push(node.definition.name)
     end
-    node = GraphNode.new()
-    node.def = Tensorflow::NodeDef.new(:name => name, :op => opName, :input => inputs, :device => device , :attr => Hash.new)
-    attrs = Hash.new if attrs == nil
+    node = GraphNode.new
+    node.definition = Tensorflow::NodeDef.new(:name => name, :op => opName, :input => inputs, :device => device , :attr => {})
+    attrs = {} if attrs == nil
     matchTypes(input, node, attrs, op)
     op.attr.each do |attribute|
       if attrs[attribute.name]
-        node.def.attr[attribute.name] = make_attr_value(attribute.name, attrs[attribute.name]) #make_attr_value(attribute.type, attrs[attribute.name])
+        node.definition.attr[attribute.name] = make_attr_value(attribute.name, attrs[attribute.name]) #make_attr_value(attribute.type, attrs[attribute.name])
       elsif attribute.default_value
-        node.def.attr[attribute.name] = attribute.default_value
+        node.definition.attr[attribute.name] = attribute.default_value
       end
     end
-    self.graph_def.node.push(node.def)
+    self.graph_def.node.push(node.definition)
     node
   end
 
@@ -110,7 +110,7 @@ class Tensorflow::Graph
   # Matches input/output parameters with corresponding data types.
   def matchTypes(input, outnode, attrs, op)
     (0..op.input_arg.length - 1).each do |i|
-      inType = input[i].outDataTypes[input[i].def.name]
+      inType = input[i].outdatatypes[input[i].definition.name]
       attrs[op.input_arg[i].type_attr] = inType   if inType != 0 and op.input_arg[i].type_attr
     end
 
@@ -130,7 +130,7 @@ class Tensorflow::Graph
 
     op.output_arg.each do |arg|
       argType = type_to_enum(arg.type)
-      outnode.outDataTypes[outnode.def.name] = attrs[arg.type_attr]
+      outnode.outdatatypes[outnode.definition.name] = attrs[arg.type_attr]
       # TODO
     end
     nil
@@ -139,9 +139,9 @@ end
 
 
 class GraphNode
-  attr_accessor :def, :ref, :outDataTypes
+  attr_accessor :definition, :ref, :outdatatypes
   def initialize
-    self.def = Tensorflow::NodeDef.new
-    self.outDataTypes = Hash.new
+    self.definition = Tensorflow::NodeDef.new
+    self.outdatatypes = {}
   end
 end

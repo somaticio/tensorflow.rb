@@ -5,7 +5,7 @@ require 'pry'
 def loadAndExtendGraphFromFile(filename)
   session = Tensorflow::Session.new()
   graph = Tensorflow::Graph.new()
-  graph.graph_from_reader(File.dirname(__FILE__)+'/example_graphs/'+filename)
+  graph.read(File.dirname(__FILE__)+'/example_graphs/'+filename)
   session.extend_graph(graph)
   session
 end
