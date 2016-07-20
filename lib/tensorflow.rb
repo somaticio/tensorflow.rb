@@ -1,6 +1,6 @@
 require 'tensorflow/core/framework/tensor'
 require 'tensorflow/core/framework/graph'
-require 'sciruby/Internal'
+require 'sciruby/tensorflow/internal'
 require 'tensorflow/tensor'
 require 'tensorflow/graph'
 require 'tensorflow/session'

@@ -1,4 +1,4 @@
-%module  "Internal"
+%module  "internal"
 %include "typemaps.i"
 %include "std_vector.i"
 %include "std_string.i"
