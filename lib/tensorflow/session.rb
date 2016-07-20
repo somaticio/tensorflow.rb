@@ -17,9 +17,9 @@ class Tensorflow::Session
   # A TensorFlow graph is a description of computations. To compute anything, a graph must be launched in a Session. A Session places the graph ops and provides methods to execute them.
 
   def initialize()
-  	self.status = Tensorflow::Internal::TF_NewStatus()
-  	self.ops = Tensorflow::Internal::TF_NewSessionOptions()
-  	self.session = Tensorflow::Internal::TF_NewSession(self.ops, self.status)
+    self.status = Tensorflow::Internal::TF_NewStatus()
+    self.ops = Tensorflow::Internal::TF_NewSessionOptions()
+    self.session = Tensorflow::Internal::TF_NewSession(self.ops, self.status)
   end
 
   #
@@ -32,8 +32,8 @@ class Tensorflow::Session
     output_names, output_values = initialize_outputs(outputs)
     target_names = initialize_targets(targets)
 
-   	status = Tensorflow::Internal::TF_NewStatus()
-	  Tensorflow::Internal::TF_Run_wrapper(self.session, input_names, input_values, output_names, output_values, target_names, self.status)
+    status = Tensorflow::Internal::TF_NewStatus()
+    Tensorflow::Internal::TF_Run_wrapper(self.session, input_names, input_values, output_names, output_values, target_names, self.status)
     raise ("Incorrect specifications passed.")  if Tensorflow::Internal::TF_GetCode(status) != Tensorflow::Internal::TF_OK
 
     output_array = []
@@ -162,11 +162,11 @@ class Tensorflow::Session
   #   - A c array.
   #
   def graph_def_to_c_array(array)
-   c_array = Tensorflow::Internal::Character.new(array.length)
-   (0..array.length-1).each do |i|
-     c_array[i] = array[i]
-   end
-   c_array
+    c_array = Tensorflow::Internal::Character.new(array.length)
+    (0..array.length-1).each do |i|
+      c_array[i] = array[i]
+    end
+    c_array
   end
 
 end

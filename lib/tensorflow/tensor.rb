@@ -122,18 +122,19 @@ class Tensorflow::Tensor
     start = data if self.rank == 0
     start = data.flatten[0]  if self.rank != 0 
     self.type_num = Tensorflow::Internal::TF_INT64
-    if start.is_a? Integer
+    case start
+    when Integer
       type = Integer
       self.data_size = 8
-    elsif start.is_a? Float
+    when Float
       type = Float
       self.type_num = Tensorflow::Internal::TF_DOUBLE
       self.data_size = 8
-    elsif start.is_a? String
+    when String
       type = String
       self.type_num = Tensorflow::Internal::TF_STRING
       self.data_size = 8
-    elsif start.is_a? Complex
+    when Complex
       type = Complex
       self.type_num = Tensorflow::Internal::TF_COMPLEX128
       self.data_size = 16
