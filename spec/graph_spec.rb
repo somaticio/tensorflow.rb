@@ -2,8 +2,8 @@ require 'spec_helper'
 describe "Graph" do
   it "Should make two placeholders and add them without using files generated with python." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_INT32, [2,3])
-    input2 = graph.placeholder('input2', Tensorflow::TF_INT32, [2,3])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_INT32, [2,3])
+    input2 = graph.placeholder('input2', Tensorflow::Internal::TF_INT32, [2,3])
     graph.define_op("Add",'output',[input1,input2],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)

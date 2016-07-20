@@ -17,9 +17,9 @@ class Tensorflow::Session
   # A TensorFlow graph is a description of computations. To compute anything, a graph must be launched in a Session. A Session places the graph ops and provides methods to execute them.
 
   def initialize()
-  	self.status = Tensorflow::TF_NewStatus()
-  	self.ops = Tensorflow::TF_NewSessionOptions()
-  	self.session = Tensorflow::TF_NewSession(self.ops, self.status)
+  	self.status = Tensorflow::Internal::TF_NewStatus()
+  	self.ops = Tensorflow::Internal::TF_NewSessionOptions()
+  	self.session = Tensorflow::Internal::TF_NewSession(self.ops, self.status)
   end
 
   #
@@ -32,9 +32,9 @@ class Tensorflow::Session
     output_names, output_values = initialize_outputs(outputs)
     target_names = initialize_targets(targets)
 
-   	status = Tensorflow::TF_NewStatus()
-	  Tensorflow::TF_Run_wrapper(self.session, input_names, input_values, output_names, output_values, target_names, self.status)
-    raise ("Incorrect specifications passed.")  if Tensorflow::TF_GetCode(status) != Tensorflow::TF_OK
+   	status = Tensorflow::Internal::TF_NewStatus()
+	  Tensorflow::Internal::TF_Run_wrapper(self.session, input_names, input_values, output_names, output_values, target_names, self.status)
+    raise ("Incorrect specifications passed.")  if Tensorflow::Internal::TF_GetCode(status) != Tensorflow::Internal::TF_OK
 
     output_array = []
 
@@ -47,16 +47,16 @@ class Tensorflow::Session
   end
 
   def extend_graph(graph)
-  	self.status = Tensorflow::TF_NewStatus()
-  	Tensorflow::TF_ExtendGraph(self.session, graph_def_to_c_array(graph.graph_def_raw), graph.graph_def_raw.length, self.status)
+  	self.status = Tensorflow::Internal::TF_NewStatus()
+  	Tensorflow::Internal::TF_ExtendGraph(self.session, graph_def_to_c_array(graph.graph_def_raw), graph.graph_def_raw.length, self.status)
   	self.graph = graph
   end
 
   private
 
   def initialize_inputs(inputs)
-    input_names = Tensorflow::String_Vector.new
-    input_values = Tensorflow::Tensor_Vector.new
+    input_names = Tensorflow::Internal::String_Vector.new
+    input_values = Tensorflow::Internal::Tensor_Vector.new
     if inputs != nil
       inputs.each do |key, value|
         input_values.push(value)
@@ -68,18 +68,18 @@ class Tensorflow::Session
   end
 
   def initialize_outputs(outputs)
-    output_names = Tensorflow::String_Vector.new
+    output_names = Tensorflow::Internal::String_Vector.new
     outputs.each do |name|
       output_names.push(name)
     end
 
-    output_values = Tensorflow::Tensor_Vector.new
+    output_values = Tensorflow::Internal::Tensor_Vector.new
 
     return output_names, output_values
   end
 
   def initialize_targets(targets)
-    target_names = Tensorflow::String_Vector.new
+    target_names = Tensorflow::Internal::String_Vector.new
     if targets != nil
       targets.each do |name|
         target_names.push(name)
@@ -90,7 +90,7 @@ class Tensorflow::Session
   end
 
   def convert_value_for_output_array(value)
-    size = Tensorflow::tensor_size(value)
+    size = Tensorflow::Internal::tensor_size(value)
     c_array = construct_c_array(value, size)
     length_by_dimension = length_by_dimension(value)
     arrange_into_dimensions(c_array, size, length_by_dimension)
@@ -98,29 +98,29 @@ class Tensorflow::Session
 
   # Returns an array containing the length of the tensor in each dimension
   def length_by_dimension(value)
-    num_dimensions = Tensorflow::TF_NumDims(value)
+    num_dimensions = Tensorflow::Internal::TF_NumDims(value)
     result = []
 
     (0..num_dimensions - 1).each_with_object([]) do |dimension, array|
-      array.push(Tensorflow::TF_Dim(value, dimension))
+      array.push(Tensorflow::Internal::TF_Dim(value, dimension))
     end
   end
 
   def construct_c_array(value, size)
-    type = Tensorflow::TF_TensorType(value)
+    type = Tensorflow::Internal::TF_TensorType(value)
 
     case type
-    when Tensorflow::TF_DOUBLE
-      c_array = Tensorflow::Double.new(size)
-      Tensorflow::double_reader(value, c_array, size)
-    when Tensorflow::TF_INT64
-      c_array = Tensorflow::Long_long.new(size)
-      Tensorflow::long_long_reader(value, c_array, size)
-    when Tensorflow::TF_INT32
-      c_array = Tensorflow::Int.new(size)
-      Tensorflow::int_reader(value, c_array, size)
-    when Tensorflow::TF_COMPLEX128
-      c_array = Tensorflow::complex_reader(value)
+    when Tensorflow::Internal::TF_DOUBLE
+      c_array = Tensorflow::Internal::Double.new(size)
+      Tensorflow::Internal::double_reader(value, c_array, size)
+    when Tensorflow::Internal::TF_INT64
+      c_array = Tensorflow::Internal::Long_long.new(size)
+      Tensorflow::Internal::long_long_reader(value, c_array, size)
+    when Tensorflow::Internal::TF_INT32
+      c_array = Tensorflow::Internal::Int.new(size)
+      Tensorflow::Internal::int_reader(value, c_array, size)
+    when Tensorflow::Internal::TF_COMPLEX128
+      c_array = Tensorflow::Internal::complex_reader(value)
     else
       raise "Data type not supported."
     end
@@ -162,7 +162,7 @@ class Tensorflow::Session
   #   - A c array.
   #
   def graph_def_to_c_array(array)
-   c_array = Tensorflow::Character.new(array.length)
+   c_array = Tensorflow::Internal::Character.new(array.length)
    (0..array.length-1).each do |i|
      c_array[i] = array[i]
    end

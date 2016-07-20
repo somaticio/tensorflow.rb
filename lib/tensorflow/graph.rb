@@ -96,11 +96,11 @@ class Tensorflow::Graph
   end
 
   TYPE2ENUM = {
-    DT_FLOAT: Tensorflow::TF_FLOAT,
-    DT_DOUBLE: Tensorflow::TF_DOUBLE,
-    DT_INT64: Tensorflow::TF_INT64,
-    DT_STRING: Tensorflow::TF_STRING,
-    DT_COMPLEX128: Tensorflow::TF_COMPLEX128
+    DT_FLOAT: Tensorflow::Internal::TF_FLOAT,
+    DT_DOUBLE: Tensorflow::Internal::TF_DOUBLE,
+    DT_INT64: Tensorflow::Internal::TF_INT64,
+    DT_STRING: Tensorflow::Internal::TF_STRING,
+    DT_COMPLEX128: Tensorflow::Internal::TF_COMPLEX128
   }
 
   def type_to_enum(type)

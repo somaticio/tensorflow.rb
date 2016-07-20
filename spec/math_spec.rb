@@ -3,8 +3,8 @@ require 'spec_helper'
 describe "Math" do
   it "Add two tensors." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [2,3])
-    input2 = graph.placeholder('input2', Tensorflow::TF_DOUBLE, [2,3])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [2,3])
+    input2 = graph.placeholder('input2', Tensorflow::Internal::TF_DOUBLE, [2,3])
     graph.define_op("Add",'output',[input1,input2],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -25,8 +25,8 @@ describe "Math" do
 
   it "Add two complex tensors." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_COMPLEX128, [1])
-    input2 = graph.placeholder('input2', Tensorflow::TF_COMPLEX128, [1])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_COMPLEX128, [1])
+    input2 = graph.placeholder('input2', Tensorflow::Internal::TF_COMPLEX128, [1])
     graph.define_op("Add",'output',[input1,input2],"",nil)
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
     session = Tensorflow::Session.new
@@ -46,8 +46,8 @@ describe "Math" do
 
   it "Subtract two tensors." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [2,3])
-    input2 = graph.placeholder('input2', Tensorflow::TF_DOUBLE, [2,3])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [2,3])
+    input2 = graph.placeholder('input2', Tensorflow::Internal::TF_DOUBLE, [2,3])
     graph.define_op('Sub','output', [input1, input2], '', nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -68,8 +68,8 @@ describe "Math" do
 
   it "Multiply two tensors element wise." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_INT64, [3])
-    input2 = graph.placeholder('input2', Tensorflow::TF_INT64, [3])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_INT64, [3])
+    input2 = graph.placeholder('input2', Tensorflow::Internal::TF_INT64, [3])
     graph.define_op("Mul",'output',[input1,input2],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -90,8 +90,8 @@ describe "Math" do
 
   it "Divide two tensors element wise." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_INT64, [3])
-    input2 = graph.placeholder('input2', Tensorflow::TF_INT64, [3])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_INT64, [3])
+    input2 = graph.placeholder('input2', Tensorflow::Internal::TF_INT64, [3])
     graph.define_op("div",'output',[input1,input2],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -112,7 +112,7 @@ describe "Math" do
 
   it "Returns element-wise Absolute value." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_INT64, [2,2])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_INT64, [2,2])
     graph.define_op("Abs",'output',[input1],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -131,7 +131,7 @@ describe "Math" do
 
   it "Returns element-wise inverse." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [2,2])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [2,2])
     graph.define_op("inv",'output',[input1],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -150,8 +150,8 @@ describe "Math" do
 
   it "Returns element-wise power function." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_INT64, [2,3])
-    input2 = graph.placeholder('input2', Tensorflow::TF_INT64, [2,3])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_INT64, [2,3])
+    input2 = graph.placeholder('input2', Tensorflow::Internal::TF_INT64, [2,3])
     graph.define_op("Pow",'output',[input1,input2],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -172,7 +172,7 @@ describe "Math" do
 
   it "Determinant of a matrix." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [2,2])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [2,2])
     graph.define_op("MatrixDeterminant",'output',[input1],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -192,7 +192,7 @@ describe "Math" do
 
   it "Determinant of a batch of matrices." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [3,2,2])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [3,2,2])
     graph.define_op("BatchMatrixDeterminant",'output',[input1],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -222,7 +222,7 @@ describe "Math" do
 
   it "Batched diagonal part of a batched tensor." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [2,4,4])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [2,4,4])
     graph.define_op("BatchMatrixDiagPart",'output',[input1],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -250,7 +250,7 @@ describe "Math" do
 
   it "Computes exponential of x element-wise" do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [3])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [3])
     graph.define_op("exp",'output',[input1],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -269,7 +269,7 @@ describe "Math" do
 
   it "Computes natural logarithm of x element-wise." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [3])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [3])
     graph.define_op("log",'output',[input1],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -288,7 +288,7 @@ describe "Math" do
 
   it "Returns element-wise smallest integer in not less than x. (ceil function)" do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [4])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [4])
     graph.define_op("ceil",'output',[input1],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -307,7 +307,7 @@ describe "Math" do
 
   it "Returns element-wise largest integer not greater than x. (floor function)" do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [4])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [4])
     graph.define_op("floor",'output',[input1],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -326,7 +326,7 @@ describe "Math" do
 
   it "Computes the Gauss error function of x element-wise." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [4])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [4])
     graph.define_op("erf",'output',[input1],"",nil)
 
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
@@ -347,7 +347,7 @@ describe "Math" do
 
   it "Returns MatrixInverse." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [2,2])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [2,2])
     graph.define_op("MatrixInverse",'output',[input1],"",nil)
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
     session = Tensorflow::Session.new
@@ -367,7 +367,7 @@ describe "Math" do
 
   it "Returns MatrixInverse." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [2,2])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [2,2])
     graph.define_op("MatrixInverse",'output',[input1],"",nil)
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
     session = Tensorflow::Session.new
@@ -387,8 +387,8 @@ describe "Math" do
 
   it "Returns Solves a system of linear equations." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [3,3])
-    input2 = graph.placeholder('input2', Tensorflow::TF_DOUBLE, [3,1])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [3,3])
+    input2 = graph.placeholder('input2', Tensorflow::Internal::TF_DOUBLE, [3,1])
     graph.define_op("MatrixSolve",'output',[input1,input2],"",nil)
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
     session = Tensorflow::Session.new
@@ -427,7 +427,7 @@ describe "Math" do
 
   it "Square Tensor elements." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [3,3])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [3,3])
     graph.define_op("square",'output',[input1],"",nil)
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
     session = Tensorflow::Session.new
@@ -445,8 +445,8 @@ describe "Math" do
 
   it "Multiplies two matrices." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [2,3])
-    input2 = graph.placeholder('input2', Tensorflow::TF_DOUBLE, [3,2])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_DOUBLE, [2,3])
+    input2 = graph.placeholder('input2', Tensorflow::Internal::TF_DOUBLE, [3,2])
     graph.define_op("matmul",'output',[input1,input2],"",nil)
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
     session = Tensorflow::Session.new
@@ -470,8 +470,8 @@ describe "Math" do
 
   it "Multiplies two matrices." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_COMPLEX128, [2,2])
-    input2 = graph.placeholder('input2', Tensorflow::TF_COMPLEX128, [2,2])
+    input1 = graph.placeholder('input1', Tensorflow::Internal::TF_COMPLEX128, [2,2])
+    input2 = graph.placeholder('input2', Tensorflow::Internal::TF_COMPLEX128, [2,2])
     graph.define_op("matmul",'output',[input1,input2],"",nil)
     encoder = Tensorflow::GraphDef.encode(graph.graph_def)
     session = Tensorflow::Session.new

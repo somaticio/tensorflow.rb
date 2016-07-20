@@ -51,8 +51,8 @@ class Tensorflow::Tensor
     self.element_type = find_type(data) if type == nil
     self.flatten = data.flatten
     self.tensor_data = ruby_array_to_c(self.flatten, self.type_num)
-    self.dimension_data = ruby_array_to_c(self.dimensions, Tensorflow::TF_INT64)
-    self.tensor = Tensorflow::TF_NewTensor_wrapper(self.type_num, self.dimension_data, self.dimensions.length, self.tensor_data , self.data_size * self.flatten.length)
+    self.dimension_data = ruby_array_to_c(self.dimensions, Tensorflow::Internal::TF_INT64)
+    self.tensor = Tensorflow::Internal::TF_NewTensor_wrapper(self.type_num, self.dimension_data, self.dimensions.length, self.tensor_data , self.data_size * self.flatten.length)
   end
 
   #
@@ -70,23 +70,23 @@ class Tensorflow::Tensor
   def set_type(type)
     case type
     when :float64
-      self.type_num = Tensorflow::TF_DOUBLE
+      self.type_num = Tensorflow::Internal::TF_DOUBLE
       self.data_size = 8
       self.element_type = Float
     when :int64
-      self.type_num = Tensorflow::TF_INT64
+      self.type_num = Tensorflow::Internal::TF_INT64
       self.data_size = 8
       self.element_type = Integer
     when :int32
-      self.type_num = Tensorflow::TF_INT32
+      self.type_num = Tensorflow::Internal::TF_INT32
       self.data_size = 4
       self.element_type = Integer
     when :string
-      self.type_num = Tensorflow::TF_STRING
+      self.type_num = Tensorflow::Internal::TF_STRING
       self.data_size = 8
       self.element_type = String
     when :complex
-      self.type_num = Tensorflow::TF_COMPLEX128
+      self.type_num = Tensorflow::Internal::TF_COMPLEX128
       self.data_size = 16
       self.element_type = Complex
     else
@@ -121,21 +121,21 @@ class Tensorflow::Tensor
   def find_type(data)
     start = data if self.rank == 0
     start = data.flatten[0]  if self.rank != 0 
-    self.type_num = Tensorflow::TF_INT64
+    self.type_num = Tensorflow::Internal::TF_INT64
     if start.is_a? Integer
       type = Integer
       self.data_size = 8
     elsif start.is_a? Float
       type = Float
-      self.type_num = Tensorflow::TF_DOUBLE
+      self.type_num = Tensorflow::Internal::TF_DOUBLE
       self.data_size = 8
     elsif start.is_a? String
       type = String
-      self.type_num = Tensorflow::TF_STRING
+      self.type_num = Tensorflow::Internal::TF_STRING
       self.data_size = 8
     elsif start.is_a? Complex
       type = Complex
-      self.type_num = Tensorflow::TF_COMPLEX128
+      self.type_num = Tensorflow::Internal::TF_COMPLEX128
       self.data_size = 16
     else 
       raise "Data type not supported."
@@ -150,7 +150,7 @@ class Tensorflow::Tensor
       end
       if float_flag == 1
         type = Float
-        self.type_num = Tensorflow::TF_DOUBLE
+        self.type_num = Tensorflow::Internal::TF_DOUBLE
         self.data_size = 8
       end
     else
@@ -171,22 +171,22 @@ class Tensorflow::Tensor
   #
   def ruby_array_to_c(array, type)
     c_array = []
-    if type == Tensorflow::TF_INT64
-      c_array = Tensorflow::Long_long.new(array.length)
+    if type == Tensorflow::Internal::TF_INT64
+      c_array = Tensorflow::Internal::Long_long.new(array.length)
       array.each_with_index { |value, i| c_array[i] = value }
-    elsif type == Tensorflow::TF_INT32
-      c_array = Tensorflow::Int.new(array.length)
+    elsif type == Tensorflow::Internal::TF_INT32
+      c_array = Tensorflow::Internal::Int.new(array.length)
       array.each_with_index { |value, i| c_array[i] = value }
-    elsif type == Tensorflow::TF_STRING
-      c_array = Tensorflow::String_Vector.new
+    elsif type == Tensorflow::Internal::TF_STRING
+      c_array = Tensorflow::Internal::String_Vector.new
       array.each_with_index { |value, i| c_array[i] = value }
-      c_array = Tensorflow::string_array_from_string_vector(c_array)
-    elsif type == Tensorflow::TF_COMPLEX128
-      c_array = Tensorflow::Complex_Vector.new
+      c_array = Tensorflow::Internal::string_array_from_string_vector(c_array)
+    elsif type == Tensorflow::Internal::TF_COMPLEX128
+      c_array = Tensorflow::Internal::Complex_Vector.new
       array.each_with_index { |value, i| c_array[i] = value }
-      c_array = Tensorflow::complex_array_from_complex_vector(c_array)
+      c_array = Tensorflow::Internal::complex_array_from_complex_vector(c_array)
     else
-      c_array = Tensorflow::Double.new(array.length)
+      c_array = Tensorflow::Internal::Double.new(array.length)
       array.each_with_index { |value, i| c_array[i] = value }
     end
     c_array
