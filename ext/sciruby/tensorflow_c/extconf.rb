@@ -1,5 +1,5 @@
 require "mkmf"
-system('swig -c++  -cpperraswarn -ruby Tensorflow.i') or abort
+system('swig -c++  -cpperraswarn -ruby -prefix "Tensorflow::" internal.i') or abort
 $CXXFLAGS += " -std=c++11 "
 $libs = append_library($libs, "tensorflow")
-create_makefile("sciruby/Tensorflow")
+create_makefile("sciruby/tensorflow/internal")
