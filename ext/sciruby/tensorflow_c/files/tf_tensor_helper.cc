@@ -21,6 +21,20 @@ namespace tensorflow {
 TF_Tensor* TF_NewTensor_wrapper(TF_DataType dtype, long long* dims, int num_dims,
                    void* data, size_t len) {
 
+  if(dtype == TF_STRING) {
+    std::string* tensorData = (std::string*)data;
+    long long tensorDim = dims[0];
+    size_t lengthOfAllStrings = 0;
+
+    for(auto i=0; i<tensorDim; ++i) {
+      lengthOfAllStrings += tensorData[i].length();
+    }
+
+    // roughly estimated from http://stackoverflow.com/questions/29868622/memory-consumed-by-a-string-vector-in-c
+    size_t completeLength = lengthOfAllStrings + sizeof(std::string) * tensorDim;
+    len = completeLength;
+  }
+
   void* cData = malloc(len);
   memcpy(cData, data, len);
 
@@ -122,4 +136,3 @@ std::complex<double>* complex_array_from_complex_vector(std::vector<std::complex
 };
 
 }  // namespace tensorflow
-
