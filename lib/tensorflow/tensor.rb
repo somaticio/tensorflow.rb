@@ -49,6 +49,7 @@ class Tensorflow::Tensor
     self.tensor_shape_proto = shape_proto(self.dimensions) if self.dimensions.is_a?(Array)
     self.element_type = set_type(type) if type != nil
     self.element_type = find_type(data) if type == nil
+    raise ("Multi-dimensional tensor not supported for string data type.") if self.dimensions.length > 1 and self.type_num == Tensorflow::TF_STRING
     self.flatten = data.flatten
     self.tensor_data = ruby_array_to_c(self.flatten, self.type_num)
     self.dimension_data = ruby_array_to_c(self.dimensions, Tensorflow::TF_INT64)
