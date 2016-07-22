@@ -2,6 +2,7 @@ ext/sciruby/tensorflow_c/Makefile
 ext/sciruby/tensorflow_c/*.so
 ext/sciruby/tensorflow_c/*.cxx
 ext/sciruby/tensorflow_c/*.o
+ext/sciruby/tensorflow_c/*.bundle
 .*.time
 pkg/
 .yardoc/
