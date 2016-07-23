@@ -121,27 +121,30 @@ class Tensorflow::Tensor
   #
   def find_type(data)
     start = data if self.rank == 0
-    start = data.flatten[0]  if self.rank != 0 
+    start = data.flatten[0]  if self.rank != 0
     self.type_num = Tensorflow::TF_INT64
-    if start.is_a? Integer
+
+    case start
+    when Integer
       type = Integer
       self.data_size = 8
-    elsif start.is_a? Float
+    when Float
       type = Float
       self.type_num = Tensorflow::TF_DOUBLE
       self.data_size = 8
-    elsif start.is_a? String
+    when String
       type = String
       self.type_num = Tensorflow::TF_STRING
       self.data_size = 8
-    elsif start.is_a? Complex
+    when Complex
       type = Complex
       self.type_num = Tensorflow::TF_COMPLEX128
       self.data_size = 16
-    else 
+    else
       raise "Data type not supported."
     end
-    return type if self.rank == 0 
+
+    return type if self.rank == 0
     if type == Integer  || type == Float
       float_flag = 0
       float_flag = 1 if type == Float
