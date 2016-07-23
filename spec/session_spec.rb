@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe "Tensorflow::Session" do 
   it "Should give correct results for adding two arrays." do 
-    s = loadAndExtendGraphFromFile('add_three_dim_graph.pb')
+    s = load_and_extend_graph_from_file('add_three_dim_graph.pb')
     input1 = Tensorflow::Tensor.new([1, 2, 3])
     input2 = Tensorflow::Tensor.new([3, 4, 5])
     input = Hash.new
@@ -13,7 +13,7 @@ describe "Tensorflow::Session" do
   end
 
   it "Should give correct results for adding two multi dimensional tensors." do 
-    s = loadAndExtendGraphFromFile('test_graph_multi_dim.pb')
+    s = load_and_extend_graph_from_file('test_graph_multi_dim.pb')
     input1 = Tensorflow::Tensor.new([[[11, 22],[53,42]],[[51, 24],[13,42]]])
     input2 = Tensorflow::Tensor.new([[[41, 25],[33,41]],[[61, 42],[3,44]]])
     input = Hash.new
