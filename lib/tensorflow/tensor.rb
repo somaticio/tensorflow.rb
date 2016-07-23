@@ -121,27 +121,30 @@ class Tensorflow::Tensor
   #
   def find_type(data)
     start = data if self.rank == 0
-    start = data.flatten[0]  if self.rank != 0 
+    start = data.flatten[0]  if self.rank != 0
     self.type_num = Tensorflow::TF_INT64
-    if start.is_a? Integer
+
+    case start
+    when Integer
       type = Integer
       self.data_size = 8
-    elsif start.is_a? Float
+    when Float
       type = Float
       self.type_num = Tensorflow::TF_DOUBLE
       self.data_size = 8
-    elsif start.is_a? String
+    when String
       type = String
       self.type_num = Tensorflow::TF_STRING
       self.data_size = 8
-    elsif start.is_a? Complex
+    when Complex
       type = Complex
       self.type_num = Tensorflow::TF_COMPLEX128
       self.data_size = 16
-    else 
+    else
       raise "Data type not supported."
     end
-    return type if self.rank == 0 
+
+    return type if self.rank == 0
     if type == Integer  || type == Float
       float_flag = 0
       float_flag = 1 if type == Float
@@ -172,17 +175,18 @@ class Tensorflow::Tensor
   #
   def ruby_array_to_c(array, type)
     c_array = []
-    if type == Tensorflow::TF_INT64
+    case type
+    when Tensorflow::TF_INT64
       c_array = Tensorflow::Long_long.new(array.length)
       array.each_with_index { |value, i| c_array[i] = value }
-    elsif type == Tensorflow::TF_INT32
+    when Tensorflow::TF_INT32
       c_array = Tensorflow::Int.new(array.length)
       array.each_with_index { |value, i| c_array[i] = value }
-    elsif type == Tensorflow::TF_STRING
+    when Tensorflow::TF_STRING
       c_array = Tensorflow::String_Vector.new
       array.each_with_index { |value, i| c_array[i] = value }
       c_array = Tensorflow::string_array_from_string_vector(c_array)
-    elsif type == Tensorflow::TF_COMPLEX128
+    when Tensorflow::TF_COMPLEX128
       c_array = Tensorflow::Complex_Vector.new
       array.each_with_index { |value, i| c_array[i] = value }
       c_array = Tensorflow::complex_array_from_complex_vector(c_array)
