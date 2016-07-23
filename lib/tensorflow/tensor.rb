@@ -175,17 +175,18 @@ class Tensorflow::Tensor
   #
   def ruby_array_to_c(array, type)
     c_array = []
-    if type == Tensorflow::TF_INT64
+    case type
+    when Tensorflow::TF_INT64
       c_array = Tensorflow::Long_long.new(array.length)
       array.each_with_index { |value, i| c_array[i] = value }
-    elsif type == Tensorflow::TF_INT32
+    when Tensorflow::TF_INT32
       c_array = Tensorflow::Int.new(array.length)
       array.each_with_index { |value, i| c_array[i] = value }
-    elsif type == Tensorflow::TF_STRING
+    when Tensorflow::TF_STRING
       c_array = Tensorflow::String_Vector.new
       array.each_with_index { |value, i| c_array[i] = value }
       c_array = Tensorflow::string_array_from_string_vector(c_array)
-    elsif type == Tensorflow::TF_COMPLEX128
+    when Tensorflow::TF_COMPLEX128
       c_array = Tensorflow::Complex_Vector.new
       array.each_with_index { |value, i| c_array[i] = value }
       c_array = Tensorflow::complex_array_from_complex_vector(c_array)
