@@ -121,7 +121,7 @@ class Tensorflow::Tensor
   #
   def find_type(data)
     start = data if self.rank == 0
-    start = data.flatten[0]  if self.rank != 0
+    start = data.flatten[0] if self.rank != 0
     self.type_num = Tensorflow::TF_INT64
 
     case start
