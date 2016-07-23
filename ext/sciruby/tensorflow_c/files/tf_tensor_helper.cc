@@ -49,19 +49,19 @@ void print_tensor(TF_Tensor* tensor)
     auto type = TF_TensorType(tensor);
     long long total_elements = 1;
     for (int i = 0; i < dimension_num; ++i) total_elements *= TF_Dim(tensor, i);
-    if (type == 9) {long long* tensor_data = static_cast<long long *>(TF_TensorData(tensor));
+    if (type == TF_COMPLEX) {long long* tensor_data = static_cast<long long *>(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
     }
-    else if (type == 2){ double* tensor_data = static_cast<double *>(TF_TensorData(tensor));
+    else if (type == TF_DOUBLE){ double* tensor_data = static_cast<double *>(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
     }
-    else if (type == 3){ int* tensor_data = static_cast<int *>(TF_TensorData(tensor));
+    else if (type == TF_INT32){ int* tensor_data = static_cast<int *>(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
     }
-    else if (type == 7){ std::string* tensor_data = static_cast<std::string *>(TF_TensorData(tensor));
+    else if (type == TF_STRING){ std::string* tensor_data = static_cast<std::string *>(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
     }
-    else if (type == 18){ std::complex<double>* tensor_data = static_cast<std::complex<double>* >(TF_TensorData(tensor));
+    else if (type == TF_COMPLEX128){ std::complex<double>* tensor_data = static_cast<std::complex<double>* >(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << std::real(tensor_data[i]) << " " << std::imag(tensor_data[i]) << std::endl;
     }
     std::cout << std::endl;
