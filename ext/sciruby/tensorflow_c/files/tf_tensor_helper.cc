@@ -49,7 +49,7 @@ void print_tensor(TF_Tensor* tensor)
     auto type = TF_TensorType(tensor);
     long long total_elements = 1;
     for (int i = 0; i < dimension_num; ++i) total_elements *= TF_Dim(tensor, i);
-    if (type == TF_COMPLEX) {long long* tensor_data = static_cast<long long *>(TF_TensorData(tensor));
+    if (type == TF_INT64) {long long* tensor_data = static_cast<long long *>(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
     }
     else if (type == TF_DOUBLE){ double* tensor_data = static_cast<double *>(TF_TensorData(tensor));
