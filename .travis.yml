@@ -1,0 +1,42 @@
+sudo: required
+dist: trusty # Ubuntu 14.04: https://docs.travis-ci.com/user/trusty-ci-environment/#Distribution-release
+
+jdk:
+  - oraclejdk8 # For Bazel 0.3.0 https://github.com/bazelbuild/bazel/releases/tag/0.3.0
+python:
+  - "2.7.6"
+
+install:
+  # Install TensorFlow
+  # https://www.tensorflow.org/versions/r0.9/get_started/os_setup.html#installation-for-linux
+
+  ## Bazel
+  ### Bazel dependencies
+  ### http://www.bazel.io/docs/install.html#install-on-ubuntu
+  - cd .. # out of /tensorflow.rb directory
+  - echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
+  - curl https://storage.googleapis.com/bazel-apt/doc/apt-key.pub.gpg | sudo apt-key add -
+  ### Install Bazel
+  ### https://www.tensorflow.org/versions/r0.9/get_started/os_setup.html#install-bazel
+  - sudo apt-get update && sudo apt-get install bazel
+  - wget 'https://github.com/bazelbuild/bazel/releases/download/0.3.0/bazel-0.3.0-installer-linux-x86_64.sh'
+  - chmod +x bazel-0.3.0-installer-linux-x86_64.sh
+  - ./bazel-0.3.0-installer-linux-x86_64.sh --user
+
+  ## TensorFlow dependencies
+  - sudo apt-get install -y python-numpy swig python-dev python-wheel
+  - export PYTHONPATH="/usr/lib"
+  - export PATH="$PATH:$HOME/bin"
+
+  ## Clone and build TensorFlow
+  - git clone --recurse-submodules https://github.com/tensorflow/tensorflow
+  - cd tensorflow
+  ### https://www.tensorflow.org/versions/r0.9/get_started/os_setup.html#configure-the-installation
+  - echo | ./configure # echo to hit return on prompts
+  - sudo bazel build //tensorflow:libtensorflow.so
+  - sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/lib
+
+script: bundle exec rspec spec
+
+notifications:
+  email: false
