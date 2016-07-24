@@ -1,5 +1,6 @@
 require 'tensorflow/core/framework/tensor'
 require 'tensorflow/core/framework/graph'
+require 'narray'
 require 'sciruby/Tensorflow'
 require 'tensorflow/tensor'
 require 'tensorflow/graph'
