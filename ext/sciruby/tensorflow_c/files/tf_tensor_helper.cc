@@ -42,20 +42,29 @@ TF_Tensor* TF_NewTensor_wrapper(TF_DataType dtype, long long* dims, int num_dims
       }, nullptr);
 };
 
+long long tensor_size(TF_Tensor* tensor)
+{
+  auto dimension_num = TF_NumDims(tensor);
+  long long total_elements = 1;
+  for (auto i = 0; i < dimension_num; ++i) total_elements *= TF_Dim(tensor, i);
+  return total_elements;
+};
+
+// This is a helper function used for testing and it may be removed later.
 void print_tensor(TF_Tensor* tensor)
 {
-    auto dimension_num = TF_NumDims(tensor);
-    auto size = TF_TensorByteSize(tensor);
     auto type = TF_TensorType(tensor);
-    long long total_elements = 1;
-    for (int i = 0; i < dimension_num; ++i) total_elements *= TF_Dim(tensor, i);
-    if (type == TF_INT64) {long long* tensor_data = static_cast<long long *>(TF_TensorData(tensor));
+    long long total_elements = tensor_size(tensor);
+    if (type == TF_FLOAT){ float* tensor_data = static_cast<float *>(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
     }
     else if (type == TF_DOUBLE){ double* tensor_data = static_cast<double *>(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
     }
     else if (type == TF_INT32){ int* tensor_data = static_cast<int *>(TF_TensorData(tensor));
+    for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
+    }
+    else if (type == TF_INT64) { long long* tensor_data = static_cast<long long *>(TF_TensorData(tensor));
     for (int i = 0; i < total_elements; ++i) std::cout << tensor_data[i] << " ";
     }
     else if (type == TF_STRING){ std::string* tensor_data = static_cast<std::string *>(TF_TensorData(tensor));
@@ -67,30 +76,28 @@ void print_tensor(TF_Tensor* tensor)
     std::cout << std::endl;
 };
 
-long long tensor_size(TF_Tensor* tensor)
+void float_reader(TF_Tensor* tensor, float* array, int total_elements)
 {
-  auto dimension_num = TF_NumDims(tensor);
-  long long total_elements = 1;
-  for (auto i = 0; i < dimension_num; ++i) total_elements *= TF_Dim(tensor, i);
-  return total_elements;
+    float* tensor_data = static_cast<float *>(TF_TensorData(tensor));
+    for (int i = 0; i < total_elements; ++i) array[i] = tensor_data[i];
 };
 
-void long_long_reader(TF_Tensor* tensor, long long* array, int size_we)
-{
-    long long* tensor_data = static_cast<long long *>(TF_TensorData(tensor));
-    for (int i = 0; i < size_we; ++i) array[i] = tensor_data[i];
-};
-
-void int_reader(TF_Tensor* tensor, int* array, int size_we)
-{
-    int* tensor_data = static_cast<int *>(TF_TensorData(tensor));
-    for (int i = 0; i < size_we; ++i) array[i] = tensor_data[i];
-};
-
-void double_reader(TF_Tensor* tensor, double* array, int size_we)
+void double_reader(TF_Tensor* tensor, double* array, int total_elements)
 {
     double* tensor_data = static_cast<double *>(TF_TensorData(tensor));
-    for (int i = 0; i < size_we; ++i) array[i] = tensor_data[i];
+    for (int i = 0; i < total_elements; ++i) array[i] = tensor_data[i];
+};
+
+void int_reader(TF_Tensor* tensor, int* array, int total_elements)
+{
+    int* tensor_data = static_cast<int *>(TF_TensorData(tensor));
+    for (int i = 0; i < total_elements; ++i) array[i] = tensor_data[i];
+};
+
+void long_long_reader(TF_Tensor* tensor, long long* array, int total_elements)
+{
+    long long* tensor_data = static_cast<long long *>(TF_TensorData(tensor));
+    for (int i = 0; i < total_elements; ++i) array[i] = tensor_data[i];
 };
 
 std::vector<std::string> string_reader(TF_Tensor* tensor)

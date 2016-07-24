@@ -29,7 +29,6 @@ namespace std {
 
 %include "carrays.i"
 %array_class(long long, Long_long);
-%array_class(long , Long);
 %array_class(int, Int);
 %array_class(float, Float);
 %array_class(double, Double);

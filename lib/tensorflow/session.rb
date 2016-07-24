@@ -16,10 +16,10 @@ class Tensorflow::Session
   # @!attribute graph
   # A TensorFlow graph is a description of computations. To compute anything, a graph must be launched in a Session. A Session places the graph ops and provides methods to execute them.
 
-  def initialize()
-  	self.status = Tensorflow::TF_NewStatus()
-  	self.ops = Tensorflow::TF_NewSessionOptions()
-  	self.session = Tensorflow::TF_NewSession(self.ops, self.status)
+  def initialize
+    self.status = Tensorflow::TF_NewStatus()
+    self.ops = Tensorflow::TF_NewSessionOptions()
+    self.session = Tensorflow::TF_NewSession(self.ops, self.status)
   end
 
   #
@@ -32,8 +32,8 @@ class Tensorflow::Session
     output_names, output_values = initialize_outputs(outputs)
     target_names = initialize_targets(targets)
 
-   	status = Tensorflow::TF_NewStatus()
-	  Tensorflow::TF_Run_wrapper(self.session, input_names, input_values, output_names, output_values, target_names, self.status)
+    status = Tensorflow::TF_NewStatus()
+    Tensorflow::TF_Run_wrapper(self.session, input_names, input_values, output_names, output_values, target_names, self.status)
     raise ("Incorrect specifications passed.")  if Tensorflow::TF_GetCode(status) != Tensorflow::TF_OK
 
     output_array = []
@@ -47,9 +47,9 @@ class Tensorflow::Session
   end
 
   def extend_graph(graph)
-  	self.status = Tensorflow::TF_NewStatus()
-  	Tensorflow::TF_ExtendGraph(self.session, graph_def_to_c_array(graph.graph_def_raw), graph.graph_def_raw.length, self.status)
-  	self.graph = graph
+    self.status = Tensorflow::TF_NewStatus()
+    Tensorflow::TF_ExtendGraph(self.session, graph_def_to_c_array(graph.graph_def_raw), graph.graph_def_raw.length, self.status)
+    self.graph = graph
   end
 
   private
@@ -110,15 +110,18 @@ class Tensorflow::Session
     type = Tensorflow::TF_TensorType(value)
 
     case type
+    when Tensorflow::TF_FLOAT
+      c_array = Tensorflow::Float.new(size)
+      Tensorflow::float_reader(value, c_array, size)
     when Tensorflow::TF_DOUBLE
       c_array = Tensorflow::Double.new(size)
       Tensorflow::double_reader(value, c_array, size)
-    when Tensorflow::TF_INT64
-      c_array = Tensorflow::Long_long.new(size)
-      Tensorflow::long_long_reader(value, c_array, size)
     when Tensorflow::TF_INT32
       c_array = Tensorflow::Int.new(size)
       Tensorflow::int_reader(value, c_array, size)
+    when Tensorflow::TF_INT64
+      c_array = Tensorflow::Long_long.new(size)
+      Tensorflow::long_long_reader(value, c_array, size)
     when Tensorflow::TF_COMPLEX128
       c_array = Tensorflow::complex_reader(value)
     else

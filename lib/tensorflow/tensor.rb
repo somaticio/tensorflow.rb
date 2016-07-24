@@ -70,17 +70,21 @@ class Tensorflow::Tensor
 
   def set_type(type)
     case type
+    when :float
+      self.type_num = Tensorflow::TF_FLOAT
+      self.data_size = 8
+      self.element_type = Float
     when :float64
       self.type_num = Tensorflow::TF_DOUBLE
       self.data_size = 8
       self.element_type = Float
-    when :int64
-      self.type_num = Tensorflow::TF_INT64
-      self.data_size = 8
-      self.element_type = Integer
     when :int32
       self.type_num = Tensorflow::TF_INT32
       self.data_size = 4
+      self.element_type = Integer
+    when :int64
+      self.type_num = Tensorflow::TF_INT64
+      self.data_size = 8
       self.element_type = Integer
     when :string
       self.type_num = Tensorflow::TF_STRING
@@ -176,23 +180,26 @@ class Tensorflow::Tensor
   def ruby_array_to_c(array, type)
     c_array = []
     case type
-    when Tensorflow::TF_INT64
-      c_array = Tensorflow::Long_long.new(array.length)
+    when Tensorflow::TF_FLOAT
+      c_array = Tensorflow::Float.new(array.length)
+      array.each_with_index { |value, i| c_array[i] = value }
+    when Tensorflow::TF_DOUBLE
+      c_array = Tensorflow::Double.new(array.length)
       array.each_with_index { |value, i| c_array[i] = value }
     when Tensorflow::TF_INT32
       c_array = Tensorflow::Int.new(array.length)
+      array.each_with_index { |value, i| c_array[i] = value }
+    when Tensorflow::TF_INT64
+      c_array = Tensorflow::Long_long.new(array.length)
       array.each_with_index { |value, i| c_array[i] = value }
     when Tensorflow::TF_STRING
       c_array = Tensorflow::String_Vector.new
       array.each_with_index { |value, i| c_array[i] = value }
       c_array = Tensorflow::string_array_from_string_vector(c_array)
-    when Tensorflow::TF_COMPLEX128
+    else
       c_array = Tensorflow::Complex_Vector.new
       array.each_with_index { |value, i| c_array[i] = value }
       c_array = Tensorflow::complex_array_from_complex_vector(c_array)
-    else
-      c_array = Tensorflow::Double.new(array.length)
-      array.each_with_index { |value, i| c_array[i] = value }
     end
     c_array
   end
