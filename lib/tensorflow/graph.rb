@@ -72,7 +72,7 @@ class Tensorflow::Graph
     inputs = []
     (0..input.length - 1).each do |i|
       begin
-        if op.input_arg[i].is_ref and input[i].ref
+        if op.input_arg[i].is_ref && input[i].ref
           inputs.push(input[i].ref.name)
         else
           inputs.push(input[i].definition.name)

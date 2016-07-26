@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe "Math" do
-  it "Multiply two tensors element wise." do
+describe "Variable" do
+  it "Subtract Tensors" do
     graph = Tensorflow::Graph.new
     input1 = graph.variable( "input1",[343,32], :int32)
     input2 = graph.constant( "input2",[33,42], :int32)
