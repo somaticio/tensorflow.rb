@@ -96,42 +96,6 @@ class Tensorflow::Graph
     node
   end
 
-  #
-  # When you train a model, you use variables to hold and update parameters.
-  # Variables are in-memory buffers containing tensors.
-  # They must be explicitly initialized and can be saved to disk during and after training. You can later restore saved values to exercise or analyse the model.
-  # Official documentation of {tf.variable}[https://www.tensorflow.org/versions/r0.9/api_docs/python/state_ops.html#Variable].
-  #
-  def variable(name, data, type)
-    tensor = Tensorflow::Tensor.new(data, type)
-    self.variables[name] = tensor
-    initialize_op = define_op("Const", name+"/initial_value", nil, "", {"dtype" => tensor.type_num, "value" => tensor, "shape" => tensor.tensor_shape_proto})
-    variable = define_op("Variable", name, nil, "", {"dtype" => tensor.type_num, "shape" => tensor.tensor_shape_proto, "container" => "", "shared_name" => ""})
-    variable.ref = variable.definition
-    define_op("Assign", name+"/Assign", [variable, initialize_op], "", {"use_locking" => true,"validate_shape" => true} )
-    op = define_op("Identity", name+"/read", [variable], "", nil)
-    op.ref = variable.definition
-    op
-  end
-
-  #
-  # Creates a constant Tensor that is added to the graph with a specified name.
-  # Official documentation of {tf.constant}[https://www.tensorflow.org/versions/r0.9/api_docs/python/constant_op.html#constant].
-  #
-  def constant(name, data, type)
-    tensor = Tensorflow::Tensor.new(data, type)
-    self.constants = {name => tensor}
-    self.define_op("Const", name, nil, "", {"dtype" => tensor.type_num, "value" => tensor})
-  end
-
-  def intialize_variables
-    inputs = []
-    self.variables.each do |i|
-      inputs.push("^"+i.first+"/Assign")
-    end
-    self.graph_def.node.push(Tensorflow::NodeDef.new(name: "init", op: "NoOp", input: inputs))
-  end
-
   def make_attr_value(attribute_type, value)
     case attribute_type
     when "type"
