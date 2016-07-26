@@ -10,8 +10,8 @@ general:
 dependencies:
   override:
     - docker info
-    - docker build -t circleci/elasticsearch -f tools/docker/Dockerfile .
+    - docker build -t nethsix/ruby-tensorflow-ubuntu:0.0.1 -f tools/docker/Dockerfile .
 
 test:
   override:
-    - docker run -it bb0890c9b75f /bin/bash -l -c 'cd /repos/ruby-tensorflow && bundle exec rspec'
+    - docker run -it nethsix/ruby-tensorflow-ubuntu:0.0.1 /bin/bash -l -c 'cd /repos/ruby-tensorflow && bundle exec rspec'
