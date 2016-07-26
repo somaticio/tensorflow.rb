@@ -1,0 +1,17 @@
+machine:
+  services:
+    - docker
+
+general:
+  branches:
+    only:
+      - /circle_ci/
+
+dependencies:
+  override:
+    - docker info
+    - docker build -t nethsix/ruby-tensorflow-ubuntu:0.0.1 -f tools/docker/Dockerfile .
+
+test:
+  override:
+    - docker run -it nethsix/ruby-tensorflow-ubuntu:0.0.1 /bin/bash -l -c 'cd /repos/ruby-tensorflow && bundle exec rspec'
