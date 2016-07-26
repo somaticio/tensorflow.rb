@@ -6,7 +6,6 @@ class Tensorflow::Graph
   def initialize
     self.available_ops = load_available_ops
     self.graph_def = Tensorflow::GraphDef.new
-    self.variables = {}
   end
 
   #
@@ -67,19 +66,10 @@ class Tensorflow::Graph
     op = self.available_ops[opName.downcase]
     raise ("Operation does not exist.") if !op
     opName = op.name   # This ensures that case-sensitivity does not become an issue
-    input ||= []
     raise ("Invalid number of inputs.") if op.input_arg.length != input.length
     inputs = []
-    (0..input.length - 1).each do |i|
-      begin
-        if op.input_arg[i].is_ref && input[i].ref
-          inputs.push(input[i].ref.name)
-        else
-          inputs.push(input[i].definition.name)
-        end
-      rescue NoMethodError
-        inputs.push(input[i].definition.name)
-      end
+    input.each do |node|
+      inputs.push(node.definition.name)
     end
     node = GraphNode.new
     node.definition = Tensorflow::NodeDef.new(name: name, op: opName, input: inputs, device: device , attr: {})
@@ -87,7 +77,7 @@ class Tensorflow::Graph
     match_types(input, node, attrs, op)
     op.attr.each do |attribute|
       if attrs[attribute.name]
-        node.definition.attr[attribute.name] = make_attr_value(attribute.type, attrs[attribute.name])
+        node.definition.attr[attribute.name] = make_attr_value(attribute.name, attrs[attribute.name]) #make_attr_value(attribute.type, attrs[attribute.name])
       elsif attribute.default_value
         node.definition.attr[attribute.name] = attribute.default_value
       end
@@ -97,36 +87,12 @@ class Tensorflow::Graph
   end
 
   def make_attr_value(attribute_type, value)
-    case attribute_type
-    when "type"
-      Tensorflow::AttrValue.new(type: value)
-    when "tensor"
-      tensor_element_type = value.type_num
-      content =
-        case value.type_num
-        when Tensorflow::TF_DOUBLE
-          value.flatten.pack("d*")
-        when Tensorflow::TF_INT32
-          value.flatten.pack("l*")
-        when Tensorflow::TF_INT64
-          value.flatten.pack("q*")
-        end
-      Tensorflow::AttrValue.new(
-        tensor: Tensorflow::TensorProto.new(
-          dtype: value.type_num,
-          tensor_shape: value.tensor_shape_proto,
-          tensor_content: content
-        )
-      )
-    when "shape"
-      Tensorflow::AttrValue.new(shape: value)
-    when "bool"
-      Tensorflow::AttrValue.new(b: value)
-    when "string"
-      result = Tensorflow::AttrValue.new(s: [value].pack("B*"))
-    else
-      raise "attribute type not supported"
+    # TODO -> Add support for all types
+    result = nil
+    if attribute_type == "T"
+      result = Tensorflow::AttrValue.new(type: value)
     end
+    result
   end
 
   TYPE2ENUM = {
@@ -177,7 +143,6 @@ class GraphNode
   attr_accessor :definition, :ref, :out_data_types
   def initialize
     self.definition = Tensorflow::NodeDef.new
-    self.ref = Tensorflow::NodeDef.new
     self.out_data_types = {}
   end
 end

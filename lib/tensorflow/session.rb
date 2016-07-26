@@ -69,10 +69,8 @@ class Tensorflow::Session
 
   def initialize_outputs(outputs)
     output_names = Tensorflow::String_Vector.new
-    if outputs != nil
-      outputs.each do |name|
-        output_names.push(name)
-      end
+    outputs.each do |name|
+      output_names.push(name)
     end
 
     output_values = Tensorflow::Tensor_Vector.new
