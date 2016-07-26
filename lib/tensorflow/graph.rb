@@ -146,12 +146,6 @@ class Tensorflow::Graph
           value.flatten.pack("l*")
         when Tensorflow::TF_INT64
           value.flatten.pack("q*")
-        when Tensorflow::TF_COMPLEX128
-          tensor_narray = NArray.complex(value.flatten.length)
-          (0..value.flatten.length - 1).each do |i|
-            tensor_narray[i] = value.flatten[i]
-          end
-          tensor_narray.to_s
         end
       Tensorflow::AttrValue.new(
         tensor: Tensorflow::TensorProto.new(
