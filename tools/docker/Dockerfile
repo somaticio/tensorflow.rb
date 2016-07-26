@@ -31,7 +31,7 @@ RUN cd /repos && git clone --recurse-submodules https://github.com/tensorflow/te
 # * https://github.com/tensorflow/tensorflow/issues/349
 # For why we use '--batch'
 # * https://github.com/bazelbuild/bazel/issues/418
-RUN cd /repos/tensorflow && bazel --batch build --jobs=10 //tensorflow:libtensorflow.so
+RUN cd /repos/tensorflow && bazel --batch build --jobs=10 --spawn_strategy=standalone --genrule_strategy=standalone //tensorflow:libtensorflow.so
 RUN cp /repos/tensorflow/bazel-bin/tensorflow/libtensorflow.so /usr/lib/
 
 # Required by ruby-tensorflow
