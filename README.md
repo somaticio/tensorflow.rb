@@ -1,14 +1,14 @@
-# Ruby-Tensorflow
+# tensorflow.rb
 
 ## Description
 This repository contains Ruby API for utilizing [TensorFlow](https://github.com/tensorflow/tensorflow).
 
 [![Code Climate](https://codeclimate.com/github/Arafatk/tensorflow.rb/badges/gpa.svg)](https://codeclimate.com/github/Arafatk/tensorflow.rb)
 [![Join the chat at https://gitter.im/Arafatk/tensorflow.rb](https://badges.gitter.im/Arafatk/tensorflow.rb.svg)](https://gitter.im/Arafatk/tensorflow.rb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Inline docs](http://inch-ci.org/github/Arafatk/tensorflow.rb.svg?branch=master)](http://inch-ci.org/github/Arafatk/tensorflow.rb)
+[![Inline docs](https://inch-ci.org/github/Arafatk/tensorflow.rb.svg?branch=master)](https://inch-ci.org/github/Arafatk/tensorflow.rb)
 ## Documentation
 Everything is at [RubyDoc](http://www.rubydoc.info/github/Arafatk/tensorflow.rb).
-You can also generate docs by 
+You can also generate docs by
 ```bundle exec rake doc```.
 
 
@@ -67,13 +67,12 @@ sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
 # OSX
 sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/local/lib
 ```
-### Install `ruby-tensorflow`
+### Install `tensorflow.rb`
 
 Clone and install this Ruby API:
 ```
-git clone https://github.com/Arafatk/ruby-tensorflow.git
-cd ruby-tensorflow
-cd ext/sciruby/tensorflow_c
+git clone https://github.com/Arafatk/tensorflow.rb.git
+cd tensorflow.rb/ext/sciruby/tensorflow_c
 ruby extconf.rb
 make
 make install # Creates ../lib/ruby/site_ruby/X.X.X/<arch>/tf/Tensorflow.bundle (.so Linux)
