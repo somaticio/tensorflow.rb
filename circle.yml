@@ -7,12 +7,6 @@ general:
     only:
       - /circle_ci/
 
-# dependencies:
-#   override:
-#     - docker info
-#     - docker build -t nethsix/ruby-tensorflow-ubuntu:0.0.1 -f tools/docker/Dockerfile .
-
 test:
   override:
-#     - docker run -it nethsix/ruby-tensorflow-ubuntu:0.0.1 /bin/bash -l -c 'cd /repos/ruby-tensorflow && bundle exec rspec'
      - docker run -it nethsix/ruby-tensorflow-ubuntu:0.0.1.a /bin/bash -l -c "cd /repos/ruby-tensorflow && git checkout master && git pull && bundle install && cd /repos/ruby-tensorflow/ext/sciruby/tensorflow_c && ruby extconf.rb && make && make install && cd /repos/ruby-tensorflow && bundle exec rake install && bundle exec rspec"
