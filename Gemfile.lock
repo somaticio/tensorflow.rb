@@ -11,7 +11,6 @@ GEM
     diff-lcs (1.2.5)
     google-protoc (3.0.0.alpha.6.0.0)
     method_source (0.8.2)
-    narray (0.6.1.2)
     parser (2.3.1.2)
       ast (~> 2.2)
     powerpack (0.1.1)
