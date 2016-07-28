@@ -50,7 +50,6 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.8, >= 1.8.4)
   google-protoc
-  narray
   pry
   rake (~> 10.0)
   rspec (~> 3.0)
