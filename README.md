@@ -3,6 +3,10 @@
 ## Description
 This repository contains Ruby API for utilizing [TensorFlow](https://github.com/tensorflow/tensorflow).
 
+|  **`Linux CPU`**   |  **`Linux GPU PIP`** | **`Mac OS CPU`** |
+|-------------------|----------------------|------------------|----------------|
+| [![Build Status](https://travis-ci.org/chrhansen/tensorflow.rb.svg?branch=master)](https://travis-ci.org/chrhansen/tensorflow.rb) | _Not Configured_ | _Not Configured_ |
+
 [![Code Climate](https://codeclimate.com/github/Arafatk/tensorflow.rb/badges/gpa.svg)](https://codeclimate.com/github/Arafatk/tensorflow.rb)
 [![Join the chat at https://gitter.im/Arafatk/tensorflow.rb](https://badges.gitter.im/Arafatk/tensorflow.rb.svg)](https://gitter.im/Arafatk/tensorflow.rb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Inline docs](https://inch-ci.org/github/Arafatk/tensorflow.rb.svg?branch=master)](https://inch-ci.org/github/Arafatk/tensorflow.rb)
@@ -10,7 +14,6 @@ This repository contains Ruby API for utilizing [TensorFlow](https://github.com/
 Everything is at [RubyDoc](http://www.rubydoc.info/github/Arafatk/tensorflow.rb).
 You can also generate docs by
 ```bundle exec rake doc```.
-
 
 ## Docker
 
@@ -76,7 +79,7 @@ cd tensorflow.rb/ext/sciruby/tensorflow_c
 ruby extconf.rb
 make
 make install # Creates ../lib/ruby/site_ruby/X.X.X/<arch>/tf/Tensorflow.bundle (.so Linux)
-cd ./..
+cd ./../../..
 bundle exec rake install
 ```
 The last command is for installing the gem.
