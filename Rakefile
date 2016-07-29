@@ -8,4 +8,15 @@ YARD::Rake::YardocTask.new(:doc) do |t|
   t.files = ['lib/*.rb', 'lib/**/*.rb']
 end
 
+
+task :pry do |task|
+  cmd = [ 'pry', "-r './lib/tensorflow.rb' "]
+  run *cmd
+end
+
+def run *cmd
+  sh(cmd.join(" "))
+end
+
+
 task :default => :spec

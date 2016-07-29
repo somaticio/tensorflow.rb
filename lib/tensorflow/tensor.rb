@@ -68,6 +68,9 @@ class Tensorflow::Tensor
     Tensorflow::TensorShapeProto.new(dim: dimensions)
   end
 
+  #
+  # Helper function to set the data type of tensor.
+  #
   def set_type(type)
     case type
     when :float
@@ -207,13 +210,16 @@ class Tensorflow::Tensor
   #
   # Returns the value of the element contained in the specified position in the tensor.
   #
+  # * *Input* :
+  #   - Dimension array(1 based indexing).
+  #
   # * *Returns* :
-  #   - value of the element contained in the specified position in the tensor.
+  #   - Value of the element contained in the specified position in the tensor.
   #
   def getval(dimension)
     raise("Invalid dimension array passed as input.",ShapeError) if dimension.length != self.dimensions.length
     (0..dimension.length-1).each do |i|
-      raise("Invalid dimension array passed as input.",ShapeError) if dimension[i] > self.dimensions[i] || dimension[i] < 1
+      raise("Invalid dimension array passed as input.",ShapeError) if dimension[i] > self.dimensions[i] || dimension[i] < 1 || !(dimension[i].is_a? Integer)
     end
     sum = dimension[dimension.length - 1]  - 1
     prod = self.dimensions[self.dimensions.length - 1]

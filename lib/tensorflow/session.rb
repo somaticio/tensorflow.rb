@@ -34,7 +34,7 @@ class Tensorflow::Session
 
     status = Tensorflow::TF_NewStatus()
     Tensorflow::TF_Run_wrapper(self.session, input_names, input_values, output_names, output_values, target_names, self.status)
-    raise ("Incorrect specifications passed.")  if Tensorflow::TF_GetCode(status) != Tensorflow::TF_OK
+    raise "Incorrect specifications passed." if Tensorflow::TF_GetCode(status) != Tensorflow::TF_OK
 
     output_array = []
 
@@ -47,6 +47,7 @@ class Tensorflow::Session
   end
 
   def extend_graph(graph)
+    graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
     self.status = Tensorflow::TF_NewStatus()
     Tensorflow::TF_ExtendGraph(self.session, graph_def_to_c_array(graph.graph_def_raw), graph.graph_def_raw.length, self.status)
     self.graph = graph

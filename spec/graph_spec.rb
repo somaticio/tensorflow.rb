@@ -6,18 +6,11 @@ describe "Graph" do
     input2 = graph.placeholder('input2', Tensorflow::TF_INT32, [2,3])
     graph.define_op("Add",'output',[input1,input2],"",nil)
 
-    encoder = Tensorflow::GraphDef.encode(graph.graph_def)
     session = Tensorflow::Session.new
-    graph = Tensorflow::Graph.new
-    graph.graph_def = Tensorflow::GraphDef.decode(encoder)
-    graph.graph_def_raw = encoder
     session.extend_graph(graph)
-    s = session
+
     input1 = Tensorflow::Tensor.new([[1,3, 5],[2,4, 7]],:int32)
     input2 = Tensorflow::Tensor.new([[-5,1,4],[8,2, 3]],:int32)
-    input = Hash.new
-    input["input1"] = input1.tensor
-    input["input2"] = input2.tensor
-    result = s.run(input, ["output"], nil)
+    result = session.run({"input1" => input1.tensor, "input2" => input2.tensor}, ["output"], nil)
   end
 end
