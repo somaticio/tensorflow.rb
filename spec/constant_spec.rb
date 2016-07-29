@@ -18,7 +18,7 @@ describe 'Constants' do
     let(:input2) { graph.constant( "const2",[Complex(2,2), Complex(-32,22)], :complex) }
     let(:define_op) { graph.define_op("Add",'output', [input1, input2],"",nil) }
 
-    it { is_expected.to all_be_close([(4.0+4.0i), (-30.0+56.0i)]) }
+    it { is_expected.to all_be_close([Complex(4.0,4.0), Complex(-30.0,56.0)]) }
   end
 
   context 'sub' do
