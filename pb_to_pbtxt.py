@@ -4,7 +4,6 @@
 # by
 import tensorflow as tf
 from tensorflow.python.platform import gfile
-import sys
 
 def converter(filename): 
   with gfile.FastGFile(filename,'rb') as f:
@@ -14,5 +13,5 @@ def converter(filename):
     tf.train.write_graph(graph_def, 'pbtxt/', 'protobuf.pb', as_text=True)
   return
 
-converter('graph.pb')
-    
+converter('wire_test.pb') # here you can write the name of the file to be converted
+# and then a new file will be made in pbtxt directory.
