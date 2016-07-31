@@ -6,6 +6,7 @@ class Tensorflow::Graph
   def initialize
     self.available_ops = load_available_ops
     self.graph_def = Tensorflow::GraphDef.new
+    self.variables = {}
   end
 
   #
@@ -66,10 +67,19 @@ class Tensorflow::Graph
     op = self.available_ops[opName.downcase]
     raise ("Operation does not exist.") if !op
     opName = op.name   # This ensures that case-sensitivity does not become an issue
+    input ||= []
     raise ("Invalid number of inputs.") if op.input_arg.length != input.length
     inputs = []
-    input.each do |node|
-      inputs.push(node.definition.name)
+    (0..input.length - 1).each do |i|
+      begin
+        if op.input_arg[i].is_ref && input[i].ref
+          inputs.push(input[i].ref.name)
+        else
+          inputs.push(input[i].definition.name)
+        end
+      rescue NoMethodError
+        inputs.push(input[i].definition.name)
+      end
     end
     node = GraphNode.new
     node.definition = Tensorflow::NodeDef.new(name: name, op: opName, input: inputs, device: device , attr: {})
@@ -77,7 +87,7 @@ class Tensorflow::Graph
     match_types(input, node, attrs, op)
     op.attr.each do |attribute|
       if attrs[attribute.name]
-        node.definition.attr[attribute.name] = make_attr_value(attribute.name, attrs[attribute.name]) #make_attr_value(attribute.type, attrs[attribute.name])
+        node.definition.attr[attribute.name] = make_attr_value(attribute.type, attrs[attribute.name])
       elsif attribute.default_value
         node.definition.attr[attribute.name] = attribute.default_value
       end
@@ -86,13 +96,79 @@ class Tensorflow::Graph
     node
   end
 
-  def make_attr_value(attribute_type, value)
-    # TODO -> Add support for all types
-    result = nil
-    if attribute_type == "T"
-      result = Tensorflow::AttrValue.new(type: value)
+  #
+  # When you train a model, you use variables to hold and update parameters.
+  # Variables are in-memory buffers containing tensors.
+  # They must be explicitly initialized and can be saved to disk during and after training. You can later restore saved values to exercise or analyse the model.
+  # Official documentation of {tf.variable}[https://www.tensorflow.org/versions/r0.9/api_docs/python/state_ops.html#Variable].
+  #
+  def variable(name, data, type)
+    tensor = Tensorflow::Tensor.new(data, type)
+    self.variables[name] = tensor
+    initialize_op = define_op("Const", name+"/initial_value", nil, "", {"dtype" => tensor.type_num, "value" => tensor, "shape" => tensor.tensor_shape_proto})
+    variable = define_op("Variable", name, nil, "", {"dtype" => tensor.type_num, "shape" => tensor.tensor_shape_proto, "container" => "", "shared_name" => ""})
+    variable.ref = variable.definition
+    define_op("Assign", name+"/Assign", [variable, initialize_op], "", {"use_locking" => true,"validate_shape" => true} )
+    op = define_op("Identity", name+"/read", [variable], "", nil)
+    op.ref = variable.definition
+    op
+  end
+
+  #
+  # Creates a constant Tensor that is added to the graph with a specified name.
+  # Official documentation of {tf.constant}[https://www.tensorflow.org/versions/r0.9/api_docs/python/constant_op.html#constant].
+  #
+  def constant(name, data, type)
+    tensor = Tensorflow::Tensor.new(data, type)
+    self.constants = {name => tensor}
+    self.define_op("Const", name, nil, "", {"dtype" => tensor.type_num, "value" => tensor})
+  end
+
+  def intialize_variables
+    inputs = []
+    self.variables.each do |i|
+      inputs.push("^"+i.first+"/Assign")
     end
-    result
+    self.graph_def.node.push(Tensorflow::NodeDef.new(name: "init", op: "NoOp", input: inputs))
+  end
+
+  def make_attr_value(attribute_type, value)
+    case attribute_type
+    when "type"
+      Tensorflow::AttrValue.new(type: value)
+    when "tensor"
+      tensor_element_type = value.type_num
+      content =
+        case value.type_num
+        when Tensorflow::TF_DOUBLE
+          value.flatten.pack("d*")
+        when Tensorflow::TF_INT32
+          value.flatten.pack("l*")
+        when Tensorflow::TF_INT64
+          value.flatten.pack("q*")
+        when Tensorflow::TF_COMPLEX128
+          tensor_narray = NArray.complex(value.flatten.length)
+          (0..value.flatten.length - 1).each do |i|
+            tensor_narray[i] = value.flatten[i]
+          end
+          tensor_narray.to_s
+        end
+      Tensorflow::AttrValue.new(
+        tensor: Tensorflow::TensorProto.new(
+          dtype: value.type_num,
+          tensor_shape: value.tensor_shape_proto,
+          tensor_content: content
+        )
+      )
+    when "shape"
+      Tensorflow::AttrValue.new(shape: value)
+    when "bool"
+      Tensorflow::AttrValue.new(b: value)
+    when "string"
+      result = Tensorflow::AttrValue.new(s: [value].pack("B*"))
+    else
+      raise "attribute type not supported"
+    end
   end
 
   TYPE2ENUM = {
@@ -143,6 +219,7 @@ class GraphNode
   attr_accessor :definition, :ref, :out_data_types
   def initialize
     self.definition = Tensorflow::NodeDef.new
+    self.ref = Tensorflow::NodeDef.new
     self.out_data_types = {}
   end
 end

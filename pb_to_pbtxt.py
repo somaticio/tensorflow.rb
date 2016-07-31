@@ -13,5 +13,5 @@ def converter(filename):
     tf.train.write_graph(graph_def, 'pbtxt/', 'protobuf.pb', as_text=True)
   return
 
-converter('wire_test.pb')  # here you can write the name of the file to be converted
+converter('wire_test.pb') # here you can write the name of the file to be converted
 # and then a new file will be made in pbtxt directory.
