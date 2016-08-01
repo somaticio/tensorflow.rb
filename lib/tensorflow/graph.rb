@@ -6,11 +6,12 @@ class Tensorflow::Graph
   def initialize
     self.available_ops = load_available_ops
     self.graph_def = Tensorflow::GraphDef.new
+    self.constants = {}
     self.variables = {}
   end
 
   #
-  # Loads the available ops from ops.pb file and then decodes into a list of operations. 
+  # Loads the available ops from ops.pb file and then decodes into a list of operations.
   #
   # * *Returns* :
   #   - A hashmap with name of the op as key and value as the op.
@@ -27,19 +28,19 @@ class Tensorflow::Graph
 
   #
   # Loads a graph stored in pb file into a graph def. This way you can define the graph
-  # in python / ruby, save it in pb file and load it in ruby. The limitation of 
+  # in python / ruby, save it in pb file and load it in ruby. The limitation of
   # google-protoc gem is that it can only read binary wire format for protocol buffer messages
-  # In order to debug convoluted messages in ruby its always a good idea to convert the format 
-  # to a readable form using pb_to_pbtxt.py file in the gem and specifying the file name of 
-  # the .pb file to be converted. 
-  # 
+  # In order to debug convoluted messages in ruby its always a good idea to convert the format
+  # to a readable form using pb_to_pbtxt.py file in the gem and specifying the file name of
+  # the .pb file to be converted.
+  #
   def read(filename)
     reader = File.read(filename)
     self.graph_def = Tensorflow::GraphDef.decode(reader)
     self.graph_def_raw = reader
   end
 
-  # adds a placeholder to the Graph, a placeholder is an 
+  # adds a placeholder to the Graph, a placeholder is an
   # operation that must be fed with data on execution.
   def placeholder(name, type_enum, dims)
     op = GraphNode.new
@@ -120,8 +121,10 @@ class Tensorflow::Graph
   #
   def constant(name, data, type)
     tensor = Tensorflow::Tensor.new(data, type)
-    self.constants = {name => tensor}
-    self.define_op("Const", name, nil, "", {"dtype" => tensor.type_num, "value" => tensor})
+    constants[name] = tensor
+    define_op("Const", name, nil, "", {
+      "dtype" => tensor.type_num,
+      "value" => tensor})
   end
 
   def intialize_variables
