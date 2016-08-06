@@ -21,16 +21,15 @@ You can also generate docs by
 Launch:
 
 ```
-docker run -it nethsix/ruby-tensorflow-ubuntu:0.0.1 /bin/bash -c "source /usr/local/rvm/scripts/rvm; /bin/bash"
+docker run -it nethsix/ruby-tensorflow-ubuntu:0.0.1.a /bin/bash
 ```
 
-Try:
+Test:
 
 ```
-ruby /repos/ruby-tensorflow/examples/tf_ex1.rb
+cd /repos/ruby-tensorflow/
+bundle exec rspec
 ```
-
-Location: `/repos/ruby-tensorflow/`
 
 For details, see: https://hub.docker.com/r/nethsix/ruby-tensorflow-ubuntu/
 
@@ -70,7 +69,9 @@ sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
 
 # OSX
 sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/local/lib
+export LIBRARY_PATH=$PATH:/usr/local/lib (may be required)
 ```
+
 ### Install `tensorflow.rb`
 
 Clone and install this Ruby API:
