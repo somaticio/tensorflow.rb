@@ -8,6 +8,7 @@ class Tensorflow::Graph
     self.graph_def = Tensorflow::GraphDef.new
     self.constants = {}
     self.variables = {}
+    @number_of_defaults_created = Hash.new(0)
   end
 
   #
@@ -103,8 +104,9 @@ class Tensorflow::Graph
   # They must be explicitly initialized and can be saved to disk during and after training. You can later restore saved values to exercise or analyse the model.
   # Official documentation of {tf.variable}[https://www.tensorflow.org/versions/r0.9/api_docs/python/state_ops.html#Variable].
   #
-  def variable(name, data, type)
-    tensor = Tensorflow::Tensor.new(data, type)
+  def variable(data, dtype: nil, name: nil)
+    tensor = Tensorflow::Tensor.new(data, dtype)
+    name ||= default_name("Variable")
     self.variables[name] = tensor
     initialize_op = define_op("Const", name+"/initial_value", nil, "", {"dtype" => tensor.type_num, "value" => tensor, "shape" => tensor.tensor_shape_proto})
     variable = define_op("Variable", name, nil, "", {"dtype" => tensor.type_num, "shape" => tensor.tensor_shape_proto, "container" => "", "shared_name" => ""})
@@ -119,8 +121,9 @@ class Tensorflow::Graph
   # Creates a constant Tensor that is added to the graph with a specified name.
   # Official documentation of {tf.constant}[https://www.tensorflow.org/versions/r0.9/api_docs/python/constant_op.html#constant].
   #
-  def constant(name, data, type)
-    tensor = Tensorflow::Tensor.new(data, type)
+  def constant(data, dtype: nil, name: nil)
+    tensor = Tensorflow::Tensor.new(data, dtype)
+    name ||= default_name("Constant")
     constants[name] = tensor
     define_op("Const", name, nil, "", {
       "dtype" => tensor.type_num,
@@ -214,6 +217,16 @@ class Tensorflow::Graph
       # TODO
     end
     nil
+  end
+
+  private
+
+  # Returns a default name for a new variable or constant.
+  # The name increments for each one created: Variable:0, Variable:1, and so on.
+  def default_name(type)
+    name = "#{type}:#{@number_of_defaults_created[type]}"
+    @number_of_defaults_created[type] += 1
+    name
   end
 end
 
