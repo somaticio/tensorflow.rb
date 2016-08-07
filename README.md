@@ -1,7 +1,7 @@
 # tensorflow.rb
 
 ## Description
-This repository contains Ruby API for utilizing [TensorFlow](https://github.com/tensorflow/tensorflow).
+This repository contains a Ruby API for utilizing [TensorFlow](https://github.com/tensorflow/tensorflow).
 
 |  **`Linux CPU`**   |  **`Linux GPU PIP`** | **`Mac OS CPU`** |
 |-------------------|----------------------|------------------|----------------|
@@ -15,8 +15,11 @@ Everything is at [RubyDoc](http://www.rubydoc.info/github/somaticio/tensorflow.r
 You can also generate docs by
 ```bundle exec rake doc```.
 
+## Installation
 
-## Docker
+### Docker
+
+It's easiest to get started using the prebuilt Docker container.
 
 Launch:
 
@@ -33,24 +36,27 @@ bundle exec rspec
 
 For details, see: https://hub.docker.com/r/nethsix/ruby-tensorflow-ubuntu/
 
-## Dependencies
+### Outside of Docker
 
-### Explicit Install
+Alternatively, you can install outside of a Docker container by following
+the following steps.
+
+#### Explicit dependencies
 
 - [Bazel](http://www.bazel.io/docs/install.html)
 - [TensorFlow](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/g3doc/get_started/os_setup.md)
 - [Swig](http://www.swig.org/download.html)
 
-### Implicit Install (No Action Required)
+#### Implicit dependencies (No Action Required)
 
 - [Google-Protoc gem](https://github.com/google/protobuf/tree/master/ruby) ( for installation do  ```gem install google-protoc --pre ```)
 - [Protobuf](https://github.com/google/protobuf)
 
-## Installation
+#### Installation
 
-All the dependencies mentioned above must be installed in your system before you proceed further.   
+All the dependencies mentioned above must be installed in your system before you proceed further.
 
-### Clone and Install TensorFlow
+#### Clone and Install TensorFlow
 
 This package depends on the TensorFlow shared libraries, in order to compile
 these libraries do the following:
@@ -72,7 +78,7 @@ sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/local/lib
 export LIBRARY_PATH=$PATH:/usr/local/lib (may be required)
 ```
 
-### Install `tensorflow.rb`
+#### Install `tensorflow.rb`
 
 Clone and install this Ruby API:
 ```
@@ -86,7 +92,7 @@ bundle exec rake install
 ```
 The last command is for installing the gem.
 
-### Run tests and verify install
+#### Run tests and verify install
 ```
 bundle exec rake spec
 ```
