@@ -5,7 +5,7 @@ This repository contains Ruby API for utilizing [TensorFlow](https://github.com/
 
 |  **`Linux CPU`**   |  **`Linux GPU PIP`** | **`Mac OS CPU`** |
 |-------------------|----------------------|------------------|----------------|
-| [![Build Status](https://circleci.com/gh/Arafatk/tensorflow.rb.svg?style=shield)](https://circleci.com/gh/Arafatk/tensorflow.rb) | _Not Configured_ | _Not Configured_ |
+| [![Build Status](https://circleci.com/gh/somaticio/tensorflow.rb.svg?style=shield)](https://circleci.com/gh/somaticio/tensorflow.rb) | _Not Configured_ | _Not Configured_ |
 
 [![Code Climate](https://codeclimate.com/github/somaticio/tensorflow.rb/badges/gpa.svg)](https://codeclimate.com/github/somaticio/tensorflow.rb)
 [![Join the chat at https://gitter.im/Arafatk/tensorflow.rb](https://badges.gitter.im/Arafatk/tensorflow.rb.svg)](https://gitter.im/Arafatk/tensorflow.rb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
