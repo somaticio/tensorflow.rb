@@ -8,7 +8,7 @@ This repository contains Ruby API for utilizing [TensorFlow](https://github.com/
 | [![Build Status](https://circleci.com/gh/somaticio/tensorflow.rb.svg?style=shield)](https://circleci.com/gh/somaticio/tensorflow.rb) | _Not Configured_ | _Not Configured_ |
 
 [![Code Climate](https://codeclimate.com/github/somaticio/tensorflow.rb/badges/gpa.svg)](https://codeclimate.com/github/somaticio/tensorflow.rb)
-[![Join the chat at https://gitter.im/Arafatk/tensorflow.rb](https://badges.gitter.im/Arafatk/tensorflow.rb.svg)](https://gitter.im/Arafatk/tensorflow.rb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/tensorflowrb/Lobby](https://badges.gitter.im/tensorflowrb/Lobby.svg)](https://gitter.im/tensorflowrb/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Inline docs](https://inch-ci.org/github/somaticio/tensorflow.rb.svg?branch=master)](https://inch-ci.org/github/somaticio/tensorflow.rb)
 ## Documentation
 Everything is at [RubyDoc](http://www.rubydoc.info/github/somaticio/tensorflow.rb).
