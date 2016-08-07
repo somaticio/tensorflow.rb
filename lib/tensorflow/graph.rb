@@ -11,14 +11,14 @@ class Tensorflow::Graph
   end
 
   #
-  # Loads the available ops from ops.pb file and then decodes into a list of operations.
+  # Loads the available ops from ops.pb file and then parses into a list of operations.
   #
   # * *Returns* :
   #   - A hashmap with name of the op as key and value as the op.
   #
   def load_available_ops
     ops_reader = File.read(File.dirname(__FILE__)+'/ops.pb')
-    op_list = Tensorflow::OpList.decode(ops_reader)
+    op_list = Tensorflow::OpList.parse(ops_reader)
     available_ops = {}
     (0..op_list.op.length - 1).each do |i|
       available_ops[op_list.op[i].name.downcase] = op_list.op[i]
@@ -36,7 +36,7 @@ class Tensorflow::Graph
   #
   def read(filename)
     reader = File.read(filename)
-    self.graph_def = Tensorflow::GraphDef.decode(reader)
+    self.graph_def = Tensorflow::GraphDef.parse(reader)
     self.graph_def_raw = reader
   end
 
@@ -44,13 +44,13 @@ class Tensorflow::Graph
   # operation that must be fed with data on execution.
   def placeholder(name, type_enum, dims)
     op = GraphNode.new
-    op.definition = Tensorflow::NodeDef.new(name: name, op: "Placeholder", attr: {})
+    op.definition = Tensorflow::NodeDef.new(name: name, op: "Placeholder", attr: [Tensorflow::NodeDef::AttrEntry.new(key: "dtype" ,value: Tensorflow::AttrValue.new(type: type_enum))])
     op.out_data_types = {}
     op.out_data_types[name] = type_enum
-    op.definition.attr["dtype"] = Tensorflow::AttrValue.new(type: type_enum)
+
     dim_array = []
     dims.each_with_index { |value, i| dim_array[i] = Tensorflow::TensorShapeProto::Dim.new(size: value) }
-    op.definition.attr["shape"] = Tensorflow::AttrValue.new(shape: Tensorflow::TensorShapeProto.new(dim: dim_array))
+    op.definition.attr.push(Tensorflow::NodeDef::AttrEntry.new(key: "shape",value: Tensorflow::AttrValue.new(shape: Tensorflow::TensorShapeProto.new(dim: dim_array)) ))
     self.graph_def.node.push(op.definition)
     op
   end
@@ -83,14 +83,14 @@ class Tensorflow::Graph
       end
     end
     node = GraphNode.new
-    node.definition = Tensorflow::NodeDef.new(name: name, op: opName, input: inputs, device: device , attr: {})
+    node.definition = Tensorflow::NodeDef.new(name: name, op: opName, input: inputs, device: device , attr: [])
     attrs ||= {}
     match_types(input, node, attrs, op)
     op.attr.each do |attribute|
       if attrs[attribute.name]
-        node.definition.attr[attribute.name] = make_attr_value(attribute.type, attrs[attribute.name])
+        node.definition.attr.push(Tensorflow::NodeDef::AttrEntry.new(key: attribute.name,value: make_attr_value(attribute.type, attrs[attribute.name] )))
       elsif attribute.default_value
-        node.definition.attr[attribute.name] = attribute.default_value
+        node.definition.attr.push(Tensorflow::NodeDef::AttrEntry.new(key: attribute.name,value: attribute.default_value))
       end
     end
     self.graph_def.node.push(node.definition)

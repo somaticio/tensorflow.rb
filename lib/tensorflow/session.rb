@@ -47,7 +47,7 @@ class Tensorflow::Session
   end
 
   def extend_graph(graph)
-    graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
+    graph.graph_def_raw = graph.graph_def.serialize_to_string
     self.status = Tensorflow::TF_NewStatus()
     Tensorflow::TF_ExtendGraph(self.session, graph_def_to_c_array(graph.graph_def_raw), graph.graph_def_raw.length, self.status)
     self.graph = graph

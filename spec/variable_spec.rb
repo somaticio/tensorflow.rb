@@ -9,7 +9,7 @@ describe "Variable" do
     graph.define_op("Assign",'assign_inp1', [input1, add],"",nil)
     graph.intialize_variables
     session = Tensorflow::Session.new
-    graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
+    graph.graph_def_raw = graph.graph_def.serialize_to_string
     session.intialize_variables_and_extend_graph(graph)
     result = session.run(nil, ["input1"], ["assign_inp1"])
     result = session.run(nil, ["input1"], ["assign_inp1"])

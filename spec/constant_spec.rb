@@ -7,7 +7,7 @@ describe 'Constants' do
   let(:result) { session.run(nil, ["output"], nil) }
   before do
     define_op
-    graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
+    graph.graph_def_raw = graph.graph_def.serialize_to_string
     session.extend_graph(graph)
   end
 
