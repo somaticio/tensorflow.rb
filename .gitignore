@@ -7,3 +7,4 @@ ext/sciruby/tensorflow_c/*.bundle
 pkg/
 .yardoc/
 doc/
+coverage/
