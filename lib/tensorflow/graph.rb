@@ -88,7 +88,7 @@ class Tensorflow::Graph
     match_types(input, node, attrs, op)
     op.attr.each do |attribute|
       if attrs[attribute.name]
-        node.definition.attr.push(Tensorflow::NodeDef::AttrEntry.new(key: attribute.name,value: make_attr_value(attribute.type, attrs[attribute.name] )))
+        node.definition.attr.push(Tensorflow::NodeDef::AttrEntry.new(key: attribute.name,value: make_attr_value(attribute.type, attrs[attribute.name])))
       elsif attribute.default_value
         node.definition.attr.push(Tensorflow::NodeDef::AttrEntry.new(key: attribute.name,value: attribute.default_value))
       end
@@ -119,12 +119,13 @@ class Tensorflow::Graph
   # Creates a constant Tensor that is added to the graph with a specified name.
   # Official documentation of {tf.constant}[https://www.tensorflow.org/versions/r0.9/api_docs/python/constant_op.html#constant].
   #
-  def constant(name, data, type)
-    tensor = Tensorflow::Tensor.new(data, type)
+  def constant(name, data, type, zero_dims = nil)
+    tensor = Tensorflow::Tensor.new(data, type, zero_dims)
     constants[name] = tensor
     define_op("Const", name, nil, "", {
       "dtype" => tensor.type_num,
-      "value" => tensor})
+      "value" => tensor
+      })
   end
 
   def intialize_variables
@@ -141,34 +142,70 @@ class Tensorflow::Graph
       Tensorflow::AttrValue.new(type: value)
     when "tensor"
       tensor_element_type = value.type_num
-      content =
-        case value.type_num
-        when Tensorflow::TF_DOUBLE
-          value.flatten.pack("d*")
-        when Tensorflow::TF_INT32
-          value.flatten.pack("l*")
-        when Tensorflow::TF_INT64
-          value.flatten.pack("q*")
-        when Tensorflow::TF_COMPLEX128
+      result = case value.type_num
+      when Tensorflow::TF_FLOAT
+          Tensorflow::AttrValue.new(
+            tensor: Tensorflow::TensorProto.new(
+            dtype: value.type_num,
+            tensor_shape: value.tensor_shape_proto,
+            float_val: value.flatten
+            )
+          )
+      when Tensorflow::TF_DOUBLE
+          Tensorflow::AttrValue.new(
+            tensor: Tensorflow::TensorProto.new(
+            dtype: value.type_num,
+            tensor_shape: value.tensor_shape_proto,
+            tensor_content: value.flatten.pack("d*"),
+            )
+          )
+      when Tensorflow::TF_INT32
+          Tensorflow::AttrValue.new(
+            tensor: Tensorflow::TensorProto.new(
+            dtype: value.type_num,
+            tensor_shape: value.tensor_shape_proto,
+            tensor_content: value.flatten.pack("l*"),
+            int_val: value.flatten
+            )
+          )
+      when Tensorflow::TF_INT64
+          Tensorflow::AttrValue.new(
+            tensor: Tensorflow::TensorProto.new(
+            dtype: value.type_num,
+            tensor_shape: value.tensor_shape_proto,
+            tensor_content: value.flatten.pack("q*"),
+            )
+          )
+      when Tensorflow::TF_STRING
+          Tensorflow::AttrValue.new(
+            tensor: Tensorflow::TensorProto.new(
+            dtype: value.type_num,
+            tensor_shape: value.tensor_shape_proto,
+            string_val: value.flatten
+            )
+          )
+      when Tensorflow::TF_COMPLEX128
           tensor_narray = NArray.complex(value.flatten.length)
           (0..value.flatten.length - 1).each do |i|
             tensor_narray[i] = value.flatten[i]
           end
-          tensor_narray.to_s
-        end
-      Tensorflow::AttrValue.new(
-        tensor: Tensorflow::TensorProto.new(
-          dtype: value.type_num,
-          tensor_shape: value.tensor_shape_proto,
-          tensor_content: content
-        )
-      )
+          Tensorflow::AttrValue.new(
+            tensor: Tensorflow::TensorProto.new(
+            dtype: value.type_num,
+            tensor_shape: value.tensor_shape_proto,
+            tensor_content: tensor_narray.to_s,
+            )
+          )
+      end
+      result
     when "shape"
       Tensorflow::AttrValue.new(shape: value)
     when "bool"
       Tensorflow::AttrValue.new(b: value)
     when "string"
-      result = Tensorflow::AttrValue.new(s: [value].pack("B*"))
+      Tensorflow::AttrValue.new(s: value)
+    when "int"
+      Tensorflow::AttrValue.new(i: value[0])
     else
       raise "attribute type not supported"
     end

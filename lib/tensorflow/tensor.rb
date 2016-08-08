@@ -41,19 +41,22 @@ class Tensorflow::Tensor
   # @attribute tensor_shape_proto
   #  Returns the shape of the Tensor in Ruby protocol buffers.(To be used later with ops).
 
-  def initialize(data, type = nil)
-    self.dimensions = dimension_finder(data)  if data.is_a?(Array) 
-    raise("Incorrect dimensions specified in the input.") if self.dimensions == nil && data.is_a?(Array) 
+  def initialize(data, type = nil, zero_dims = nil)
+    self.dimensions = dimension_finder(data)  if data.is_a?(Array)
+    raise("Incorrect dimensions specified in the input.") if self.dimensions == nil && data.is_a?(Array)
     self.rank = 0
     self.rank = self.dimensions.size if data.is_a?(Array)
     self.tensor_shape_proto = shape_proto(self.dimensions) if self.dimensions.is_a?(Array)
+    self.tensor_shape_proto = Tensorflow::TensorShapeProto.new if zero_dims == 1
+        
     self.element_type = set_type(type) if type != nil
     self.element_type = find_type(data) if type == nil
     raise ("Multi-dimensional tensor not supported for string data type.") if self.dimensions.length > 1 and self.type_num == Tensorflow::TF_STRING
     self.flatten = data.flatten
     self.tensor_data = ruby_array_to_c(self.flatten, self.type_num)
     self.dimension_data = ruby_array_to_c(self.dimensions, Tensorflow::TF_INT64)
-    self.tensor = Tensorflow::TF_NewTensor_wrapper(self.type_num, self.dimension_data, self.dimensions.length, self.tensor_data , self.data_size * self.flatten.length)
+    self.tensor = Tensorflow::TF_NewTensor_wrapper(self.type_num, Tensorflow::Long_long.new(1), 0, self.tensor_data , 0) if zero_dims == 1
+    self.tensor = Tensorflow::TF_NewTensor_wrapper(self.type_num, self.dimension_data, self.dimensions.length, self.tensor_data , self.data_size * self.flatten.length) if zero_dims == nil
   end
 
   #

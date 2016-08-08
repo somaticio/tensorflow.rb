@@ -3,15 +3,36 @@
 # or by python and this will convert it to pbtxt format which can easily be interpretted
 # by
 import tensorflow as tf
+from google.protobuf import text_format
 from tensorflow.python.platform import gfile
+def convert_pbtxt_to_graphdef(filename):
+  """Returns a `tf.GraphDef` proto representing the data in the given pbtxt file.
+
+  Args:
+    filename: The name of a file containing a GraphDef pbtxt (text-formatted
+      `tf.GraphDef` protocol buffer data).
+
+  Returns:
+    A `tf.GraphDef` protocol buffer.
+  """
+  with open(filename, 'r') as f:
+    graph_def = tf.GraphDef()
+
+    file_content = f.read()
+
+    # Merges the human-readable string in `file_content` into `graph_def`.
+    text_format.Merge(file_content, graph_def)
+    tf.import_graph_def(graph_def, name='')
+    tf.train.write_graph(graph_def, 'pbtxt/', 'protobuf.pb', as_text=False)
 
 def converter(filename): 
   with gfile.FastGFile(filename,'rb') as f:
     graph_def = tf.GraphDef()
     graph_def.ParseFromString(f.read())
     tf.import_graph_def(graph_def, name='')
-    tf.train.write_graph(graph_def, 'pbtxt/', 'protobuf.pb', as_text=True)
+    tf.train.write_graph(graph_def, 'pbtxt/', 'protobuf.pbtxt', as_text=True)
   return
 
-converter('wire_test.pb') # here you can write the name of the file to be converted
+
+converter('graph.pb')  # here you can write the name of the file to be converted
 # and then a new file will be made in pbtxt directory.
