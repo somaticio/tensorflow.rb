@@ -7,3 +7,5 @@ ext/sciruby/tensorflow_c/*.bundle
 pkg/
 .yardoc/
 doc/
+examples.txt
+pbtxt/
