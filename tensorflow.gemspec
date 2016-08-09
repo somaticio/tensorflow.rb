@@ -14,8 +14,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec', '~> 3.0'
   s.add_development_dependency 'google-protoc'
   s.add_development_dependency 'narray'
-  s.add_development_dependency 'simplecov'
-  s.add_development_dependency 'simplecov-json'
-  s.add_development_dependency 'simplecov-rcov'
   s.extensions = ['ext/sciruby/tensorflow_c/extconf.rb']
 end
