@@ -1,12 +1,12 @@
 # Tensor is an n-dimensional array or list which represents a value produced by an Operation.
 # A tensor has a rank, and a shape.
-# A Tensor is a symbolic handle to one of the outputs of an Operation. It does not hold the values of that 
+# A Tensor is a symbolic handle to one of the outputs of an Operation. It does not hold the values of that
 # operation's output, but instead provides a means of computing those values in a TensorFlow Session.
 # Official documentation of {tensor}[https://www.tensorflow.org/versions/r0.9/api_docs/python/framework.html#Tensor].
 # This class has two primary purposes:
 # * *Description* :
-#   - A Tensor can be passed as an input to another Operation. This builds a dataflow connection between 
-#   operations, which enables TensorFlow to execute an entire Graph that represents a large, multi-step 
+#   - A Tensor can be passed as an input to another Operation. This builds a dataflow connection between
+#   operations, which enables TensorFlow to execute an entire Graph that represents a large, multi-step
 #   computation.
 #   - After the graph has been launched in a session, the value of the Tensor can be computed by passing it to
 #   a Session.
@@ -42,14 +42,16 @@ class Tensorflow::Tensor
   #  Returns the shape of the Tensor in Ruby protocol buffers.(To be used later with ops).
 
   def initialize(data, type = nil)
-    self.dimensions = dimension_finder(data)  if data.is_a?(Array) 
-    raise("Incorrect dimensions specified in the input.") if self.dimensions == nil && data.is_a?(Array) 
+    self.dimensions = dimension_finder(data) if data.is_a?(Array)
+    raise("Incorrect dimensions specified in the input.") if self.dimensions == nil && data.is_a?(Array)
     self.rank = 0
     self.rank = self.dimensions.size if data.is_a?(Array)
     self.tensor_shape_proto = shape_proto(self.dimensions) if self.dimensions.is_a?(Array)
     self.element_type = set_type(type) if type != nil
     self.element_type = find_type(data) if type == nil
-    raise ("Multi-dimensional tensor not supported for string data type.") if self.dimensions.length > 1 and self.type_num == Tensorflow::TF_STRING
+    if dimensions.length > 1 && type_num == Tensorflow::TF_STRING
+      raise ("Multi-dimensional tensor not supported for string data type.")
+    end
     self.flatten = data.flatten
     self.tensor_data = ruby_array_to_c(self.flatten, self.type_num)
     self.dimension_data = ruby_array_to_c(self.dimensions, Tensorflow::TF_INT64)
@@ -103,7 +105,7 @@ class Tensorflow::Tensor
   end
 
   #
-  # Recursively finds the dimensions of the input array. 
+  # Recursively finds the dimensions of the input array.
   #
   # * *Returns* :
   #   - Dimension array (If the input is an n - dimensional matrix.)
@@ -117,9 +119,9 @@ class Tensorflow::Tensor
       [array.size]
     end
   end
-  
+
   #
-  # Converts a give ruby array to C array (using SWIG) by detecting the data type automatically. 
+  # Converts a give ruby array to C array (using SWIG) by detecting the data type automatically.
   # Design decision needs to be made regarding this so the all the data types are supported.
   # Currently Integer(Ruby) is converted to long long(C) and Float(Ruby) is converted double(C).
   #
@@ -173,7 +175,7 @@ class Tensorflow::Tensor
   end
 
   #
-  # Converts a give ruby array to C array (using SWIG) by detecting the data type automatically. 
+  # Converts a give ruby array to C array (using SWIG) by detecting the data type automatically.
   # Design decision needs to be made regarding this so the all the data types are supported.
   # Currently Integer(Ruby) is converted to long long(C) and Float(Ruby) is converted double(C).
   #
