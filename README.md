@@ -104,3 +104,10 @@ Copyright (c) 2016, Arafat Dad Khan.
 [somatic](http://somatic.io)
 
 All rights reserved.
+
+## Acknowledgements
+
+* The [Ruby Science Foundation](http://sciruby.com/) and [somatic](http://somatic.io) for mentoring and sponsoring the project
+
+
+
