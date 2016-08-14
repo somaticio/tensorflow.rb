@@ -121,8 +121,8 @@ class Tensorflow::Graph
   # Creates a constant Tensor that is added to the graph with a specified name.
   # Official documentation of {tf.constant}[https://www.tensorflow.org/versions/r0.9/api_docs/python/constant_op.html#constant].
   #
-  def constant(data, dtype: nil, name: nil)
-    tensor = Tensorflow::Tensor.new(data, dtype)
+  def constant(value, dtype: nil, shape: nil, name: nil)
+    tensor = Tensorflow::Tensor.new(value, dtype)
     name ||= default_name("Constant")
     constants[name] = tensor
     define_op("Const", name, nil, "", {
@@ -224,7 +224,7 @@ class Tensorflow::Graph
   # Returns a default name for a new variable or constant.
   # The name increments for each one created: Variable:0, Variable:1, and so on.
   def default_name(type)
-    name = "#{type}:#{@number_of_defaults_created[type]}"
+    name = "#{type}_#{@number_of_defaults_created[type]}"
     @number_of_defaults_created[type] += 1
     name
   end
