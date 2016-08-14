@@ -1,49 +1,56 @@
 require 'spec_helper'
 
 describe 'Constants' do
-  let!(:graph) { Tensorflow::Graph.new }
+  let(:graph) { Tensorflow::Graph.new }
   let(:session) { Tensorflow::Session.new }
-  let(:result) { session.run(nil, ["output"], nil) }
+  let(:result) do
+    graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
+    session.extend_graph(graph)
+
+    session.run(nil, ['output'], nil)
+  end
 
   subject { result[0] }
 
   describe 'name' do
-    it "sets the constant name when it is specified" do
-      no_name1 = graph.constant([1, 2, 3], name: "testing_names")
-      expect(no_name1.definition.name).to eq("testing_names")
+    it 'sets the constant name when it is specified' do
+      no_name1 = graph.constant([1, 2, 3], name: 'testing_names')
+      expect(no_name1.definition.name).to eq('testing_names')
     end
 
-    it "sets a default name if none is specified" do
+    it 'sets a default name if none is specified' do
       no_name = graph.constant([1, 2, 3])
-      expect(no_name.definition.name).to eq("Constant:0")
+      expect(no_name.definition.name).to eq('Constant:0')
     end
 
-    it "increments the default constant name for each unnamed constant" do
+    it 'increments the default constant name for each unnamed constant' do
       no_name1 = graph.constant([1, 2, 3])
       no_name2 = graph.constant([4, 5, 6])
-      expect(no_name1.definition.name).to eq("Constant:0")
-      expect(no_name2.definition.name).to eq("Constant:1")
+      expect(no_name1.definition.name).to eq('Constant:0')
+      expect(no_name2.definition.name).to eq('Constant:1')
     end
   end
 
   describe 'type' do
     context 'explicit type' do
-      it "sets data type when it is specified" do
+      it 'sets data type when it is specified' do
         no_type = graph.constant([1, 2, 3], dtype: :int32)
-        dtype = graph.type_to_enum(no_type.definition.attr["dtype"].type)
+        dtype = graph.type_to_enum(no_type.definition.attr['dtype'].type)
         expect(dtype).to eq(Tensorflow::TF_INT32)
       end
     end
 
     context 'inferred type' do
-      it 'infers data type based on initial data if not explicitly specified' do
-        no_type = graph.constant([1, 2, 3], name: 'no_type')
+      let!(:no_type) { graph.constant([1, 2, 3], name: 'output') }
+
+      it 'infers data type' do
         dtype = graph.type_to_enum(no_type.definition.attr['dtype'].type)
+
         expect(dtype).to eq(Tensorflow::TF_INT64)
-        graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
-        session.extend_graph(graph)
-        result = session.run(nil, ['no_type'], nil)
-        expect(result[0]).to match_array([1, 2, 3])
+      end
+
+      it 'creates the proper tensor on the graph' do
+        expect(subject).to match_array([1, 2, 3])
       end
     end
   end
@@ -54,10 +61,6 @@ describe 'Constants' do
       let(:input2) { graph.constant([332, 332], name: 'const2', dtype: :float64) }
       let!(:define_op) do
         graph.define_op('Sub', 'output', [input1, input2], '', nil)
-      end
-      before do
-        graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
-        session.extend_graph(graph)
       end
 
       it { is_expected.to all_be_close([302.0, 100.0]) }
@@ -79,12 +82,8 @@ describe 'Constants' do
         graph.define_op('Add', 'output', [input1, input2], '', nil)
       end
 
-      before do
-        graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
-        session.extend_graph(graph)
-      end
-
-      it { is_expected.to all_be_close([Complex(4.0,4.0), Complex(-30.0,56.0)]) }
+      it { is_expected.to all_be_close(
+        [Complex(4.0,4.0), Complex(-30.0,56.0)]) }
     end
   end
 end
