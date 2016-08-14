@@ -64,13 +64,14 @@ describe 'Constants' do
       graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
       session.extend_graph(graph)
       session.run(nil, ['Constant_0'], nil)
+             .first
     end
 
     context 'Rank 0 (scalar)' do
       let!(:scalar) { graph.constant(-1.0) }
 
       it 'fetches rank-0 tensor' do
-        expect(const_result.first).to match_array(-1.0)
+        expect(const_result).to eq -1.0
       end
     end
 
@@ -78,7 +79,7 @@ describe 'Constants' do
       let!(:vector) { graph.constant([1, 2, 3, 4, 5, 6, 7]) }
 
       it 'fetches rank-1 tensor' do
-        expect(const_result.first).to match_array([1, 2, 3, 4, 5, 6, 7])
+        expect(const_result).to match_array([1, 2, 3, 4, 5, 6, 7])
       end
     end
 
@@ -86,7 +87,7 @@ describe 'Constants' do
       let!(:vector) { graph.constant([[1, 2, 3], [4, 5, 6], [7, 8, 9]]) }
 
       it 'fetches rank-2 tensor' do
-        expect(const_result.first)
+        expect(const_result)
           .to match_array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
       end
     end
@@ -99,7 +100,7 @@ describe 'Constants' do
       ]) }
 
       it 'fetches rank-3 tensor' do
-        expect(const_result.first).to match_array([
+        expect(const_result).to match_array([
           [[2], [4], [6]],
           [[8], [10], [12]],
           [[14], [16], [18]]
@@ -113,7 +114,7 @@ describe 'Constants' do
       let!(:vector) { graph.constant(-1.0, shape: [2, 3]) }
 
       it 'fetches rank-2 tensor' do
-        expect(const_result.first).to match_array([
+        expect(const_result).to match_array([
           [-1.0, -1.0, -1.0],
           [-1.0, -1.0, -1.0]
         ])
