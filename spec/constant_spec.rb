@@ -32,20 +32,6 @@ describe 'Constants' do
   end
 
   describe 'creating and fetching on graph' do
-    context 'all inferred' do
-      let!(:list) { graph.constant([8, 7, 4]) }
-      let(:result1) do
-        graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
-        session.extend_graph(graph)
-
-        session.run(nil, ['Constant_0'], nil)
-      end
-
-      it 'creates proper tensor' do
-        expect(result1[0]).to match_array([8, 7, 4])
-      end
-    end
-
     context 'explicit type' do
       let(:with_type) { graph.constant([1, 2, 3], dtype: :int32) }
 
@@ -68,6 +54,70 @@ describe 'Constants' do
 
       it 'creates the proper tensor on the graph' do
         expect(subject).to match_array([1, 2, 3])
+      end
+    end
+  end
+
+  # https://www.tensorflow.org/versions/r0.10/resources/dims_types.html#rank
+  describe 'rank' do
+    let(:const_result) do
+      graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
+      session.extend_graph(graph)
+      session.run(nil, ['Constant_0'], nil)
+             .first
+    end
+
+    context 'Rank 0 (scalar)' do
+      let!(:scalar) { graph.constant(-1.0) }
+
+      it 'fetches rank-0 tensor' do
+        expect(const_result).to eq -1.0
+      end
+    end
+
+    context 'Rank 1 (vector)' do
+      let!(:vector) { graph.constant([1, 2, 3, 4, 5, 6, 7]) }
+
+      it 'fetches rank-1 tensor' do
+        expect(const_result).to match_array([1, 2, 3, 4, 5, 6, 7])
+      end
+    end
+
+    context 'Rank 2 (matrix)' do
+      let!(:vector) { graph.constant([[1, 2, 3], [4, 5, 6], [7, 8, 9]]) }
+
+      it 'fetches rank-2 tensor' do
+        expect(const_result)
+          .to match_array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+      end
+    end
+
+    context 'Rank 3 (3-tensor)' do
+      let!(:vector) { graph.constant([
+        [[2], [4], [6]],
+        [[8], [10], [12]],
+        [[14], [16], [18]]
+      ]) }
+
+      it 'fetches rank-3 tensor' do
+        expect(const_result).to match_array([
+          [[2], [4], [6]],
+          [[8], [10], [12]],
+          [[14], [16], [18]]
+        ])
+      end
+    end
+  end
+
+  describe 'shape' do
+    context 'rank 2 shape' do
+      let!(:vector) { graph.constant(-1.0, shape: [2, 3]) }
+
+      it 'fetches rank-2 tensor' do
+        expect(const_result).to match_array([
+          [-1.0, -1.0, -1.0],
+          [-1.0, -1.0, -1.0]
+        ])
       end
     end
   end
