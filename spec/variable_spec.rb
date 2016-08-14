@@ -10,23 +10,23 @@ describe "Variable" do
 
   it "sets a default name if none is specified" do
     no_name = graph.variable([1, 2, 3])
-    expect(no_name.ref.name).to eq("Variable:0")
+    expect(no_name.ref.name).to eq("Variable_0")
   end
 
   it "increments the default variable name for each unnamed variable" do
     no_name1 = graph.variable([1, 2, 3])
     no_name2 = graph.variable([4, 5, 6])
-    expect(no_name1.ref.name).to eq("Variable:0")
-    expect(no_name2.ref.name).to eq("Variable:1")
+    expect(no_name1.ref.name).to eq("Variable_0")
+    expect(no_name2.ref.name).to eq("Variable_1")
   end
 
   it "increments variable and constant names separately" do
     variable0 = graph.variable([0])
     constant0 = graph.constant([0])
     variable1 = graph.variable([1])
-    expect(variable0.ref.name).to eq("Variable:0")
-    expect(constant0.definition.name).to eq("Constant:0")
-    expect(variable1.ref.name).to eq("Variable:1")
+    expect(variable0.ref.name).to eq("Variable_0")
+    expect(constant0.definition.name).to eq("Constant_0")
+    expect(variable1.ref.name).to eq("Variable_1")
   end
 
   it "sets data type when it is specified" do

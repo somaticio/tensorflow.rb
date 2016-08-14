@@ -20,19 +20,33 @@ describe 'Constants' do
 
     it 'sets a default name if none is specified' do
       no_name = graph.constant([1, 2, 3])
-      expect(no_name.definition.name).to eq('Constant:0')
+      expect(no_name.definition.name).to eq('Constant_0')
     end
 
     it 'increments the default constant name for each unnamed constant' do
       no_name1 = graph.constant([1, 2, 3])
       no_name2 = graph.constant([4, 5, 6])
-      expect(no_name1.definition.name).to eq('Constant:0')
-      expect(no_name2.definition.name).to eq('Constant:1')
+      expect(no_name1.definition.name).to eq('Constant_0')
+      expect(no_name2.definition.name).to eq('Constant_1')
     end
   end
 
-  describe 'type' do
-    context 'explicit' do
+  describe 'creating and fetching on graph' do
+    context 'all inferred' do
+      let!(:list) { graph.constant([8, 7, 4]) }
+      let(:result1) do
+        graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
+        session.extend_graph(graph)
+
+        session.run(nil, ['Constant_0'], nil)
+      end
+
+      it 'creates proper tensor' do
+        expect(result1[0]).to match_array([8, 7, 4])
+      end
+    end
+
+    context 'explicit type' do
       let(:with_type) { graph.constant([1, 2, 3], dtype: :int32) }
 
       it 'sets data type when it is specified' do
@@ -43,7 +57,7 @@ describe 'Constants' do
       end
     end
 
-    context 'inferred' do
+    context 'inferred type' do
       let!(:no_type) { graph.constant([1, 2, 3], name: 'output') }
 
       it 'infers data type' do
