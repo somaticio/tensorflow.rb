@@ -32,15 +32,18 @@ describe 'Constants' do
   end
 
   describe 'type' do
-    context 'explicit type' do
+    context 'explicit' do
+      let(:with_type) { graph.constant([1, 2, 3], dtype: :int32) }
+
       it 'sets data type when it is specified' do
-        no_type = graph.constant([1, 2, 3], dtype: :int32)
-        dtype = graph.type_to_enum(no_type.definition.attr['dtype'].type)
+        dtype = graph.type_to_enum(
+          with_type.definition.attr['dtype'].type)
+
         expect(dtype).to eq(Tensorflow::TF_INT32)
       end
     end
 
-    context 'inferred type' do
+    context 'inferred' do
       let!(:no_type) { graph.constant([1, 2, 3], name: 'output') }
 
       it 'infers data type' do
