@@ -4,7 +4,7 @@ describe 'Constants' do
   let(:graph) { Tensorflow::Graph.new }
   let(:session) { Tensorflow::Session.new }
   let(:result) do
-    graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
+    graph.graph_def_raw = graph.graph_def.serialize_to_string
     session.extend_graph(graph)
 
     session.run(nil, ['output'], nil)
@@ -35,7 +35,7 @@ describe 'Constants' do
     context 'all inferred' do
       let!(:list) { graph.constant([8, 7, 4]) }
       let(:result1) do
-        graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
+        graph.graph_def_raw = graph.graph_def.serialize_to_string
         session.extend_graph(graph)
 
         session.run(nil, ['Constant_0'], nil)
@@ -46,25 +46,8 @@ describe 'Constants' do
       end
     end
 
-    context 'explicit type' do
-      let(:with_type) { graph.constant([1, 2, 3], dtype: :int32) }
-
-      it 'sets data type when it is specified' do
-        dtype = graph.type_to_enum(
-          with_type.definition.attr['dtype'].type)
-
-        expect(dtype).to eq(Tensorflow::TF_INT32)
-      end
-    end
-
     context 'inferred type' do
       let!(:no_type) { graph.constant([1, 2, 3], name: 'output') }
-
-      it 'infers data type' do
-        dtype = graph.type_to_enum(no_type.definition.attr['dtype'].type)
-
-        expect(dtype).to eq(Tensorflow::TF_INT64)
-      end
 
       it 'creates the proper tensor on the graph' do
         expect(subject).to match_array([1, 2, 3])

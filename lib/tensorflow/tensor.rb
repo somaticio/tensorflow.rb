@@ -42,11 +42,19 @@ class Tensorflow::Tensor
   #  Returns the shape of the Tensor in Ruby protocol buffers.(To be used later with ops).
 
   def initialize(data, type = nil)
-    self.dimensions = dimension_finder(data) if data.is_a?(Array)
-    raise("Incorrect dimensions specified in the input.") if self.dimensions == nil && data.is_a?(Array)
-    self.rank = 0
-    self.rank = self.dimensions.size if data.is_a?(Array)
-    self.tensor_shape_proto = shape_proto(self.dimensions) if self.dimensions.is_a?(Array)
+    self.dimensions = dimension_finder(data)
+    self.rank = self.dimensions.size
+    self.tensor_shape_proto = shape_proto(self.dimensions)
+    if data.is_a?(Array) == false
+      self.tensor_shape_proto = shape_proto([])
+      raise "The data type of a scalar tensor must be specified on initialization." if !type
+      self.element_type = set_type(type) if type != nil
+      self.tensor_data = ruby_array_to_c([data], self.type_num)
+      self.dimension_data = ruby_array_to_c([1], Tensorflow::TF_INT64)
+      return self.tensor = Tensorflow::TF_NewTensor_wrapper(
+                  type_num, dimension_data, 0, tensor_data,data_size)
+    end
+    raise("Incorrect dimensions specified in the input.") if self.dimensions == []
     self.element_type = set_type(type) if type != nil
     self.element_type = find_type(data) if type == nil
     if dimensions.length > 1 && type_num == Tensorflow::TF_STRING
@@ -55,8 +63,10 @@ class Tensorflow::Tensor
     self.flatten = data.flatten
     self.tensor_data = ruby_array_to_c(self.flatten, self.type_num)
     self.dimension_data = ruby_array_to_c(self.dimensions, Tensorflow::TF_INT64)
-    self.tensor = Tensorflow::TF_NewTensor_wrapper(self.type_num, self.dimension_data, self.dimensions.length, self.tensor_data , self.data_size * self.flatten.length)
-  end
+    self.tensor = Tensorflow::TF_NewTensor_wrapper(
+       type_num, dimension_data, dimensions.length, tensor_data,
+       data_size * flatten.length)
+    end
 
   #
   # Converts the dimensions of the tensor to Protbuf format.
@@ -65,9 +75,9 @@ class Tensorflow::Tensor
   #   - The shape of the tensor
   #
   def shape_proto(array)
-    dimensions = []
-    array.each_with_index { |value, i| dimensions[i] = Tensorflow::TensorShapeProto::Dim.new(size: value) }
-    Tensorflow::TensorShapeProto.new(dim: dimensions)
+    dims = []
+    array.each_with_index { |value, i| dims[i] = Tensorflow::TensorShapeProto::Dim.new(size: value) }
+    Tensorflow::TensorShapeProto.new(dim: dims)
   end
 
   #
@@ -112,6 +122,7 @@ class Tensorflow::Tensor
   #   - nil             (If the input is not a n - dimensional matrix.)
   #
   def dimension_finder(array)
+    return [] unless array.is_a?(Array)
     if array.any? { |nested_array| nested_array.is_a?(Array) }
       dim = array.group_by { |nested_array| nested_array.is_a?(Array) && dimension_finder(nested_array) }.keys
       [array.size] + dim.first if dim.size == 1 && dim.first
@@ -158,8 +169,8 @@ class Tensorflow::Tensor
       float_flag = 0
       float_flag = 1 if type == Float
       data.flatten.each do |i|
-        raise "Different data types in array." if !(i.is_a? (Float) or i.is_a? (Integer))
-        float_flag = 1 if i.is_a? (Float)
+        raise "Different data types in array." if !(i.is_a?(Float) || i.is_a?(Integer))
+        float_flag = 1 if i.is_a?(Float)
       end
       if float_flag == 1
         type = Float
@@ -168,9 +179,10 @@ class Tensorflow::Tensor
       end
     else
       data.flatten.each do |i|
-        raise "Different data types in array." if !(i.is_a?  (type))
+        raise "Different data types in array." if !(i.is_a?(type))
       end
     end
+
     type
   end
 
@@ -229,6 +241,7 @@ class Tensorflow::Tensor
        sum += (dimension[dimension.length - 2 - i] - 1) * prod
        prod *= self.dimensions[self.dimensions.length - 2 - i]
     end
-    self.flatten[sum]
+
+    flatten[sum]
   end
 end
