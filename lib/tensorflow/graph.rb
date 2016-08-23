@@ -19,7 +19,7 @@ class Tensorflow::Graph
   #
   def load_available_ops
     ops_reader = File.read(File.dirname(__FILE__)+'/ops.pb')
-    op_list = Tensorflow::OpList.decode(ops_reader)
+    op_list = Tensorflow::OpList.parse(ops_reader)
     available_ops = {}
     (0..op_list.op.length - 1).each do |i|
       available_ops[op_list.op[i].name.downcase] = op_list.op[i]
@@ -37,7 +37,7 @@ class Tensorflow::Graph
   #
   def read(filename)
     reader = File.read(filename)
-    self.graph_def = Tensorflow::GraphDef.decode(reader)
+    self.graph_def = Tensorflow::GraphDef.parse(reader)
     self.graph_def_raw = reader
   end
 
@@ -45,13 +45,13 @@ class Tensorflow::Graph
   # operation that must be fed with data on execution.
   def placeholder(name, type_enum, dims)
     op = GraphNode.new
-    op.definition = Tensorflow::NodeDef.new(name: name, op: "Placeholder", attr: {})
+    op.definition = Tensorflow::NodeDef.new(name: name, op: "Placeholder", attr: [Tensorflow::NodeDef::AttrEntry.new(key: "dtype" ,value: Tensorflow::AttrValue.new(type: type_enum))])
     op.out_data_types = {}
     op.out_data_types[name] = type_enum
-    op.definition.attr["dtype"] = Tensorflow::AttrValue.new(type: type_enum)
+
     dim_array = []
     dims.each_with_index { |value, i| dim_array[i] = Tensorflow::TensorShapeProto::Dim.new(size: value) }
-    op.definition.attr["shape"] = Tensorflow::AttrValue.new(shape: Tensorflow::TensorShapeProto.new(dim: dim_array))
+    op.definition.attr.push(Tensorflow::NodeDef::AttrEntry.new(key: "shape",value: Tensorflow::AttrValue.new(shape: Tensorflow::TensorShapeProto.new(dim: dim_array)) ))
     self.graph_def.node.push(op.definition)
     op
   end
@@ -84,14 +84,14 @@ class Tensorflow::Graph
       end
     end
     node = GraphNode.new
-    node.definition = Tensorflow::NodeDef.new(name: name, op: opName, input: inputs, device: device , attr: {})
+    node.definition = Tensorflow::NodeDef.new(name: name, op: opName, input: inputs, device: device , attr: [])
     attrs ||= {}
     match_types(input, node, attrs, op)
     op.attr.each do |attribute|
       if attrs[attribute.name]
-        node.definition.attr[attribute.name] = make_attr_value(attribute.type, attrs[attribute.name])
+        node.definition.attr.push(Tensorflow::NodeDef::AttrEntry.new(key: attribute.name,value: make_attr_value(attribute.type, attrs[attribute.name])))
       elsif attribute.default_value
-        node.definition.attr[attribute.name] = attribute.default_value
+        node.definition.attr.push(Tensorflow::NodeDef::AttrEntry.new(key: attribute.name,value: attribute.default_value))
       end
     end
     self.graph_def.node.push(node.definition)
@@ -144,34 +144,41 @@ class Tensorflow::Graph
       Tensorflow::AttrValue.new(type: value)
     when "tensor"
       tensor_element_type = value.type_num
-      content =
-        case value.type_num
-        when Tensorflow::TF_DOUBLE
-          value.flatten.pack("d*")
-        when Tensorflow::TF_INT32
-          value.flatten.pack("l*")
-        when Tensorflow::TF_INT64
-          value.flatten.pack("q*")
-        when Tensorflow::TF_COMPLEX128
+      result = Tensorflow::AttrValue.new(
+                tensor: Tensorflow::TensorProto.new(
+                dtype: value.type_num,
+                tensor_shape: value.tensor_shape_proto,
+                )
+              )
+      case value.type_num
+      when Tensorflow::TF_FLOAT
+        result.tensor.float_val = value.flatten
+      when Tensorflow::TF_DOUBLE
+        result.tensor.double_val = value.flatten
+        result.tensor.tensor_content = value.flatten.pack("d*")
+      when Tensorflow::TF_INT32
+        result.tensor.int_val = value.flatten
+        result.tensor.tensor_content = value.flatten.pack("l*")
+      when Tensorflow::TF_INT64
+        result.tensor.tensor_content = value.flatten.pack("q*")
+      when Tensorflow::TF_STRING
+        result.tensor.string_val = value.flatten
+      when Tensorflow::TF_COMPLEX128
           tensor_narray = NArray.complex(value.flatten.length)
           (0..value.flatten.length - 1).each do |i|
             tensor_narray[i] = value.flatten[i]
           end
-          tensor_narray.to_s
-        end
-      Tensorflow::AttrValue.new(
-        tensor: Tensorflow::TensorProto.new(
-          dtype: value.type_num,
-          tensor_shape: value.tensor_shape_proto,
-          tensor_content: content
-        )
-      )
+        result.tensor.tensor_content = tensor_narray.to_s
+      end
+      result
     when "shape"
       Tensorflow::AttrValue.new(shape: value)
     when "bool"
       Tensorflow::AttrValue.new(b: value)
     when "string"
-      result = Tensorflow::AttrValue.new(s: [value].pack("B*"))
+      Tensorflow::AttrValue.new(s: value)
+    when "int"
+      Tensorflow::AttrValue.new(i: value[0])
     else
       raise "attribute type not supported"
     end

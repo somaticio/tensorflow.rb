@@ -29,18 +29,6 @@ describe "Variable" do
     expect(variable1.ref.name).to eq("Variable_1")
   end
 
-  it "sets data type when it is specified" do
-    no_type = graph.variable([1, 2, 3], dtype: :int32)
-    dtype = graph.type_to_enum(no_type.ref.attr["dtype"].type)
-    expect(dtype).to eq(Tensorflow::TF_INT32)
-  end
-
-  it "infers data type based on initial data if not explicitly specified" do
-    no_type = graph.variable([1, 2, 3])
-    dtype = graph.type_to_enum(no_type.ref.attr["dtype"].type)
-    expect(dtype).to eq(Tensorflow::TF_INT64)
-  end
-
   it "subtracts tensors across multiple sessions" do
     input1 = graph.variable([343,32], dtype: :int32, name: "input1")
     input2 = graph.constant([33,42], dtype: :int32, name: "input2")
@@ -48,7 +36,7 @@ describe "Variable" do
     graph.define_op("Assign",'assign_inp1', [input1, add],"",nil)
     graph.intialize_variables
     session = Tensorflow::Session.new
-    graph.graph_def_raw = Tensorflow::GraphDef.encode(graph.graph_def)
+    graph.graph_def_raw = graph.graph_def.serialize_to_string
     session.intialize_variables_and_extend_graph(graph)
     result = session.run(nil, ["input1"], ["assign_inp1"])
     result = session.run(nil, ["input1"], ["assign_inp1"])
