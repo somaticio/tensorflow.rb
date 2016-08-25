@@ -20,8 +20,8 @@ describe "Tensorflow::Tensor" do
       session = Tensorflow::Session.new
       session.extend_graph(graph)
       inputs = {
-        'input1' => Tensorflow::Tensor.new(12,:int64).tensor,
-        'input2' => Tensorflow::Tensor.new(43,:int64).tensor,
+        'input1' => Tensorflow::Tensor.new(12, :int64).tensor,
+        'input2' => Tensorflow::Tensor.new(43, :int64).tensor,
       }
       result = session.run(inputs, ['output'], [])
       expect(result[0]).to match_array(55)
@@ -36,7 +36,7 @@ describe "Tensorflow::Tensor" do
 
     it "Should make tensor of string data type." do
       input1 = Tensorflow::Tensor.new("Ruby", :string)
-      expect(["Ruby"]).to match_array(Tensorflow::string_reader(input1.tensor))
+      expect(Tensorflow::string_reader(input1.tensor)).to match_array(["Ruby"])
       graph = Tensorflow::Graph.new
       graph.constant(["Ruby"], dtype: :string)
     end
