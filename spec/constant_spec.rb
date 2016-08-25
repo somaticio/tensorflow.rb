@@ -86,4 +86,77 @@ describe 'Constants' do
         [Complex(4.0,4.0), Complex(-30.0,56.0)]) }
     end
   end
+
+  # https://www.tensorflow.org/versions/r0.10/resources/dims_types.html#rank
+  describe 'rank' do
+    let(:const_result) do
+      graph.graph_def_raw = graph.graph_def.serialize_to_string
+      session.extend_graph(graph)
+      session.run(nil, ['Constant_0'], nil)
+             .first
+    end
+
+    context 'Rank 0 (scalar)' do
+      let!(:scalar) { graph.constant(-1.0) }
+
+      xit 'fetches rank-0 tensor' do
+        # TODO: this currently returns [-1.0]
+        expect(const_result).to eq -1.0
+      end
+    end
+
+    context 'Rank 1 (vector)' do
+      let!(:vector) { graph.constant([1, 2, 3, 4, 5, 6, 7]) }
+
+      it 'fetches rank-1 tensor' do
+        expect(const_result).to match_array([1, 2, 3, 4, 5, 6, 7])
+      end
+    end
+
+    context 'Rank 2 (matrix)' do
+      let!(:vector) { graph.constant([[1, 2, 3], [4, 5, 6], [7, 8, 9]]) }
+
+      it 'fetches rank-2 tensor' do
+        expect(const_result)
+          .to match_array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+      end
+    end
+
+    context 'Rank 3 (3-tensor)' do
+      let!(:vector) { graph.constant([
+        [[2], [4], [6]],
+        [[8], [10], [12]],
+        [[14], [16], [18]]
+      ]) }
+
+      it 'fetches rank-3 tensor' do
+        expect(const_result).to match_array([
+          [[2], [4], [6]],
+          [[8], [10], [12]],
+          [[14], [16], [18]]
+        ])
+      end
+    end
+  end
+
+  describe 'shape' do
+    let(:const_result) do
+      graph.graph_def_raw = graph.graph_def.serialize_to_string
+      session.extend_graph(graph)
+      session.run(nil, ['Constant_0'], nil)
+             .first
+    end
+
+    context 'rank 2 shape' do
+      let!(:vector) { graph.constant(-1.0, shape: [2, 3]) }
+
+      xit 'fetches rank-2 tensor' do
+        # TODO: should reshape scalar if shape passed in
+        expect(const_result).to match_array([
+          [-1.0, -1.0, -1.0],
+          [-1.0, -1.0, -1.0]
+        ])
+      end
+    end
+  end
 end
