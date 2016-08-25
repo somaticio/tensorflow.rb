@@ -41,42 +41,32 @@ class Tensorflow::Tensor
   # @attribute tensor_shape_proto
   #  Returns the shape of the Tensor in Ruby protocol buffers.(To be used later with ops).
 
-  def initialize(data, type = nil)
-    self.dimensions = dimension_finder(data)
-    self.rank = self.dimensions.size
-    self.tensor_shape_proto = shape_proto(self.dimensions)
-    if data.is_a?(Array) == false
-      self.tensor_shape_proto = shape_proto([])
-      raise "The data type of a scalar tensor must be specified on initialization." if !type
-      self.element_type = set_type(type) if type != nil
-      self.tensor_data = ruby_array_to_c([data], self.type_num)
-      self.dimension_data = ruby_array_to_c([1], Tensorflow::TF_INT64)
-      return self.tensor = Tensorflow::TF_NewTensor_wrapper(
-                  type_num, dimension_data, 0, tensor_data,data_size)
+  def initialize(value, type = nil)
+    self.dimensions = value.shape
+    self.rank = dimensions.size
+    self.tensor_shape_proto = shape_proto(dimensions)
+    self.element_type = type.nil? ? find_type(value) : set_type(type)
+    if rank > 1 && type_num == Tensorflow::TF_STRING
+      raise ("Multi-dimensional tensor not supported for string value type.")
     end
-    raise("Incorrect dimensions specified in the input.") if self.dimensions == []
-    self.element_type = set_type(type) if type != nil
-    self.element_type = find_type(data) if type == nil
-    if dimensions.length > 1 && type_num == Tensorflow::TF_STRING
-      raise ("Multi-dimensional tensor not supported for string data type.")
-    end
-    self.flatten = data.flatten
-    self.tensor_data = ruby_array_to_c(self.flatten, self.type_num)
-    self.dimension_data = ruby_array_to_c(self.dimensions, Tensorflow::TF_INT64)
-    self.tensor = Tensorflow::TF_NewTensor_wrapper(
-       type_num, dimension_data, dimensions.length, tensor_data,
-       data_size * flatten.length)
-    end
+    self.flatten = [value].flatten
+    self.tensor_data = ruby_array_to_c(flatten, type_num)
+    self.dimension_data = ruby_array_to_c(
+      rank.zero? ? [1] : dimensions, Tensorflow::TF_INT64)
+    self.tensor = Tensorflow::TF_NewTensor_wrapper(type_num,
+      dimension_data, rank, tensor_data, data_size * flatten.length)
+  end
 
   #
-  # Converts the dimensions of the tensor to Protbuf format.
+  # Converts the dimensions of the tensor to Protobuf format.
   #
   # * *Returns* :
   #   - The shape of the tensor
   #
   def shape_proto(array)
-    dims = []
-    array.each_with_index { |value, i| dims[i] = Tensorflow::TensorShapeProto::Dim.new(size: value) }
+    dims = array.map do |size|
+      Tensorflow::TensorShapeProto::Dim.new(size: size)
+    end
     Tensorflow::TensorShapeProto.new(dim: dims)
   end
 
@@ -84,50 +74,21 @@ class Tensorflow::Tensor
   # Helper function to set the data type of tensor.
   #
   def set_type(type)
-    case type
+    self.type_num, self.data_size, self.element_type = case type
     when :float
-      self.type_num = Tensorflow::TF_FLOAT
-      self.data_size = 8
-      self.element_type = Float
+      [Tensorflow::TF_FLOAT, 8, Float]
     when :float64
-      self.type_num = Tensorflow::TF_DOUBLE
-      self.data_size = 8
-      self.element_type = Float
+      [Tensorflow::TF_DOUBLE, 8, Float]
     when :int32
-      self.type_num = Tensorflow::TF_INT32
-      self.data_size = 4
-      self.element_type = Integer
+      [Tensorflow::TF_INT32, 4, Integer]
     when :int64
-      self.type_num = Tensorflow::TF_INT64
-      self.data_size = 8
-      self.element_type = Integer
+      [Tensorflow::TF_INT64, 8, Integer]
     when :string
-      self.type_num = Tensorflow::TF_STRING
-      self.data_size = 8
-      self.element_type = String
+      [Tensorflow::TF_STRING, 8, String]
     when :complex
-      self.type_num = Tensorflow::TF_COMPLEX128
-      self.data_size = 16
-      self.element_type = Complex
+      [Tensorflow::TF_COMPLEX128, 16, Complex]
     else
       raise ArgumentError, "Data type #{type} not supported"
-    end
-  end
-
-  #
-  # Recursively finds the dimensions of the input array.
-  #
-  # * *Returns* :
-  #   - Dimension array (If the input is an n - dimensional matrix.)
-  #   - nil             (If the input is not a n - dimensional matrix.)
-  #
-  def dimension_finder(array)
-    return [] unless array.is_a?(Array)
-    if array.any? { |nested_array| nested_array.is_a?(Array) }
-      dim = array.group_by { |nested_array| nested_array.is_a?(Array) && dimension_finder(nested_array) }.keys
-      [array.size] + dim.first if dim.size == 1 && dim.first
-    else
-      [array.size]
     end
   end
 
@@ -140,34 +101,24 @@ class Tensorflow::Tensor
   #   - Data type
   #
   def find_type(data)
-    start = data if self.rank == 0
-    start = data.flatten[0] if self.rank != 0
-    self.type_num = Tensorflow::TF_INT64
+    first_element = rank.zero? ? data : data.flatten[0]
 
-    case start
+    type, self.type_num, self.data_size = case first_element
     when Integer
-      type = Integer
-      self.data_size = 8
+      [Integer, Tensorflow::TF_INT64, 8]
     when Float
-      type = Float
-      self.type_num = Tensorflow::TF_DOUBLE
-      self.data_size = 8
+      [Float, Tensorflow::TF_DOUBLE, 8]
     when String
-      type = String
-      self.type_num = Tensorflow::TF_STRING
-      self.data_size = 8
+      [String, Tensorflow::TF_STRING, 8]
     when Complex
-      type = Complex
-      self.type_num = Tensorflow::TF_COMPLEX128
-      self.data_size = 16
+      [Complex, Tensorflow::TF_COMPLEX128, 16]
     else
       raise "Data type not supported."
     end
 
-    return type if self.rank == 0
-    if type == Integer  || type == Float
-      float_flag = 0
-      float_flag = 1 if type == Float
+    return type if rank == 0
+    if type == Integer || type == Float
+      float_flag = type == Float ? 1 : 0
       data.flatten.each do |i|
         raise "Different data types in array." if !(i.is_a?(Float) || i.is_a?(Integer))
         float_flag = 1 if i.is_a?(Float)
@@ -231,15 +182,15 @@ class Tensorflow::Tensor
   #   - Value of the element contained in the specified position in the tensor.
   #
   def getval(dimension)
-    raise("Invalid dimension array passed as input.",ShapeError) if dimension.length != self.dimensions.length
+    raise("Invalid dimension array passed as input.",ShapeError) if dimension.length != dimensions.length
     (0..dimension.length-1).each do |i|
-      raise("Invalid dimension array passed as input.",ShapeError) if dimension[i] > self.dimensions[i] || dimension[i] < 1 || !(dimension[i].is_a? Integer)
+      raise("Invalid dimension array passed as input.",ShapeError) if dimension[i] > dimensions[i] || dimension[i] < 1 || !(dimension[i].is_a? Integer)
     end
     sum = dimension[dimension.length - 1]  - 1
-    prod = self.dimensions[self.dimensions.length - 1]
+    prod = dimensions[dimensions.length - 1]
     (0..dimension.length - 2).each do |i|
        sum += (dimension[dimension.length - 2 - i] - 1) * prod
-       prod *= self.dimensions[self.dimensions.length - 2 - i]
+       prod *= dimensions[dimensions.length - 2 - i]
     end
 
     flatten[sum]
