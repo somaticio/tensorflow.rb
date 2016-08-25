@@ -41,26 +41,26 @@ class Tensorflow::Tensor
   # @attribute tensor_shape_proto
   #  Returns the shape of the Tensor in Ruby protocol buffers.(To be used later with ops).
 
-  def initialize(data, type = nil)
-    self.dimensions = dimension_finder(data)
-    self.rank = self.dimensions.size
+  def initialize(value, type = nil)
+    self.dimensions = value.shape
+    self.rank = dimensions.size
     self.tensor_shape_proto = shape_proto(self.dimensions)
-    if data.is_a?(Array) == false
+    if value.is_a?(Array) == false
       self.tensor_shape_proto = shape_proto([])
-      raise "The data type of a scalar tensor must be specified on initialization." if !type
+      raise "The value type of a scalar tensor must be specified on initialization." if !type
       self.element_type = set_type(type) if type != nil
-      self.tensor_data = ruby_array_to_c([data], self.type_num)
+      self.tensor_data = ruby_array_to_c([value], self.type_num)
       self.dimension_data = ruby_array_to_c([1], Tensorflow::TF_INT64)
       return self.tensor = Tensorflow::TF_NewTensor_wrapper(
                   type_num, dimension_data, 0, tensor_data,data_size)
     end
     raise("Incorrect dimensions specified in the input.") if self.dimensions == []
     self.element_type = set_type(type) if type != nil
-    self.element_type = find_type(data) if type == nil
+    self.element_type = find_type(value) if type == nil
     if dimensions.length > 1 && type_num == Tensorflow::TF_STRING
-      raise ("Multi-dimensional tensor not supported for string data type.")
+      raise ("Multi-dimensional tensor not supported for string value type.")
     end
-    self.flatten = data.flatten
+    self.flatten = value.flatten
     self.tensor_data = ruby_array_to_c(self.flatten, self.type_num)
     self.dimension_data = ruby_array_to_c(self.dimensions, Tensorflow::TF_INT64)
     self.tensor = Tensorflow::TF_NewTensor_wrapper(
@@ -111,23 +111,6 @@ class Tensorflow::Tensor
       self.element_type = Complex
     else
       raise ArgumentError, "Data type #{type} not supported"
-    end
-  end
-
-  #
-  # Recursively finds the dimensions of the input array.
-  #
-  # * *Returns* :
-  #   - Dimension array (If the input is an n - dimensional matrix.)
-  #   - nil             (If the input is not a n - dimensional matrix.)
-  #
-  def dimension_finder(array)
-    return [] unless array.is_a?(Array)
-    if array.any? { |nested_array| nested_array.is_a?(Array) }
-      dim = array.group_by { |nested_array| nested_array.is_a?(Array) && dimension_finder(nested_array) }.keys
-      [array.size] + dim.first if dim.size == 1 && dim.first
-    else
-      [array.size]
     end
   end
 
