@@ -42,7 +42,7 @@ class Tensorflow::Tensor
   #  Returns the shape of the Tensor in Ruby protocol buffers.(To be used later with ops).
 
   def initialize(value, type = nil)
-    self.shape = self.class.set_shape(value)
+    self.shape = self.class.shape_of(value)
     self.rank = shape.size
     self.tensor_shape_proto = shape_proto(shape)
     self.element_type = type.nil? ? find_type(value) : set_type(type)
@@ -205,10 +205,10 @@ class Tensorflow::Tensor
   #   - Dimension array `[[2], [4]].shape` => `[2, 1]`
   #
   # TODO: Handle non-rectangular arrays and raise error if mixed data types
-  def self.set_shape(value)
+  def self.shape_of(value)
     if value.is_a?(Array)
       if value.any? { |ele| ele.is_a?(Array) }
-        dim = value.group_by { |ele| ele.is_a?(Array) && set_shape(ele) }.keys
+        dim = value.group_by { |ele| ele.is_a?(Array) && shape_of(ele) }.keys
         [value.size] + dim.first if dim.size == 1 && dim.first
       else
         [value.size]
