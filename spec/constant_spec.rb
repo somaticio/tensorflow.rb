@@ -143,9 +143,9 @@ describe 'Constants' do
     let(:const_result) do
       graph.graph_def_raw = graph.graph_def.serialize_to_string
       session.extend_graph(graph)
-      session.run(nil, ['Constant_0'], nil)
-             .first
+      session.run(nil, ['Constant_0'], nil).first
     end
+    subject { Tensorflow::Tensor }
 
     context 'rank 2 shape' do
       let!(:vector) { graph.constant(-1.0, shape: [2, 3]) }
@@ -157,6 +157,56 @@ describe 'Constants' do
           [-1.0, -1.0, -1.0]
         ])
       end
+    end
+
+    describe 'Array' do
+      context 'empty array' do
+        it { expect(subject.new([]).shape).to eq [0] }
+      end
+
+      context '1D' do
+        it { expect{subject.new([nil]).shape}.to raise_error(RuntimeError) }
+        it { expect(subject.new([1, 2, 3]).shape).to eq [3] }
+        it { expect(subject.new([-1.0, 2.0, 3e9, 1000]).shape).to eq [4] }
+        it { expect(subject.new(['str1', 'str2']).shape).to eq [2] }
+      end
+
+      context '2D' do
+        it { expect(subject.new([[1, 2, 3], [4, 5, 6]]).shape).to eq [2, 3] }
+        it { expect(subject.new([[-1.0, 2.0], [3e9, 1000]]).shape)
+          .to eq [2, 2] }
+        it { expect(subject.new(['str1', 'str2']).shape).to eq [2] }
+      end
+
+      context '3D' do
+        it { expect(subject.new([[[1, 2, 3], [4, 5, 6]]]).shape)
+          .to eq [1, 2, 3] }
+        it { expect(subject.new([[[-1.0], [2.0]], [[3e9], [1000]]]).shape)
+          .to eq [2, 2, 1] }
+      end
+    end
+
+    describe 'Numeric' do
+      context 'Float' do
+        it { expect(subject.new(4.0).shape).to eq [] }
+      end
+
+      context 'Integer' do
+        it { expect(subject.new(4).shape).to eq [] }
+      end
+
+      context 'Float' do
+        it { expect(subject.new(4.0).shape).to eq [] }
+      end
+
+      context 'Complex' do
+        it { expect(subject.new(Complex(2, 3)).shape).to eq [] }
+      end
+    end
+
+    describe 'String' do
+      it { expect(subject.new('some string').shape).to eq [] }
+      it { expect(subject.new('').shape).to eq [] }
     end
   end
 end

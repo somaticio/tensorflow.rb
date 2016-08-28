@@ -17,15 +17,15 @@
 #
 # * *Examples* :
 #     input = Tensor.new([[[2,3,4],[2,3,4],[2,3,4]],[[2,3,4],[2,3,4],[2,3,4]]])
-#     input.dimensions =>  [2, 3, 3]
+#     input.shape =>  [2, 3, 3]
 #     input.rank       =>  3
 #     input.element_type       =>  Integer
 #
 
 class Tensorflow::Tensor
-  attr_accessor :dimensions, :element_type , :rank, :type_num, :flatten, :tensor_data, :dimension_data, :tensor, :data_size, :tensor_shape_proto
-  # @!attribute dimensions
-  #  Return the dimensions of the tensor in an array.
+  attr_accessor :shape, :element_type , :rank, :type_num, :flatten, :tensor_data, :dimension_data, :tensor, :data_size, :tensor_shape_proto
+  # @!attribute shape
+  #  Return the shape of the tensor in an array.
   # @!attribute element_type
   #  Return data type of the tensor element. (It is best if proper design decision is made regarding this. Because Currently data type support is limited to int64 and double.)
   # @!attribute rank
@@ -37,14 +37,14 @@ class Tensorflow::Tensor
   # @!attribute tensor_data
   #  Returns serialized data in the form of a c array.
   # @!attribute dimension_data
-  #  Returns dimensions of the tensor in the form of a c array.
-  # @attribute tensor_shape_proto
+  #  Returns shape of the tensor in the form of a c array.
+  # @!attribute tensor_shape_proto
   #  Returns the shape of the Tensor in Ruby protocol buffers.(To be used later with ops).
 
   def initialize(value, type = nil)
-    self.dimensions = value.shape
-    self.rank = dimensions.size
-    self.tensor_shape_proto = shape_proto(dimensions)
+    self.shape = self.class.set_shape(value)
+    self.rank = shape.size
+    self.tensor_shape_proto = shape_proto(shape)
     self.element_type = type.nil? ? find_type(value) : set_type(type)
     if rank > 1 && type_num == Tensorflow::TF_STRING
       raise ("Multi-dimensional tensor not supported for string value type.")
@@ -52,13 +52,13 @@ class Tensorflow::Tensor
     self.flatten = [value].flatten
     self.tensor_data = ruby_array_to_c(flatten, type_num)
     self.dimension_data = ruby_array_to_c(
-      rank.zero? ? [1] : dimensions, Tensorflow::TF_INT64)
+      rank.zero? ? [1] : shape, Tensorflow::TF_INT64)
     self.tensor = Tensorflow::TF_NewTensor_wrapper(type_num,
       dimension_data, rank, tensor_data, data_size * flatten.length)
   end
 
   #
-  # Converts the dimensions of the tensor to Protobuf format.
+  # Converts the shape of the tensor to Protobuf format.
   #
   # * *Returns* :
   #   - The shape of the tensor
@@ -106,14 +106,14 @@ class Tensorflow::Tensor
     type, self.type_num, self.data_size = case first_element
     when Integer
       [Integer, Tensorflow::TF_INT64, 8]
-    when Float
+    when Float, nil
       [Float, Tensorflow::TF_DOUBLE, 8]
     when String
       [String, Tensorflow::TF_STRING, 8]
     when Complex
       [Complex, Tensorflow::TF_COMPLEX128, 16]
     else
-      raise "Data type not supported."
+      raise 'Data type not supported.'
     end
 
     return type if rank == 0
@@ -182,17 +182,39 @@ class Tensorflow::Tensor
   #   - Value of the element contained in the specified position in the tensor.
   #
   def getval(dimension)
-    raise("Invalid dimension array passed as input.",ShapeError) if dimension.length != dimensions.length
+    raise("Invalid dimension array passed as input.",ShapeError) if dimension.length != shape.length
     (0..dimension.length-1).each do |i|
-      raise("Invalid dimension array passed as input.",ShapeError) if dimension[i] > dimensions[i] || dimension[i] < 1 || !(dimension[i].is_a? Integer)
+      raise("Invalid dimension array passed as input.",ShapeError) if dimension[i] > shape[i] || dimension[i] < 1 || !(dimension[i].is_a? Integer)
     end
-    sum = dimension[dimension.length - 1]  - 1
-    prod = dimensions[dimensions.length - 1]
+    sum = dimension.last - 1
+    prod = shape.last
     (0..dimension.length - 2).each do |i|
        sum += (dimension[dimension.length - 2 - i] - 1) * prod
-       prod *= dimensions[dimensions.length - 2 - i]
+       prod *= shape[shape.length - 2 - i]
     end
 
     flatten[sum]
+  end
+
+  private
+
+  #
+  # Recursively finds the shape of the input array.
+  #
+  # * *Returns* :
+  #   - Dimension array `[[2], [4]].shape` => `[2, 1]`
+  #
+  # TODO: Handle non-rectangular arrays and raise error if mixed data types
+  def self.set_shape(value)
+    if value.is_a?(Array)
+      if value.any? { |ele| ele.is_a?(Array) }
+        dim = value.group_by { |ele| ele.is_a?(Array) && set_shape(ele) }.keys
+        [value.size] + dim.first if dim.size == 1 && dim.first
+      else
+        [value.size]
+      end
+    else
+      []
+    end
   end
 end
