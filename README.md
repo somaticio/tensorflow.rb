@@ -41,6 +41,10 @@ For details, see: https://hub.docker.com/r/nethsix/ruby-tensorflow-ubuntu/
 Alternatively, you can install outside of a Docker container by following
 the following steps.
 
+### Install Script
+We have a make shift install script in tools directory. You are welcome
+to make improvements to it.
+
 #### Explicit dependencies
 
 - [Bazel](http://www.bazel.io/docs/install.html)
