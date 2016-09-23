@@ -218,7 +218,6 @@ install linux "unzip"
 install linux "dh-autoreconf"
 
 
-
 # Install Bazel
 # 
 # Export path if not yet saved
@@ -238,9 +237,13 @@ else
 	install_shell $PKG_BAZEL
 fi
 
+
+
 # 
 # Install TensorFlow
 # 
+# Clone Repo
+clone $TENSORFLOW "tensorflow"
 
 # Go to tensorflow dir
 cd "tensorflow"
@@ -250,29 +253,34 @@ echo ""
 echo "= Configuring TensorFlow (GPU: $TENSORFLOW_GPU_ENABLED)"
 ./configure <<< "n"
 
-# Compile TensorFlow Core and CC
+# Compile TensorFlow
 echo ""
-echo "= Compiling TensorFlow [cc|core]"
+echo "= Compiling TensorFlow"
 
 # If you are behind a proxy then you need to define proxy here to work with bazel.
-#
-export http_proxy=http://10.3.100.207:8080
-export https_proxy=https://10.3.100.207:8080
-#bazel build //tensorflow/cc:cc_ops //tensorflow/core:tensorflow
+# export http_proxy=http://10.3.100.207:8080
+# export https_proxy=https://10.3.100.207:8080
 
-#bazel --batch build --jobs=10 --spawn_strategy=standalone --genrule_strategy=standalone //tensorflow:libtensorflow.so
+bazel --batch build --jobs=10 --spawn_strategy=standalone --genrule_strategy=standalone //tensorflow:libtensorflow.so
+cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
+
+#moving out of tensorflow clone
+cd ./..
+
+# Installing swig
+sudo apt-get install swig
+
+# Installing Ruby Dependencies
 sudo apt-get install ruby-dev
 sudo apt install ruby-bundler
-cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
-ls
 
-#git clone https://github.com/Arafatk/ruby-tensorflow.git
-
-cd ruby-tensorflow/ext/sciruby/tensorflow_c
+#cloning tensorflow.rb
+git clone https://github.com/somaticio/tensorflow.rb.git
+cd tensorflow.rb/ext/sciruby/tensorflow_c
 ruby extconf.rb
 make
 make install # Creates ../lib/ruby/site_ruby/X.X.X/<arch>/tf/Tensorflow.bundle (.so Linux)
-cd ./..
+cd ./../../..
 bundle exec rake install
 
 # 
@@ -282,37 +290,4 @@ bundle exec rake install
 cd ../../../ # Go to ./tools
 
 echo ""
-echo "= Cleaning up..."
-
-srcDir="../src/includes"
-libDir="../src/lib"
-
-# Make directory and clean it
-mkdir -p $srcDir
-mkdir -p $libDir
-
-rm -rf $srcDir
-rm -rf $libDir
-
-# Copy .h & .cc files
-cp -a tensorflow/bazel-genfiles/. 				$srcDir
-cp -a tensorflow/tensorflow/cc 					$srcDir/tensorflow
-cp -a tensorflow/tensorflow/core 				$srcDir/tensorflow
-cp -a tensorflow/google/protobuf/src/google		$srcDir
-cp -a tensorflow/third_party					$srcDir
-
-# Copy Libraries (.o)
-mkdir -p $libDir/google
-mkdir -p $libDir/external
-mkdir -p $libDir/tensorflow
-
-cp -a tensorflow/bazel-bin/google/.			$libDir/google
-cp -a tensorflow/bazel-bin/external/.		$libDir/external
-cp -a tensorflow/bazel-bin/tensorflow/.		$libDir/tensorflow
-
-# Remove repo folder
-rm -rf "tensorflow"
-
-echo ""
-echo "= Finished!"
-echo ""
+echo "Thanks you for installing tensorflow.rb"
