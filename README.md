@@ -15,6 +15,11 @@ Everything is at [RubyDoc](http://www.rubydoc.info/github/somaticio/tensorflow.r
 You can also generate docs by
 ```bundle exec rake doc```.
 
+## Blog Posts 
+1. [Introductory blog post](https://medium.com/@Arafat./introducing-tensorflow-ruby-api-e77a477ff16e#.mhvj9ojlj)
+2. [Developers blog post](https://medium.com/@Arafat./ruby-tensorflow-for-developers-2ec56b8668c5#.97tng1qqi)
+3. [Image Recognition Tutorial](https://medium.com/@Arafat./image-recognition-in-ruby-tensorflow-df5d5c05389b#.ty1vygtrg)
+
 ## Installation
 
 ### Docker
