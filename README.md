@@ -98,6 +98,10 @@ bundle exec rake spec
 ```
 This command is to run the tests.
 
+### Install Script
+I have also made a make shift install script in tools directory. You are free to use it, but it still needs some work and its best if you follow the installation procedure above or use docker. You are welcome to make improvements to the script.
+
+
 ## License
 
 Copyright (c) 2016, Arafat Dad Khan.
