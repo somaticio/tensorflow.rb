@@ -73,6 +73,20 @@ install_shell() {
 
 }
 
+make_install() {
+	local dir=$1
+
+	echo ""
+	echo "= installing $1 $2"
+
+ 	cd $dir \
+	 && ./configure --disable-dependency-tracking --prefix=$PREFIX $2 \
+	 && make \
+	 && make install \
+	 && echo "... removing $dir" \
+	 && cd .. && rm -fr $dir
+}
+
 fetch() {
 	local tarball=`basename $1`
 	local dir=`basename $tarball .tar.gz`
@@ -87,21 +101,6 @@ fetch() {
 		&& make_install $dir $2
 }
 
-fetch_xz() {
-	local tarball=`basename $1`
-	local dir=`basename $tarball .tar.xz`
-
-	echo ""
-	echo "= downloading $tarball"
-	
-	curl -# -L $1 -o $tarball \
-		&& echo "== unpacking" \
-		&& tar -xJf $tarball \
-		&& echo "== removing tarball" \
-		&& rm -fr $tarball \
-		&& make_install $dir
-}
-
 clone(){
 	local repo=$1
 	local folderName=$2
@@ -114,20 +113,6 @@ clone(){
 
 	# Git clone the repo
 	git clone --recurse-submodules $repo ./$folderName
-}
-
-make_install() {
-	local dir=$1
-
-	echo ""
-	echo "= installing $1 $2"
-
- 	cd $dir \
-	 && ./configure --disable-dependency-tracking --prefix=$PREFIX $2 \
-	 && make \
-	 && make install \
-	 && echo "... removing $dir" \
-	 && cd .. && rm -fr $dir
 }
 
 install(){
@@ -214,6 +199,11 @@ install linux "g++"
 install linux "zlib1g-dev"
 install linux "unzip"
 
+# Install SWIG and ruby dependencies
+install linux "swig"
+install linux "ruby-dev"
+install linux "ruby-bundler"
+
 # Install protobuf dependencies
 install linux "dh-autoreconf"
 
@@ -257,22 +247,15 @@ echo "= Configuring TensorFlow (GPU: $TENSORFLOW_GPU_ENABLED)"
 echo ""
 echo "= Compiling TensorFlow"
 
+# Bazel 
 # If you are behind a proxy then you need to define proxy here to work with bazel.
-# export http_proxy=http://10.3.100.207:8080
-# export https_proxy=https://10.3.100.207:8080
-
+# export http_proxy=http:// 
+# export https_proxy=https:// 
 bazel --batch build --jobs=10 --spawn_strategy=standalone --genrule_strategy=standalone //tensorflow:libtensorflow.so
 cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
 
 #moving out of tensorflow clone
 cd ./..
-
-# Installing swig
-sudo apt-get install swig
-
-# Installing Ruby Dependencies
-sudo apt-get install ruby-dev
-sudo apt install ruby-bundler
 
 #cloning tensorflow.rb
 git clone https://github.com/somaticio/tensorflow.rb.git
@@ -290,4 +273,4 @@ bundle exec rake install
 cd ../../../ # Go to ./tools
 
 echo ""
-echo "Thanks you for installing tensorflow.rb"
+echo "Thank you for installing tensorflow.rb"
