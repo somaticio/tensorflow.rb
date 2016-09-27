@@ -227,9 +227,7 @@ else
 fi
 
 # 
-# Install TensorFlow
-# 
-# Clone Repo
+# Clone TensorFlow Repo
 clone $TENSORFLOW "tensorflow"
 
 # Go to tensorflow dir
