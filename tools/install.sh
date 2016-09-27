@@ -207,7 +207,6 @@ install linux "ruby-bundler"
 # Install protobuf dependencies
 install linux "dh-autoreconf"
 
-
 # Install Bazel
 # 
 # Export path if not yet saved
@@ -226,8 +225,6 @@ if hash bazel 2>/dev/null; then
 else
 	install_shell $PKG_BAZEL
 fi
-
-
 
 # 
 # Install TensorFlow
@@ -265,12 +262,6 @@ make
 make install # Creates ../lib/ruby/site_ruby/X.X.X/<arch>/tf/Tensorflow.bundle (.so Linux)
 cd ./../../..
 bundle exec rake install
-
-# 
-# Copy essential files to ./src/includes
-# (Copies essential parts to ../src)
-# 
-cd ../../../ # Go to ./tools
 
 echo ""
 echo "Thank you for installing tensorflow.rb"
