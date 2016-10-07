@@ -43,6 +43,4 @@ describe "Variable" do
     result = session.run(nil, ["input1"], ["assign_inp1"])
     expect(result[0]).to match_array([244, -94])
   end
-
-
 end
