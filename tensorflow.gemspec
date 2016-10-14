@@ -9,10 +9,10 @@ Gem::Specification.new do |s|
   s.files       = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   s.license     = "Apache License, Version 2.0"
   s.homepage    = "https://github.com/somaticio/tensorflow.rb"
+  s.add_runtime_dependency 'ruby-protocol-buffers'
+  s.add_runtime_dependency 'narray'
   s.add_development_dependency "bundler", '~> 1.8', '>= 1.8.4'
   s.add_development_dependency "rake", "~> 10.0"
   s.add_development_dependency 'rspec', '~> 3.0'
-  s.add_development_dependency 'ruby-protocol-buffers'
-  s.add_development_dependency 'narray'
   s.extensions = ['ext/sciruby/tensorflow_c/extconf.rb']
 end
