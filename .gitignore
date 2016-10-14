@@ -9,3 +9,4 @@ pkg/
 doc/
 examples.txt
 pbtxt/
+Gemfile.lock
