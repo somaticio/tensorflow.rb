@@ -29,17 +29,24 @@ It's easiest to get started using the prebuilt Docker container.
 Launch:
 
 ```
-docker run -it nethsix/ruby-tensorflow-ubuntu:0.0.1.a /bin/bash
+docker run --rm -it nethsix/ruby-tensorflow-ubuntu:0.0.1 /bin/bash
 ```
 
 Test:
 
 ```
-cd /repos/ruby-tensorflow/
+cd /repos/tensorflow.rb/
 bundle exec rspec
 ```
 
-For details, see: https://hub.docker.com/r/nethsix/ruby-tensorflow-ubuntu/
+Image Classification Tutorial:
+
+```
+cd /repos/tensorflow.rb/image/
+cat README
+```
+
+For more details about all the fun machine-learning stuff already pre-installed, see: https://hub.docker.com/r/nethsix/ruby-tensorflow-ubuntu/
 
 ### Outside of Docker
 
