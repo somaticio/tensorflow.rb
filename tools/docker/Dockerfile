@@ -58,10 +58,10 @@ RUN /bin/bash -l -c "gem install bundle --no-rdoc --no-ri"
 RUN /bin/bash -l -c "rvm gemset create ruby-tensorflow"
 
 # Install ruby-tensorflow
-RUN cd /repos && git clone https://github.com/Arafatk/ruby-tensorflow.git
-RUN cd /repos/ruby-tensorflow && /bin/bash -l -c "rvm --ruby-version use 2.2.4@ruby-tensorflow"
+RUN cd /repos && git clone https://github.com/somaticio/tensorflow.rb
+RUN cd /repos/tensorflow.rb && /bin/bash -l -c "rvm --ruby-version use 2.2.4@ruby-tensorflow"
 
-RUN cd /repos/ruby-tensorflow && /bin/bash -l -c "bundle install"
+RUN cd /repos/tensorflow.rb && /bin/bash -l -c "bundle install"
 
-RUN cd /repos/ruby-tensorflow/ext/sciruby/tensorflow_c && /bin/bash -l -c "ruby extconf.rb && make && make install"
-RUN cd /repos/ruby-tensorflow && /bin/bash -l -c "bundle exec rake install"
+RUN cd /repos/tensorflow.rb/ext/sciruby/tensorflow_c && /bin/bash -l -c "ruby extconf.rb && make && make install"
+RUN cd /repos/tensorflow.rb && /bin/bash -l -c "bundle exec rake install"
