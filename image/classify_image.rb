@@ -28,7 +28,10 @@ def read_tensor_from_image(file_path)
   session.run(nil, ['normalized'], nil)
 end
 
-tensor = read_tensor_from_image('mysore_palace.jpg')
+image_file = ARGV.size < 1 ? 'mysore_palace.jpg' : ARGV[0]
+$stdout.puts "Trying to classify image file: #{image_file}"
+raise ArgumentError, "Cannot find image file: #{image_file}" unless File.file?(image_file)
+tensor = read_tensor_from_image(image_file)
 graph = Tensorflow::Graph.new
 graph.read(File.dirname(__FILE__)+'/tensorflow_inception_graph.pb')
 session = Tensorflow::Session.new
