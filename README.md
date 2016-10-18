@@ -75,6 +75,7 @@ these libraries do the following:
 ```
 git clone --recurse-submodules https://github.com/tensorflow/tensorflow
 cd tensorflow
+./configure
 ```
 This command clones the repository and a few sub modules. After this you should do:
 ```
