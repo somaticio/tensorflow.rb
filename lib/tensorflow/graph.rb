@@ -143,7 +143,6 @@ class Tensorflow::Graph
     when "type"
       Tensorflow::AttrValue.new(type: value)
     when "tensor"
-      tensor_element_type = value.type_num
       result = Tensorflow::AttrValue.new(
                 tensor: Tensorflow::TensorProto.new(
                 dtype: value.type_num,
@@ -219,7 +218,6 @@ class Tensorflow::Graph
     end
 
     op.output_arg.each do |arg|
-      argType = type_to_enum(arg.type)
       outnode.out_data_types[outnode.definition.name] = attrs[arg.type_attr]
       # TODO
     end

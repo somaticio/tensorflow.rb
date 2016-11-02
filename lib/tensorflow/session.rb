@@ -109,7 +109,6 @@ class Tensorflow::Session
   # Returns an array containing the length of the tensor in each dimension
   def length_by_dimension(value)
     num_dimensions = Tensorflow::TF_NumDims(value)
-    result = []
 
     (0..num_dimensions - 1).each_with_object([]) do |dimension, array|
       array.push(Tensorflow::TF_Dim(value, dimension))
