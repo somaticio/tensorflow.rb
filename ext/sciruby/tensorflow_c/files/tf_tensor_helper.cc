@@ -39,7 +39,7 @@ TF_Tensor* TF_NewTensor_wrapper(TF_DataType dtype, long long* dims, int num_dims
   memcpy(cData, data, len);
 
   return TF_NewTensor(dtype, dims, num_dims, cData, len, [](void *cData, size_t len, void* arg){
-      }, nullptr);
+  }, nullptr);
 };
 
 long long tensor_size(TF_Tensor* tensor)

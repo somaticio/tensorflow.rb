@@ -5,7 +5,7 @@
 %include "std_complex.i"
 
 %{
-#include "./files/tensor_c_api.h"     
+#include "./files/tensor_c_api.h"
 #include "./files/version.h"
 #include "./files/tf_tensor_helper.h"
 #include "./files/tf_tensor_helper.cc"

@@ -15,7 +15,7 @@ Everything is at [RubyDoc](http://www.rubydoc.info/github/somaticio/tensorflow.r
 You can also generate docs by
 ```bundle exec rake doc```.
 
-## Blog Posts 
+## Blog Posts
 1. [Introductory blog post](https://medium.com/@Arafat./introducing-tensorflow-ruby-api-e77a477ff16e#.mhvj9ojlj)
 2. [Developers blog post](https://medium.com/@Arafat./ruby-tensorflow-for-developers-2ec56b8668c5#.97tng1qqi)
 3. [Image Recognition Tutorial](https://medium.com/@Arafat./image-recognition-in-ruby-tensorflow-df5d5c05389b#.ty1vygtrg)
@@ -79,7 +79,7 @@ cd tensorflow
 ```
 This command clones the repository and a few sub modules. After this you should do:
 ```
-bazel build //tensorflow:libtensorflow.so
+bazel build -c opt //tensorflow:libtensorflow.so
 ```
 This command takes in the order of 10-15 minutes to run and creates a shared library. When finished, copy the newly generated libtensorflow.so shared library:
 ```
@@ -125,6 +125,3 @@ All rights reserved.
 ## Acknowledgements
 
 * The [Ruby Science Foundation](http://sciruby.com/) and [somatic](http://somatic.io) for mentoring and sponsoring the project
-
-
-
