@@ -60,6 +60,13 @@ limitations under the License.
 // * Devices are not in this API.  Instead, they are created/used internally
 //   and the API just provides high level controls over the number of
 //   devices of each type.
+//
+//
+//
+// Ruby API Changes
+// int64_t has been changed to long long to work with SWIG
+// function TF_SetAttrTypeList has been changed too
+// const TF_DataType* values  ==> TF_DataType* values
 
 #ifdef __cplusplus
 extern "C" {
@@ -188,7 +195,7 @@ typedef struct TF_Tensor TF_Tensor;
 //      (*deallocator)(data, len, deallocator_arg)
 // Clients must provide a custom deallocator function so they can pass in
 // memory managed by something like numpy.
-extern TF_Tensor* TF_NewTensor(TF_DataType, const long long * dims, int num_dims,
+extern TF_Tensor* TF_NewTensor(TF_DataType, const long long* dims, int num_dims,
                                void* data, size_t len,
                                void (*deallocator)(void* data, size_t len,
                                                    void* arg),
@@ -203,7 +210,7 @@ extern TF_Tensor* TF_NewTensor(TF_DataType, const long long * dims, int num_dims
 //
 // The caller must set the Tensor values by writing them to the pointer returned
 // by TF_TensorData with length TF_TensorByteSize.
-extern TF_Tensor* TF_AllocateTensor(TF_DataType, const long long * dims,
+extern TF_Tensor* TF_AllocateTensor(TF_DataType, const long long* dims,
                                     int num_dims, size_t len);
 
 // Destroy a tensor.
@@ -217,7 +224,7 @@ extern int TF_NumDims(const TF_Tensor*);
 
 // Return the length of the tensor in the "dim_index" dimension.
 // REQUIRES: 0 <= dim_index < TF_NumDims(tensor)
-extern long long  TF_Dim(const TF_Tensor* tensor, int dim_index);
+extern long long TF_Dim(const TF_Tensor* tensor, int dim_index);
 
 // Return the size of the underlying data in bytes.
 extern size_t TF_TensorByteSize(const TF_Tensor*);
@@ -299,7 +306,7 @@ typedef struct TF_Port {
 //   * An invalid shape is being set (e.g., the shape being set
 //     is incompatible with the existing shape).
 extern void TF_GraphSetTensorShape(TF_Graph* graph, TF_Port port,
-                                   const long long * dims, const int num_dims,
+                                   const long long* dims, const int num_dims,
                                    TF_Status* status);
 
 // Returns the number of dimensions of the Tensor referenced by `port`
@@ -324,7 +331,7 @@ extern int TF_GraphGetTensorNumDims(TF_Graph* graph, TF_Port port,
 // Returns an error into `status` if:
 //   * `port` is not in `graph`.
 //   * `num_dims` does not match the actual number of dimensions.
-extern void TF_GraphGetTensorShape(TF_Graph* graph, TF_Port port, long long * dims,
+extern void TF_GraphGetTensorShape(TF_Graph* graph, TF_Port port, long long* dims,
                                    int num_dims, TF_Status* status);
 
 // Operation will only be added to *graph when TF_FinishOperation() is
@@ -392,9 +399,9 @@ extern void TF_SetAttrStringList(TF_OperationDescription* desc,
                                  const void* const* values, const int* lengths,
                                  int num_values);
 extern void TF_SetAttrInt(TF_OperationDescription* desc, const char* attr_name,
-                          long long  value);
+                          long long value);
 extern void TF_SetAttrIntList(TF_OperationDescription* desc,
-                              const char* attr_name, const long long * values,
+                              const char* attr_name, const long long* values,
                               int num_values);
 extern void TF_SetAttrFloat(TF_OperationDescription* desc,
                             const char* attr_name, float value);
@@ -408,12 +415,15 @@ extern void TF_SetAttrBoolList(TF_OperationDescription* desc,
                                const unsigned char* values, int num_values);
 extern void TF_SetAttrType(TF_OperationDescription* desc, const char* attr_name,
                            TF_DataType value);
+extern void TF_SetAttrTypeList(TF_OperationDescription* desc,
+                               const char* attr_name, TF_DataType* values,
+                               int num_values);
 
 // Set `num_dims` to -1 to represent "unknown rank".  Otherwise,
 // `dims` points to an array of length `num_dims`.  `dims[i]` must be
 // >= -1, with -1 meaning "unknown dimension".
 extern void TF_SetAttrShape(TF_OperationDescription* desc,
-                            const char* attr_name, const long long * dims,
+                            const char* attr_name, const long long* dims,
                             int num_dims);
 // `dims` and `num_dims` must point to arrays of length `num_shapes`.
 // Set `num_dims[i]` to -1 to represent "unknown rank".  Otherwise,
@@ -421,7 +431,7 @@ extern void TF_SetAttrShape(TF_OperationDescription* desc,
 // must be >= -1, with -1 meaning "unknown dimension".
 extern void TF_SetAttrShapeList(TF_OperationDescription* desc,
                                 const char* attr_name,
-                                const long long * const* dims, const int* num_dims,
+                                const long long* const* dims, const int* num_dims,
                                 int num_shapes);
 // `proto` must point to an array of `proto_len` bytes representing a
 // binary-serialized TensorShapeProto.
@@ -554,7 +564,7 @@ typedef struct {
   unsigned char is_list;
 
   // Length of the list if is_list is true. Undefined otherwise.
-  long long  list_size;
+  long long list_size;
 
   // Type of elements of the list if is_list != 0.
   // Type of the single value stored in the attribute if is_list == 0.
@@ -576,7 +586,7 @@ typedef struct {
   //     then total_size is the cumulative number
   //     of dimensions of all shapes in the list.
   // (5) Otherwise, total_size is undefined.
-  long long  total_size;
+  long long total_size;
 } TF_AttrMetadata;
 
 // Returns metadata about the value of the attribute `attr_name` of `oper`.
@@ -610,14 +620,14 @@ extern void TF_OperationGetAttrStringList(TF_Operation* oper,
                                           TF_Status* status);
 
 extern void TF_OperationGetAttrInt(TF_Operation* oper, const char* attr_name,
-                                   long long * value, TF_Status* status);
+                                   long long* value, TF_Status* status);
 
 // Fills in `values` with the value of the attribute `attr_name` of `oper`.
 // `values` must point to an array of length at least `max_values` (ideally set
 // TF_AttrMetadata.list_size from TF_OperationGetAttrMetadata(oper,
 // attr_name)).
 extern void TF_OperationGetAttrIntList(TF_Operation* oper,
-                                       const char* attr_name, long long * values,
+                                       const char* attr_name, long long* values,
                                        int max_values, TF_Status* status);
 
 extern void TF_OperationGetAttrFloat(TF_Operation* oper, const char* attr_name,
@@ -659,7 +669,7 @@ extern void TF_OperationGetAttrTypeList(TF_Operation* oper,
 // `values` must point to an array of length at least `num_dims` (ideally set to
 // TF_Attr_Meta.size from TF_OperationGetAttrMetadata(oper, attr_name)).
 extern void TF_OperationGetAttrShape(TF_Operation* oper, const char* attr_name,
-                                     long long * value, int num_dims,
+                                     long long* value, int num_dims,
                                      TF_Status* status);
 
 // Fills in `dims` with the list of shapes in the attribute `attr_name` of
@@ -669,16 +679,16 @@ extern void TF_OperationGetAttrShape(TF_Operation* oper, const char* attr_name,
 // i-th shape in the list is unknown.
 //
 // The elements of `dims` will point to addresses in `storage` which must be
-// large enough to hold at least `storage_size` long long s.  Ideally, `num_shapes`
+// large enough to hold at least `storage_size` long longs.  Ideally, `num_shapes`
 // would be set to TF_AttrMetadata.list_size and `storage_size` would be set to
 // TF_AttrMetadata.total_size from TF_OperationGetAttrMetadata(oper,
 // attr_name).
 //
 // Fails if storage_size is insufficient to hold the requested shapes.
 extern void TF_OperationGetAttrShapeList(TF_Operation* oper,
-                                         const char* attr_name, long long ** dims,
+                                         const char* attr_name, long long** dims,
                                          int* num_dims, int num_shapes,
-                                         long long * storage, int storage_size,
+                                         long long* storage, int storage_size,
                                          TF_Status* status);
 
 // Sets `value` to the binary-serialized TensorShapeProto of the value of
