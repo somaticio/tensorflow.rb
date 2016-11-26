@@ -4,17 +4,18 @@
 class Tensorflow::Graph2
   attr_accessor :c
   def initialize
-    c = Tensorflow::TF_NewGraph()
+    self.c = Tensorflow::TF_NewGraph()
+    self.g = Tensorflow::TF_NewGraph()
   end
 
   # Import imports the nodes and edges from a serialized representation of
   # another Graph into g.
   #
   # Names of imported nodes will be prefixed with prefix.
-  def writeto(byte, prefix)
+  def writeto
     buf = Tensorflow::TF_NewBuffer()
-    status = Status.new
-    Tensorflow::TF_GraphToGraphDef(g,buf,status.c)
+    status = Tensorflow::Status.new
+    Tensorflow::TF_GraphToGraphDef(c,buf,status.c)
     Tensorflow::buff_printer(buf)
   end
 
@@ -32,8 +33,8 @@ class Tensorflow::Graph2
     c_array[0] = byte
     buf = Tensorflow::TF_NewBuffer()
     Tensorflow::buff(buf,c_array)
-    status = Status.new
-    Tensorflow::TF_GraphImportGraphDef(c,buf,opts,status.c)
+    status = Tensorflow::TF_NewStatus()
+    Tensorflow::TF_GraphImportGraphDef(self.g,buf,opts,status)
   end
 
 
