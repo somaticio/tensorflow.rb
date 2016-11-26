@@ -17,9 +17,9 @@ class Tensorflow::Session
   # A TensorFlow graph is a description of computations. To compute anything, a graph must be launched in a Session. A Session places the graph ops and provides methods to execute them.
 
   def initialize
-    self.status = Tensorflow::TF_NewStatus()
+    self.status = Status.new()
     self.ops = Tensorflow::TF_NewSessionOptions()
-    self.session = Tensorflow::TF_NewSession(self.ops, self.status)
+    self.session = Tensorflow::TF_NewSession(self.ops, self.status.c)
   end
 
   #

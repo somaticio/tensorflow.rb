@@ -50,6 +50,26 @@ long long tensor_size(TF_Tensor* tensor)
   return total_elements;
 };
 
+
+void buff(TF_Buffer* inputer, std::vector<std::string> file_string ){
+  int len = file_string[0].length();
+  (*inputer).length = (size_t)len;
+  (*inputer).data = new char[len];
+  auto buffer_data_pointer = (*inputer).data ;
+  for(int i = 0; i<len; i++){
+    *(char *)(buffer_data_pointer+i) = file_string[0][i];
+  }
+}
+
+void buff_printer(TF_Buffer* inputer){
+  auto len = inputer->length;
+  auto buffer_data_pointer = (*inputer).data ;
+  for(int i = 0; i<len; i++){
+   std::cout << *(char *)(buffer_data_pointer+i);
+  }
+  std::cout << "\n";
+}
+
 // This is a helper function used for testing and it may be removed later.
 void print_tensor(TF_Tensor* tensor)
 {
