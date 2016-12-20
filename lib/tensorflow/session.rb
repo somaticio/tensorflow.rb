@@ -1,3 +1,12 @@
+class Tensorflow::SessionOptions
+    attr_accessor :target
+    def c(o)
+      opt = Tensorflow::TF_NewSessionOptions()
+      return opt if(o == nil)
+      # Write some stuff here
+    end
+end
+
 # A class for running TensorFlow operations.
 # A Session object encapsulates the environment in which Operation objects are executed, and Tensor objects are evaluated.
 # A Session instance lets a caller drive a TensorFlow graph computation.
@@ -8,7 +17,7 @@
 # fetch outputs as Tensors. Protocol buffer exposes various configuration options for a session. The Op definations are stored in ops.pb file.
 # Official documentation of {session}[https://www.tensorflow.org/versions/r0.9/api_docs/python/client.html#Session] and {Operation}[https://www.tensorflow.org/versions/r0.9/api_docs/python/framework.html#Operation].
 class Tensorflow::Session
-  attr_accessor :status, :ops, :session, :graph
+  attr_accessor :status, :ops, :session, :graph, :c
   # @!attribute dimensions
   #  Create a success status.
   # @!attribute ops
@@ -20,6 +29,16 @@ class Tensorflow::Session
     self.status = Status.new()
     self.ops = Tensorflow::TF_NewSessionOptions()
     self.session = Tensorflow::TF_NewSession(self.ops, self.status.c)
+  end
+
+  def newsession(graph, options)
+    self.status = Status.new()
+    cOpt = options.c(nil)
+  	cSess := C.TF_NewSession(graph.c, cOpt, status.c)
+  	Tensorflow::TF_DeleteSessionOptions(cOpt)
+
+    self.c = cSess
+    return self.c
   end
 
   #
