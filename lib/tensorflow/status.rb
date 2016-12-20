@@ -1,7 +1,7 @@
 class Tensorflow::Status
   attr_accessor :c
   def initialize
-    c = Tensorflow::TF_NewStatus()
+    self.c = Tensorflow::TF_NewStatus()
   end
 
   def newstatus
@@ -22,5 +22,4 @@ class Tensorflow::Status
     puts err_code
   end
 
-  
 end

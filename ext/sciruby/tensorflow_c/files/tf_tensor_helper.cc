@@ -51,23 +51,24 @@ long long tensor_size(TF_Tensor* tensor)
 };
 
 
-void buff(TF_Buffer* inputer, std::vector<std::string> file_string ){
+void buffer_read(TF_Buffer* inputer, std::vector<std::string> file_string){
   int len = file_string[0].length();
   (*inputer).length = (size_t)len;
   (*inputer).data = new char[len];
-  auto buffer_data_pointer = (*inputer).data ;
+  auto buffer_data_pointer = (*inputer).data;
   for(int i = 0; i<len; i++){
     *(char *)(buffer_data_pointer+i) = file_string[0][i];
   }
 }
 
-void buff_printer(TF_Buffer* inputer){
+std::string buffer_write(TF_Buffer* inputer){
   auto len = inputer->length;
-  auto buffer_data_pointer = (*inputer).data ;
+  auto buffer_data_pointer = (*inputer).data;
+  std::string buffer;
   for(int i = 0; i<len; i++){
-   std::cout << *(char *)(buffer_data_pointer+i);
+   buffer += *(char *)(buffer_data_pointer+i);
   }
-  std::cout << "\n";
+  return buffer;
 }
 
 // This is a helper function used for testing and it may be removed later.
@@ -160,6 +161,16 @@ std::complex<double>* complex_array_from_complex_vector(std::vector<std::complex
     for (auto i = 0; i < vector_size; ++i)
       complex_array[i] = complex_vector[i];
     return complex_array;
+};
+
+TF_Output* TF_Output_array_from_vector(std::vector<TF_Output> TF_Output_vector)
+{
+    auto vector_size = TF_Output_vector.size();
+    static TF_Output *TF_Output_array;
+    TF_Output_array = new TF_Output [vector_size];
+    for (auto i = 0; i < vector_size; ++i)
+      TF_Output_array[i] = TF_Output_vector[i];
+    return TF_Output_array;
 };
 
 }  // namespace tensorflow

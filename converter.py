@@ -14,7 +14,7 @@ def pbtxt_to_graphdef(filename):
     tf.import_graph_def(graph_def, name='')
     tf.train.write_graph(graph_def, 'pbtxt/', 'protobuf.pb', as_text=False)
 
-def graphdef_to_pbtxt(filename): 
+def graphdef_to_pbtxt(filename):
   with gfile.FastGFile(filename,'rb') as f:
     graph_def = tf.GraphDef()
     graph_def.ParseFromString(f.read())
@@ -23,5 +23,5 @@ def graphdef_to_pbtxt(filename):
   return
 
 
-graphdef_to_pbtxt('graph.pb')  # here you can write the name of the file to be converted
+graphdef_to_pbtxt('h.pb')  # here you can write the name of the file to be converted
 # and then a new file will be made in pbtxt directory.

@@ -4,3 +4,4 @@ contents = file.read
 
 graph = Tensorflow::Graph2.new
 graph.import(contents,"rohit")
+graph.operation("Placeholder")

@@ -17,6 +17,7 @@ namespace std {
    %template(String_Vector)  vector<string>;
    %template(Integer_Vector) vector<long long>;
    %template(Tensor_Vector)  vector<TF_Tensor *>;
+   %template(TF_Output_vector) vector<TF_Output *>;
    %template(Complex_Vector) vector<std::complex<double> >;
 }
 

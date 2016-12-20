@@ -1,5 +1,5 @@
 class Tensorflow::Operation
-  attr_accessor :graph, :op
+  attr_accessor :c, :g
 
   def name
      # May need to convert this to a ruby string
@@ -27,8 +27,8 @@ class Tensorflow::Operation
   def output_list_size(output)
     string_helper = Tensorflow::String_Vector.new
     string_helper[0] = output
-    status = Tensorflow::TF_NewStatus()
-    n = Tensorflow::TF_OperationOutputListLength(op,output,status)
+    status = Tensorflow::Status.new
+    n = Tensorflow::TF_OperationOutputListLength(op,output,status.c)
     return n
   end
 end
@@ -41,5 +41,10 @@ class Output
       port.oper  = Operations.op
       return port
     end
+end
 
+class Input
+    attr_accessor :Index, :Operations
+    def initialize
+    end
 end
