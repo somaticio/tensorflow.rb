@@ -22,6 +22,5 @@ def graphdef_to_pbtxt(filename):
     tf.train.write_graph(graph_def, 'pbtxt/', 'protobuf.pbtxt', as_text=True)
   return
 
-
-graphdef_to_pbtxt('proto.pb')  # here you can write the name of the file to be converted
+graphdef_to_pbtxt('dat1')  # here you can write the name of the file to be converted
 # and then a new file will be made in pbtxt directory.

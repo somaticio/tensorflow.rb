@@ -51,13 +51,13 @@ long long tensor_size(TF_Tensor* tensor)
 };
 
 
-void buffer_read(TF_Buffer* inputer, std::vector<std::string> file_string){
-  int len = file_string[0].length();
+void buffer_read(TF_Buffer* inputer, std::string file_string){
+  int len = file_string.length();
   (*inputer).length = (size_t)len;
   (*inputer).data = new char[len];
   auto buffer_data_pointer = (*inputer).data;
   for(int i = 0; i<len; i++){
-    *(char *)(buffer_data_pointer+i) = file_string[0][i];
+    *(char *)(buffer_data_pointer+i) = file_string[i];
   }
 }
 
@@ -163,14 +163,22 @@ std::complex<double>* complex_array_from_complex_vector(std::vector<std::complex
     return complex_array;
 };
 
-TF_Output* TF_Output_array_from_vector(std::vector<TF_Output> TF_Output_vector)
+TF_OperationDescription* TF_Output_array_from_vector(TF_OperationDescription* desc, std::vector<TF_Output > TF_Output_vector)
 {
     auto vector_size = TF_Output_vector.size();
     static TF_Output *TF_Output_array;
     TF_Output_array = new TF_Output [vector_size];
     for (auto i = 0; i < vector_size; ++i)
       TF_Output_array[i] = TF_Output_vector[i];
-    return TF_Output_array;
+    TF_AddInputList(desc, TF_Output_array, vector_size);
+    return desc;
 };
+
+TF_Output input(TF_Operation* operation, int index){
+  TF_Output port;
+  port.oper = operation;
+  port.index = index;
+  return port;
+}
 
 }  // namespace tensorflow

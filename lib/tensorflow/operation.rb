@@ -1,5 +1,19 @@
+class Tensorflow::Output
+    attr_accessor :index, :operation
+    def c
+      port = Tensorflow::input(self.operation.c,self.index)
+      return port
+    end
+end
+
+
+# Operation that has been added to the graph.
 class Tensorflow::Operation
   attr_accessor :c, :g
+  # @!attribute c
+  #  contains the graph representation.
+  # @!attribute g
+  # A reference to the Graph to prevent it from being GCed while the Operation is still alive.
 
   def name
      # May need to convert this to a ruby string
@@ -10,7 +24,6 @@ class Tensorflow::Operation
     # May need to convert this to a ruby string
     return Tensorflow::TF_OperationOpType(op)
   end
-
 
   def num_outputs
     # May need to convert this to ruby int
@@ -25,25 +38,20 @@ class Tensorflow::Operation
   # the list of tensors for a specific output of the operation, identified
   # by its name.
   def output_list_size(output)
-    string_helper = Tensorflow::String_Vector.new
-    string_helper[0] = output
+    cname = CString(output)
     status = Tensorflow::Status.new
-    n = Tensorflow::TF_OperationOutputListLength(op,output,status.c)
-    return n
+    return Tensorflow::TF_OperationOutputListLength(op, cname, status.c)
+  end
+
+  def output(i)
+    out = Tensorflow::Output.new
+    out.operation = self
+    out.index = i
+    return out
   end
 end
 
-class Output
-    attr_accessor :Index, :Operations
-    def c
-      port = Tensorflow::TF_Port.new
-      port.index = Index
-      port.oper  = Operations.op
-      return port
-    end
-end
-
-class Input
+class Tensorflow::Input
     attr_accessor :Index, :Operations
     def initialize
     end

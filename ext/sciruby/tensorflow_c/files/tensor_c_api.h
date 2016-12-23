@@ -328,7 +328,9 @@ typedef struct TF_Input {
 // Represents a specific output of an operation.
 typedef struct TF_Output {
   TF_Operation* oper;
-  int index;  // The index of the output within oper.
+  int index;
+  // The index of the output within oper.
+  // Okay this is weird
 } TF_Output;
 
 // Sets the shape of the Tensor referenced by `output` in `graph` to

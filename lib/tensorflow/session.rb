@@ -34,7 +34,7 @@ class Tensorflow::Session
   def newsession(graph, options)
     self.status = Status.new()
     cOpt = options.c(nil)
-  	cSess := C.TF_NewSession(graph.c, cOpt, status.c)
+  	cSess = C.TF_NewSession(graph.c, cOpt, status.c)
   	Tensorflow::TF_DeleteSessionOptions(cOpt)
 
     self.c = cSess
