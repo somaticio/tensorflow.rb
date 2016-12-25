@@ -18,8 +18,8 @@ class Tensorflow::Graph2
     return Tensorflow::buffer_write(buffer)
   end
 
-  # import function imports the nodes and edges from a serialized representation of
-  # another Graph into g.
+  # import function imports the nodes and edges from
+  # a serialized representation of another Graph into g.
   # Names of imported nodes will be prefixed with prefix.
   def import(byte, prefix)
     cprefix = CString(prefix)
@@ -110,6 +110,7 @@ class Tensorflow::Graph2
       opspec.input.each do |name|
         Tensorflow::TF_AddInput(cdesc, name.c)
       end
+
       # Now we only have to indetify the case of output list.
     elsif opspec.input.length > 1
       vector = Tensorflow::TF_Output_vector.new

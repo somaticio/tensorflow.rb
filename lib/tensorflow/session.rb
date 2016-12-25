@@ -25,21 +25,60 @@ class Tensorflow::Session
   # @!attribute graph
   # A TensorFlow graph is a description of computations. To compute anything, a graph must be launched in a Session. A Session places the graph ops and provides methods to execute them.
 
-  def initialize
-    self.status = Status.new()
-    self.ops = Tensorflow::TF_NewSessionOptions()
-    self.session = Tensorflow::TF_NewSession(self.ops, self.status.c)
+  def initialize(graph, options)
+    self.status = Tensorflow::Status.new
+    cOpt = Tensorflow::TF_NewSessionOptions() #  To be changed
+  	cSess = Tensorflow::TF_NewSession(graph.c, cOpt, status.c)
+  	Tensorflow::TF_DeleteSessionOptions(cOpt)
+    # Add error check here
+    self.c = cSess
   end
 
   def newsession(graph, options)
-    self.status = Status.new()
+    self.status = Tensorflow::Status.new
     cOpt = options.c(nil)
   	cSess = C.TF_NewSession(graph.c, cOpt, status.c)
   	Tensorflow::TF_DeleteSessionOptions(cOpt)
 
     self.c = cSess
-    return self.c
+    return self
   end
+
+  #
+  # Runs a session on a given input.
+  # * *Returns* :
+  #   - nil
+  #
+  def run2(inputs, outputs, targets)
+    inputPorts = Tensorflow::TF_Output_vector.new
+    inputValues = Tensorflow::Tensor_Vector.new
+    inputs.each do |port, tensor|
+      inputPorts.push(port.c)
+      inputValues.push(tensor.tensor)
+    end
+    inputPorts = Tensorflow::TF_Output_array_from_vector(inputPorts)
+    inputValues = Tensorflow::TF_Tensor_array_from_vector(inputValues)
+
+    outputPorts = Tensorflow::TF_Output_vector.new
+
+    outputs.each do |output|
+      puts "Start"
+      output.c
+      puts "before"
+      outputPorts.push(output.c)
+      puts "end"
+    end
+
+    outputPorts = Tensorflow::TF_Output_array_from_vector(outputPorts)
+    status = Tensorflow::Status.new
+
+    outputValues = Tensorflow::TF_Tensor_array_from_given_length(outputs.length)
+    # Keeping Target nil for now
+    Tensorflow::TF_SessionRun(self.c, nil, inputPorts, inputValues, inputs.length, outputPorts, outputValues, outputs.length, nil, 0, nil, status.c)
+    puts outputs.length
+    Tensorflow::tf_tensor_typer(outputValues, outputs.length)
+  end
+
 
   #
   # Runs a session on a given input.

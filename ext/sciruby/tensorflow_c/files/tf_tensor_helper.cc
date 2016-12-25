@@ -163,16 +163,40 @@ std::complex<double>* complex_array_from_complex_vector(std::vector<std::complex
     return complex_array;
 };
 
-TF_OperationDescription* TF_Output_array_from_vector(TF_OperationDescription* desc, std::vector<TF_Output > TF_Output_vector)
+TF_Output* TF_Output_array_from_vector(std::vector<TF_Output > TF_Output_vector)
 {
     auto vector_size = TF_Output_vector.size();
     static TF_Output *TF_Output_array;
     TF_Output_array = new TF_Output [vector_size];
     for (auto i = 0; i < vector_size; ++i)
       TF_Output_array[i] = TF_Output_vector[i];
-    TF_AddInputList(desc, TF_Output_array, vector_size);
-    return desc;
+    return TF_Output_array;
 };
+
+TF_Tensor** TF_Tensor_array_from_vector(std::vector<TF_Tensor *> TF_Tensor_vector)
+{
+    auto vector_size = TF_Tensor_vector.size();
+    static TF_Tensor **TF_Tensor_array;
+    TF_Tensor_array = new TF_Tensor* [vector_size];
+    for (auto i = 0; i < vector_size; ++i)
+      TF_Tensor_array[i] = TF_Tensor_vector[i];
+    return TF_Tensor_array;
+};
+
+void tf_tensor_typer(TF_Tensor** hark, int length)
+{
+  auto lndims = TF_NumDims(hark[0]);
+  std::cout << lndims << " Tensor \n";
+  return;
+}
+
+TF_Tensor** TF_Tensor_array_from_given_length(int length)
+{
+    static TF_Tensor **TF_Tensor_array;
+    TF_Tensor_array = new TF_Tensor* [length];
+    return TF_Tensor_array;
+};
+
 
 TF_Output input(TF_Operation* operation, int index){
   TF_Output port;

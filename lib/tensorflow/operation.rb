@@ -1,6 +1,7 @@
 class Tensorflow::Output
     attr_accessor :index, :operation
     def c
+      puts " this is the c thing"
       port = Tensorflow::input(self.operation.c,self.index)
       return port
     end
