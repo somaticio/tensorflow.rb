@@ -107,9 +107,11 @@ class Tensorflow::Graph2
 
     status = Tensorflow::Status.new
     if opspec.input.length > 0
+      puts "Okay so here I verify that the op.c method works"
       opspec.input.each do |name|
         Tensorflow::TF_AddInput(cdesc, name.c)
       end
+      puts "Here it ends with twice usage"
 
       # Now we only have to indetify the case of output list.
     elsif opspec.input.length > 1

@@ -3,6 +3,7 @@
 # or by python and then convert it back and forth from human readable to binary format.
 
 import tensorflow as tf
+import shutil, os
 from google.protobuf import text_format
 from tensorflow.python.platform import gfile
 
@@ -22,5 +23,7 @@ def graphdef_to_pbtxt(filename):
     tf.train.write_graph(graph_def, 'pbtxt/', 'protobuf.pbtxt', as_text=True)
   return
 
+if (os.path.isdir("/home/arafat/Desktop/tensorflow/tensorflow.rb/pbtxt")):
+  shutil.rmtree("/home/arafat/Desktop/tensorflow/tensorflow.rb/pbtxt")
 graphdef_to_pbtxt('dat1')  # here you can write the name of the file to be converted
 # and then a new file will be made in pbtxt directory.
