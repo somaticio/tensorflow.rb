@@ -40,7 +40,7 @@ class Tensorflow::Session
   # * *Returns* :
   #   - nil
   #
-  def run2(inputs, outputs, targets)
+  def run(inputs, outputs, targets)
     inputPorts = Tensorflow::TF_Output_vector.new
     inputValues = Tensorflow::Tensor_Vector.new
     inputs.each do |port, tensor|
@@ -62,28 +62,12 @@ class Tensorflow::Session
     outputValues = Tensorflow::TF_Tensor_array_from_given_length(outputs.length)
     # Keeping Target nil for now
     Tensorflow::TF_SessionRun(self.c, nil, inputPorts, inputValues, inputs.length, outputPorts, outputValues, outputs.length, nil, 0, nil, status.c)
-    Tensorflow::tf_tensor_typer(outputValues, outputs.length)
-    outputValues[0]
-  end
 
 
-  #
-  # Runs a session on a given input.
-  # * *Returns* :
-  #   - nil
-  #
-  def run(inputs, outputs, targets)
-    input_names, input_values = initialize_inputs(inputs)
-    output_names, output_values = initialize_outputs(outputs)
-    target_names = initialize_targets(targets)
-
-    status = Tensorflow::TF_NewStatus()
-    Tensorflow::TF_Run_wrapper(self.session, input_names, input_values, output_names, output_values, target_names, self.status)
-    raise "Incorrect specifications passed." if Tensorflow::TF_GetCode(status) != Tensorflow::TF_OK
-
+    outputValues = Tensorflow::TF_Tensor_vector_from_array(outputValues, outputs.length)
     output_array = []
 
-    output_values.each do |value|
+    outputValues.each do |value|
       converted_value = convert_value_for_output_array(value)
       output_array.push(converted_value)
     end
@@ -178,7 +162,7 @@ class Tensorflow::Session
       Tensorflow::long_long_reader(value, c_array, size)
     when Tensorflow::TF_COMPLEX128
       c_array = Tensorflow::complex_reader(value)
-      # Add support for bool, uint and other data types.  
+      # Add support for bool, uint and other data types.
     else
       raise "Data type not supported."
     end

@@ -97,6 +97,19 @@ void print_tensor(TF_Tensor* tensor)
     std::cout << std::endl;
 };
 
+std::string  tf_tensor_typer(TF_Tensor** hark, int length)
+{
+  auto lndims = TF_NumDims(hark[0]);
+  auto mydim = TF_Dim(hark[0],lndims-1);
+  auto cbytes = TF_TensorData(hark[0]);
+  auto lengthy = TF_TensorByteSize(hark[0]);
+  long long* tensor_data = static_cast<long long *>(TF_TensorData(hark[0]));
+  long long array[4];
+  for (int i = 0; i < 4; ++i) array[i] = tensor_data[i];
+  for (int i = 0; i < 4; ++i) std::cout << array[i] << "\n";
+  return "werw";
+}
+
 void float_reader(TF_Tensor* tensor, float* array, int total_elements)
 {
     float* tensor_data = static_cast<float *>(TF_TensorData(tensor));
@@ -183,18 +196,14 @@ TF_Tensor** TF_Tensor_array_from_vector(std::vector<TF_Tensor *> TF_Tensor_vecto
     return TF_Tensor_array;
 };
 
-std::string  tf_tensor_typer(TF_Tensor** hark, int length)
+std::vector<TF_Tensor *> TF_Tensor_vector_from_array(TF_Tensor** TF_Tensor_array, int vector_size)
 {
-  auto lndims = TF_NumDims(hark[0]);
-  auto mydim = TF_Dim(hark[0],lndims-1);
-  auto cbytes = TF_TensorData(hark[0]);
-  auto lengthy = TF_TensorByteSize(hark[0]);
-  long long* tensor_data = static_cast<long long *>(TF_TensorData(hark[0]));
-  long long array[4];
-  for (int i = 0; i < 4; ++i) array[i] = tensor_data[i];
-  for (int i = 0; i < 4; ++i) std::cout << array[i] << "\n";
-  return "werw";
-}
+    std::vector<TF_Tensor *> TF_Tensor_vector;
+    for (auto i = 0; i < vector_size; ++i)
+      TF_Tensor_vector.push_back(TF_Tensor_array[i]);
+    return TF_Tensor_vector;
+};
+
 
 TF_Tensor** TF_Tensor_array_from_given_length(int length)
 {

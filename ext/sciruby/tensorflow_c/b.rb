@@ -10,10 +10,8 @@ opec.type = "Add"
 opec.input = [con, jon]
 
 concat = graph.AddOperation(opec)
-gkdoo = Tensorflow::SessionOptions.new
+gkdoo = Tensorflow::Session_options.new
 sess = Tensorflow::Session.new(graph, gkdoo)
-out = sess.run2([],[concat.output(0)],[])
+out = sess.run([],[concat.output(0)],[])
 File.open("dat1", 'w') { |file| file.write(graph.writeto) }
-
-
-puts out[3].unpack("l")
+puts out
