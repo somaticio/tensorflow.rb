@@ -1,5 +1,3 @@
-require 'tensorflow/core/framework/tensor.pb'
-require 'tensorflow/core/framework/graph.pb'
 require 'sciruby/Tensorflow'
 require 'narray'
 require 'tensorflow/opspec'
