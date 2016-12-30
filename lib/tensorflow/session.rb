@@ -1,12 +1,3 @@
-class Tensorflow::SessionOptions
-    attr_accessor :target
-    def c(o)
-      opt = Tensorflow::TF_NewSessionOptions()
-      return opt if(o == nil)
-      # Write some stuff here
-    end
-end
-
 # A class for running TensorFlow operations.
 # A Session object encapsulates the environment in which Operation objects are executed, and Tensor objects are evaluated.
 # A Session instance lets a caller drive a TensorFlow graph computation.
@@ -62,11 +53,7 @@ class Tensorflow::Session
     outputPorts = Tensorflow::TF_Output_vector.new
 
     outputs.each do |output|
-      puts "Start"
-      output.c
-      puts "before"
       outputPorts.push(output.c)
-      puts "end"
     end
 
     outputPorts = Tensorflow::TF_Output_array_from_vector(outputPorts)
@@ -75,8 +62,8 @@ class Tensorflow::Session
     outputValues = Tensorflow::TF_Tensor_array_from_given_length(outputs.length)
     # Keeping Target nil for now
     Tensorflow::TF_SessionRun(self.c, nil, inputPorts, inputValues, inputs.length, outputPorts, outputValues, outputs.length, nil, 0, nil, status.c)
-    puts outputs.length
     Tensorflow::tf_tensor_typer(outputValues, outputs.length)
+    outputValues[0]
   end
 
 
@@ -191,6 +178,7 @@ class Tensorflow::Session
       Tensorflow::long_long_reader(value, c_array, size)
     when Tensorflow::TF_COMPLEX128
       c_array = Tensorflow::complex_reader(value)
+      # Add support for bool, uint and other data types.  
     else
       raise "Data type not supported."
     end
