@@ -1,6 +1,6 @@
 require 'tensorflow'
 graph = Tensorflow::Graph2.new
-j = Tensorflow::Tensor.new([2,3,4,6])
+j = Tensorflow::Tensor.new([3,12,4,6])
 k = Tensorflow::Tensor.new([2,3,4,6])
 con = graph.const("m1", j)
 jon = graph.const("m2", k)

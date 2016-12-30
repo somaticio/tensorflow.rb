@@ -183,24 +183,17 @@ TF_Tensor** TF_Tensor_array_from_vector(std::vector<TF_Tensor *> TF_Tensor_vecto
     return TF_Tensor_array;
 };
 
-std::vector<std::string>  tf_tensor_typer(TF_Tensor** hark, int length)
+std::string  tf_tensor_typer(TF_Tensor** hark, int length)
 {
   auto lndims = TF_NumDims(hark[0]);
   auto mydim = TF_Dim(hark[0],lndims-1);
   auto cbytes = TF_TensorData(hark[0]);
   auto lengthy = TF_TensorByteSize(hark[0]);
-  static uint64_t *byterr;
-  byterr = new uint64_t [lengthy];
-  auto buffer_data_pointer = cbytes;
-
-  std::vector<std::string> str;
-  std::cout << lengthy << " This is the length\n";
-  for(int i = 0; i<lengthy; i++){
-   std::ostringstream o;
-   o << *(uint64_t *)(buffer_data_pointer+i);
-   str.push_back(o.str());
-  }
-  return str;
+  long long* tensor_data = static_cast<long long *>(TF_TensorData(hark[0]));
+  long long array[4];
+  for (int i = 0; i < 4; ++i) array[i] = tensor_data[i];
+  for (int i = 0; i < 4; ++i) std::cout << array[i] << "\n";
+  return "werw";
 }
 
 TF_Tensor** TF_Tensor_array_from_given_length(int length)
