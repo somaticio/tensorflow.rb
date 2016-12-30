@@ -1,8 +1,7 @@
 class Tensorflow::Output
     attr_accessor :index, :operation
     def c
-      puts " this is the c thing"
-      return Tensorflow::input(self.operation.c,self.index)
+      return Tensorflow::input(self.operation.c, self.index)
     end
 end
 

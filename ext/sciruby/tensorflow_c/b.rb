@@ -12,7 +12,7 @@ operation = graph.AddOperation(opec)
 session_option = Tensorflow::Session_options.new
 sess = Tensorflow::Session.new(graph, session_option)
 out = sess.run([],[operation.output(0)],[])
-File.open("Addition", 'w') { |file| file.write(graph.writeto) }
+File.open("Addition", 'w') { |file| file.write(graph.write_to) }
 print out, "\n"
 
 
@@ -27,5 +27,9 @@ operation = graph.AddOperation(opec)
 session_option = Tensorflow::Session_options.new
 sess = Tensorflow::Session.new(graph, session_option)
 out = sess.run([],[operation.output(0)],[])
-File.open("Negation", 'w') { |file| file.write(graph.writeto) }
+
 print out, "\n"
+
+graph = Tensorflow::Graph2.new
+graph.read_file("Negation")
+graph.write_file("negationtest")

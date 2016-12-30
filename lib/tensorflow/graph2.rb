@@ -11,11 +11,30 @@ class Tensorflow::Graph2
   end
 
   # writeto writes out a serialized representation of g to w.
-  def writeto
+  def write_to
     buffer = Tensorflow::TF_NewBuffer()
     status = Tensorflow::Status.new
     Tensorflow::TF_GraphToGraphDef(self.c, buffer, status.c)
-    return Tensorflow::buffer_write(buffer)
+    Tensorflow::buffer_write(buffer)
+  end
+
+  # writeto writes out a serialized representation of g to a file.
+  def write_file(filename)
+    File.open(filename, 'w') { |file| file.write(write_to) }
+  end
+
+  #
+  # Loads a graph stored in pb file into a graph def. This way you can define the graph
+  # in python / ruby, save it in pb file and load it in ruby. The limitation of
+  # is that it can only read binary wire format for protocol buffer messages
+  # In order to debug convoluted messages in ruby its always a good idea to convert the format
+  # to a readable form using pb_to_pbtxt.py file in the gem and specifying the file name of
+  # the .pb file to be converted.
+  #
+  def read_file(filename)
+    raise ArgumentError, "File does not exist" if !File.file?(filename)
+    reader = File.read(filename)
+    import(reader,"")
   end
 
   # import function imports the nodes and edges from
@@ -39,7 +58,7 @@ class Tensorflow::Graph2
     op = Tensorflow::Operation.new
     return nil if cop == nil
     op.c = cop
-    op.g = self # the graph is contained in g variable
+    op.g = self
     return op
   end
 
@@ -70,35 +89,6 @@ class Tensorflow::Graph2
     return op.output(0)
   end
 
-  # Creates a constant Tensor that is added to the graph with a specified name.
-  # Official documentation of {tf.constant}[https://www.tensorflow.org/versions/r0.9/api_docs/python/constant_op.html#constant].
-  def neg(name, port)
-    # Value is the tensor but for now we can ignore that shit
-    # Raise error if name and data type are incorrect in any way
-    # we have both datatype and tensor for this.
-    opspec = Tensorflow::OpSpec.new
-    opspec.type = "Neg"
-    opspec.name = name
-    opspec.input.push(port)
-    op = AddOperation(opspec)
-    return op.output(0)
-  end
-
-    # Creates a constant Tensor that is added to the graph with a specified name.
-    # Official documentation of {tf.constant}[https://www.tensorflow.org/versions/r0.9/api_docs/python/constant_op.html#constant].
-    def add(name, port1, port2)
-      # Value is the tensor but for now we can ignore that shit
-      # Raise error if name and data type are incorrect in any way
-      # we have both datatype and tensor for this.
-      opspec = Tensorflow::OpSpec.new
-      opspec.type = "Add"
-      opspec.name = name
-      opspec.input.push(port1)
-      opspec.input.push(port2)
-      op = AddOperation(opspec)
-      return op.output(0)
-    end
-
   # everything uptil set attributes is okay but then we need reflect equivalent for ruby
   def AddOperation(opspec)
     cname = CString(opspec.name)
@@ -107,18 +97,15 @@ class Tensorflow::Graph2
 
     status = Tensorflow::Status.new
     if opspec.input.length > 0
-      puts "Okay so here I verify that the op.c method works"
       opspec.input.each do |name|
         Tensorflow::TF_AddInput(cdesc, name.c)
       end
-      puts "Here it ends with twice usage"
 
       # Now we only have to indetify the case of output list.
     elsif opspec.input.length > 1
       vector = Tensorflow::TF_Output_vector.new
       opspec.input.each_with_index do |name, i|
         vector[i] = name.c
-        puts name, "Naming the things", name.c, "This is great"
       end
       cdesc = Tensorflow::TF_Output_array_from_vector(cdesc, vector)
     end

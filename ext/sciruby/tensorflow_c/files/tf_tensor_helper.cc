@@ -50,23 +50,22 @@ long long tensor_size(TF_Tensor* tensor)
   return total_elements;
 };
 
-
-void buffer_read(TF_Buffer* inputer, std::string file_string){
-  int len = file_string.length();
-  (*inputer).length = (size_t)len;
-  (*inputer).data = new char[len];
-  auto buffer_data_pointer = (*inputer).data;
-  for(int i = 0; i<len; i++){
+void buffer_read(TF_Buffer* tf_buffer, std::string file_string){
+  int length = file_string.length();
+  (*tf_buffer).length = (size_t)length;
+  (*tf_buffer).data = new char[length];
+  auto buffer_data_pointer = (*tf_buffer).data;
+  for(int i = 0; i < length; i++){
     *(char *)(buffer_data_pointer+i) = file_string[i];
   }
 }
 
-std::string buffer_write(TF_Buffer* inputer){
-  auto len = inputer->length;
-  auto buffer_data_pointer = (*inputer).data;
+std::string buffer_write(TF_Buffer* tf_buffer){
+  auto length = tf_buffer->length;
+  auto buffer_data_pointer = (*tf_buffer).data;
   std::string buffer;
-  for(int i = 0; i<len; i++){
-   buffer += *(char *)(buffer_data_pointer+i);
+  for(int i = 0; i < length; i++){
+    buffer += *(char *)(buffer_data_pointer+i);
   }
   return buffer;
 }
@@ -96,19 +95,6 @@ void print_tensor(TF_Tensor* tensor)
     }
     std::cout << std::endl;
 };
-
-std::string  tf_tensor_typer(TF_Tensor** hark, int length)
-{
-  auto lndims = TF_NumDims(hark[0]);
-  auto mydim = TF_Dim(hark[0],lndims-1);
-  auto cbytes = TF_TensorData(hark[0]);
-  auto lengthy = TF_TensorByteSize(hark[0]);
-  long long* tensor_data = static_cast<long long *>(TF_TensorData(hark[0]));
-  long long array[4];
-  for (int i = 0; i < 4; ++i) array[i] = tensor_data[i];
-  for (int i = 0; i < 4; ++i) std::cout << array[i] << "\n";
-  return "werw";
-}
 
 void float_reader(TF_Tensor* tensor, float* array, int total_elements)
 {
@@ -204,14 +190,12 @@ std::vector<TF_Tensor *> TF_Tensor_vector_from_array(TF_Tensor** TF_Tensor_array
     return TF_Tensor_vector;
 };
 
-
 TF_Tensor** TF_Tensor_array_from_given_length(int length)
 {
     static TF_Tensor **TF_Tensor_array;
     TF_Tensor_array = new TF_Tensor* [length];
     return TF_Tensor_array;
 };
-
 
 TF_Output input(TF_Operation* operation, int index){
   TF_Output port;
