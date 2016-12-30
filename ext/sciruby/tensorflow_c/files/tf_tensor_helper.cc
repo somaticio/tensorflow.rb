@@ -190,6 +190,47 @@ std::vector<TF_Tensor *> TF_Tensor_vector_from_array(TF_Tensor** TF_Tensor_array
     return TF_Tensor_vector;
 };
 
+std::vector<TF_Tensor *> Session_run(TF_Session* graph_session, std::vector<TF_Output > inputPorts, std::vector<TF_Tensor *> inputValues, std::vector<TF_Output > outputPorts, std::vector<TF_Operation *> cTargets)
+{
+    auto status = TF_NewStatus();
+
+    auto array_length = inputPorts.size();
+    static TF_Output *inputPorts_array;
+    inputPorts_array = new TF_Output [array_length];
+    for (auto i = 0; i < array_length; ++i)
+      inputPorts_array[i] = inputPorts[i];
+
+    array_length = outputPorts.size();
+    static TF_Output *outputPorts_array;
+    outputPorts_array = new TF_Output [array_length];
+    for (auto i = 0; i < array_length; ++i)
+      outputPorts_array[i] = outputPorts[i];
+
+    array_length = inputValues.size();
+    static TF_Tensor **inputValues_array;
+    inputValues_array = new TF_Tensor* [array_length];
+    for (auto i = 0; i < array_length; ++i)
+      inputValues_array[i] = inputValues[i];
+
+    static TF_Tensor **outputValues_array;
+    outputValues_array = new TF_Tensor* [array_length];
+
+    array_length = cTargets.size();
+    static TF_Operation **cTargets_array;
+    cTargets_array = new TF_Operation* [array_length];
+    for (auto i = 0; i < array_length; ++i)
+      cTargets_array[i] = cTargets[i];
+
+    TF_SessionRun(graph_session, NULL, &inputPorts_array[0], &inputValues_array[0], inputPorts.size(), &outputPorts_array[0], &outputValues_array[0], outputPorts.size(), &cTargets_array[0], cTargets.size(), NULL, status);
+
+    array_length = outputPorts.size();
+    std::vector<TF_Tensor *> TF_Tensor_vector;
+    for (auto i = 0; i < array_length; ++i)
+      TF_Tensor_vector.push_back(outputValues_array[i]);
+
+    return TF_Tensor_vector;
+};
+
 TF_Tensor** TF_Tensor_array_from_given_length(int length)
 {
     static TF_Tensor **TF_Tensor_array;

@@ -31,38 +31,41 @@ class Tensorflow::Session
   #   - nil
   #
   def run(inputs, outputs, targets)
+
     inputPorts = Tensorflow::TF_Output_vector.new
     inputValues = Tensorflow::Tensor_Vector.new
     inputs.each do |port, tensor|
       inputPorts.push(port.c)
       inputValues.push(tensor.tensor)
     end
-    inputPorts = Tensorflow::TF_Output_array_from_vector(inputPorts)
-    inputValues = Tensorflow::TF_Tensor_array_from_vector(inputValues)
 
     outputPorts = Tensorflow::TF_Output_vector.new
-
     outputs.each do |output|
       outputPorts.push(output.c)
     end
 
-    outputPorts = Tensorflow::TF_Output_array_from_vector(outputPorts)
-    status = Tensorflow::Status.new
+    cTargets = Tensorflow::TF_Operation_vector.new
+    targets.each do |targe|
+      cTargets.push(targe.c)
+    end
 
-    outputValues = Tensorflow::TF_Tensor_array_from_given_length(outputs.length)
-    # Keeping Target nil for now
-    Tensorflow::TF_SessionRun(self.c, nil, inputPorts, inputValues, inputs.length, outputPorts, outputValues, outputs.length, nil, 0, nil, status.c)
-
-
-    outputValues = Tensorflow::TF_Tensor_vector_from_array(outputValues, outputs.length)
+    outputValues = Tensorflow::Session_run(self.c, inputPorts, inputValues, outputPorts, cTargets)
     output_array = []
 
     outputValues.each do |value|
       converted_value = convert_value_for_output_array(value)
       output_array.push(converted_value)
     end
+    return output_array
 
-    output_array
+
+  # outputPorts = Tensorflow::TF_Output_array_from_vector(outputPorts)
+  # status = Tensorflow::Status.new
+
+  # outputValues = Tensorflow::TF_Tensor_array_from_given_length(outputs.length)
+    # Keeping Target nil for now
+#    Tensorflow::TF_SessionRun(self.c, nil, inputPorts, inputValues, inputs.length, outputPorts, outputValues, outputs.length, nil, 0, nil, status.c)
+
   end
 
   def extend_graph(graph)

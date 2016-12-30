@@ -23,7 +23,7 @@ def graphdef_to_pbtxt(filename):
     tf.train.write_graph(graph_def, 'pbtxt/', 'protobuf.pbtxt', as_text=True)
   return
 
-if (os.path.isdir("/home/arafat/Desktop/tensorflow/tensorflow.rb/pbtxt")):
-  shutil.rmtree("/home/arafat/Desktop/tensorflow/tensorflow.rb/pbtxt")
-graphdef_to_pbtxt('dat1')  # here you can write the name of the file to be converted
+if (os.path.isdir("/home/arafat/Desktop/tensorflow/tensorflow.rb/ext/sciruby/tensorflow_c/pbtxt")):
+  shutil.rmtree("/home/arafat/Desktop/tensorflow/tensorflow.rb/ext/sciruby/tensorflow_c/pbtxt")
+graphdef_to_pbtxt('dat2')  # here you can write the name of the file to be converted
 # and then a new file will be made in pbtxt directory.

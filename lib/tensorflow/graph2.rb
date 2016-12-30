@@ -10,7 +10,13 @@ class Tensorflow::Graph2
     self.c = Tensorflow::TF_NewGraph()
   end
 
-  # writeto writes out a serialized representation of g to w.
+  def delete_graph
+    Tensorflow::TF_DeleteGraph(self.c)
+  end
+
+  # write_to writes out a serialized representation of graph in binary wire format.
+  # This graph defination can be written to file using write_file function and then
+  # converted to a readable form using converter.py file in the gem.
   def write_to
     buffer = Tensorflow::TF_NewBuffer()
     status = Tensorflow::Status.new
@@ -18,19 +24,17 @@ class Tensorflow::Graph2
     Tensorflow::buffer_write(buffer)
   end
 
-  # writeto writes out a serialized representation of g to a file.
+  # writeto writes out a serialized representation of graph to a file.
   def write_file(filename)
     File.open(filename, 'w') { |file| file.write(write_to) }
   end
 
-  #
   # Loads a graph stored in pb file into a graph def. This way you can define the graph
   # in python / ruby, save it in pb file and load it in ruby. The limitation of
   # is that it can only read binary wire format for protocol buffer messages
   # In order to debug convoluted messages in ruby its always a good idea to convert the format
-  # to a readable form using pb_to_pbtxt.py file in the gem and specifying the file name of
-  # the .pb file to be converted.
-  #
+  # to a readable form using converter.py file in the gem and specifying the file name of
+  # the .pb file to be converted. This makes use of import function.
   def read_file(filename)
     raise ArgumentError, "File does not exist" if !File.file?(filename)
     reader = File.read(filename)
@@ -54,12 +58,12 @@ class Tensorflow::Graph2
   # Operation returns the Operation named name in the Graph, or nil if no such
   # operation is present.
   def operation(name)
-    cop = Tensorflow::TF_GraphOperationByName(self.c, CString(name))
-    op = Tensorflow::Operation.new
-    return nil if cop == nil
-    op.c = cop
-    op.g = self
-    return op
+    c_operation = Tensorflow::TF_GraphOperationByName(self.c, CString(name))
+    operation = Tensorflow::Operation.new
+    return nil if c_operation == nil
+    operation.c = c_operation
+    operation.g = self
+    return operation
   end
 
   # Adds a placeholder to the Graph, a placeholder is an
@@ -70,8 +74,8 @@ class Tensorflow::Graph2
     opspec.name = name
     opspec.type = "Placeholder"
     opspec.attr["dtype"] = type_enum
-    op = AddOperation(opspec)
-    return op.output(0)
+    operation = AddOperation(opspec)
+    return operation.output(0)
   end
 
   # Creates a constant Tensor that is added to the graph with a specified name.
@@ -85,42 +89,52 @@ class Tensorflow::Graph2
     opspec.name = name
     opspec.attr["dtype"] = value.type_num
     opspec.attr["value"] = value
-    op = AddOperation(opspec)
-    return op.output(0)
+    operation = AddOperation(opspec)
+    return operation.output(0)
   end
+
+  # Add a method for variables so that they are not alone
+
+
+
+
+  
 
   # everything uptil set attributes is okay but then we need reflect equivalent for ruby
   def AddOperation(opspec)
+    opspec.name = opspec.type if opspec.name == nil
     cname = CString(opspec.name)
     ctype = CString(opspec.type)
     cdesc = Tensorflow::TF_NewOperation(self.c, ctype, cname)
 
-    status = Tensorflow::Status.new
     if opspec.input.length > 0
       opspec.input.each do |name|
         Tensorflow::TF_AddInput(cdesc, name.c)
       end
-
-      # Now we only have to indetify the case of output list.
-    elsif opspec.input.length > 1
-      vector = Tensorflow::TF_Output_vector.new
-      opspec.input.each_with_index do |name, i|
-        vector[i] = name.c
-      end
-      cdesc = Tensorflow::TF_Output_array_from_vector(cdesc, vector)
+      # Add the case of inputlist
     end
 
+    status = Tensorflow::Status.new
     opspec.attr.each do |name, value|
-      cdesc, status = setattr(cdesc, status, name, value, "int")
+      cdesc, status = setattr(cdesc, status, name, value)
+  			# Memory leak here as the TF_OperationDescription
+  			# object will not be cleaned up. At the time of this
+  			# writing, this was next to impossible since it
+  			# required value to be a string tensor with
+  			# incorrectly encoded strings. Given this rarity, live
+  			# with the memory leak.  If it becomes a real problem,
+  			# consider adding a TF_DeleteOperationDescription
+  			# function to the C API.
     end
-    op = Tensorflow::Operation.new
-    op.c = Tensorflow::TF_FinishOperation(cdesc, status.c)
-    op.g = self
-    return op
+
+    operation = Tensorflow::Operation.new
+    operation.c = Tensorflow::TF_FinishOperation(cdesc, status.c)
+    operation.g = self
+    return operation
   end
 
   # How are we using a way to set attributes for string and other types.
-  def setattr(cdesc, status, name, value, type) # adding extra type for fun
+  def setattr(cdesc, status, name, value) # adding extra type for fun
     cAttrName = CString(name)
     type = "DataType"     if name == "dtype"
     type = "Tensor"       if name == "value"

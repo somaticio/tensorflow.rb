@@ -14,11 +14,12 @@
 %}
 
 namespace std {
-   %template(String_Vector)  vector<string>;
-   %template(Integer_Vector) vector<long long>;
-   %template(Tensor_Vector)  vector<TF_Tensor *>;
-   %template(TF_Output_vector) vector<TF_Output>;
-   %template(Complex_Vector) vector<std::complex<double> >;
+   %template(String_Vector)       vector<string>;
+   %template(Integer_Vector)      vector<long long>;
+   %template(Tensor_Vector)       vector<TF_Tensor*>;
+   %template(TF_Output_vector)    vector<TF_Output>;
+   %template(TF_Operation_vector) vector<TF_Operation*>;
+   %template(Complex_Vector)      vector<std::complex<double> >;
 }
 
 %include "./files/version.h"
@@ -31,7 +32,6 @@ namespace std {
 %include "carrays.i"
 %array_class(long long, Long_long);
 %array_class(int, Int);
-%array_class(uint8_t, Irrrnt);
 %array_class(float, Float);
 %array_class(double, Double);
 %array_class(char, Character);
