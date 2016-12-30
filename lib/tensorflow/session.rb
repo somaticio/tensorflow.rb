@@ -18,21 +18,11 @@ class Tensorflow::Session
 
   def initialize(graph, options)
     self.status = Tensorflow::Status.new
-    cOpt = Tensorflow::TF_NewSessionOptions() #  To be changed
-  	cSess = Tensorflow::TF_NewSession(graph.c, cOpt, status.c)
-  	Tensorflow::TF_DeleteSessionOptions(cOpt)
+    c_options = Tensorflow::TF_NewSessionOptions() #  To be changed
+  	c_session = Tensorflow::TF_NewSession(graph.c, c_options, status.c)
+  	Tensorflow::TF_DeleteSessionOptions(c_options)
     # Add error check here
-    self.c = cSess
-  end
-
-  def newsession(graph, options)
-    self.status = Tensorflow::Status.new
-    cOpt = options.c(nil)
-  	cSess = C.TF_NewSession(graph.c, cOpt, status.c)
-  	Tensorflow::TF_DeleteSessionOptions(cOpt)
-
-    self.c = cSess
-    return self
+    self.c = c_session
   end
 
   #

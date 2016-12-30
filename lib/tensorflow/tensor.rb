@@ -38,13 +38,10 @@ class Tensorflow::Tensor
   #  Returns serialized data in the form of a c array.
   # @!attribute dimension_data
   #  Returns shape of the tensor in the form of a c array.
-  # @!attribute tensor_shape_proto
-  #  Returns the shape of the Tensor in Ruby protocol buffers.(To be used later with ops).
 
   def initialize(value, type = nil)
     self.shape = self.class.shape_of(value)
     self.rank = shape.size
-    self.tensor_shape_proto = shape_proto(shape)
     self.element_type = type.nil? ? find_type(value) : set_type(type)
     if rank > 1 && type_num == Tensorflow::TF_STRING
       raise ("Multi-dimensional tensor not supported for string value type.")
@@ -55,19 +52,6 @@ class Tensorflow::Tensor
       rank.zero? ? [1] : shape, Tensorflow::TF_INT64)
     self.tensor = Tensorflow::TF_NewTensor_wrapper(type_num,
       dimension_data, rank, tensor_data, data_size * flatten.length)
-  end
-
-  #
-  # Converts the shape of the tensor to Protobuf format.
-  #
-  # * *Returns* :
-  #   - The shape of the tensor
-  #
-  def shape_proto(array)
-    dims = array.map do |size|
-      Tensorflow::TensorShapeProto::Dim.new(size: size)
-    end
-    Tensorflow::TensorShapeProto.new(dim: dims)
   end
 
   #
