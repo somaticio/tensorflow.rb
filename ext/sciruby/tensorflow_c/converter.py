@@ -25,5 +25,5 @@ def graphdef_to_pbtxt(filename):
 
 if (os.path.isdir("/home/arafat/Desktop/tensorflow/tensorflow.rb/ext/sciruby/tensorflow_c/pbtxt")):
   shutil.rmtree("/home/arafat/Desktop/tensorflow/tensorflow.rb/ext/sciruby/tensorflow_c/pbtxt")
-graphdef_to_pbtxt('dat2')  # here you can write the name of the file to be converted
+graphdef_to_pbtxt('proto')  # here you can write the name of the file to be converted
 # and then a new file will be made in pbtxt directory.

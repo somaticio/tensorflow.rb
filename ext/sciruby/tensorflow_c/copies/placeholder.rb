@@ -5,7 +5,7 @@ tensor_2 = Tensorflow::Tensor.new([[22,3,7,12]])
 placeholder_1 = graph.placeholder("m1", tensor_1.type_num)
 placeholder_2 = graph.placeholder("m2", tensor_2.type_num)
 opec = Tensorflow::OpSpec.new
-opec.name = "Yoo_HOOO_Thisisworkign"
+opec.name = "Additionofconstants"
 opec.type = "Add"
 opec.input = [placeholder_1, placeholder_2]
 
