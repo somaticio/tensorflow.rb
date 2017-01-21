@@ -9,8 +9,6 @@
 #include "./files/version.h"
 #include "./files/tf_tensor_helper.h"
 #include "./files/tf_tensor_helper.cc"
-#include "./files/tf_session_helper.h"
-#include "./files/tf_session_helper.cc"
 %}
 
 namespace std {
@@ -26,8 +24,6 @@ namespace std {
 %include "./files/tensor_c_api.h"
 %include "./files/tf_tensor_helper.h"
 %include "./files/tf_tensor_helper.cc"
-%include "./files/tf_session_helper.h"
-%include "./files/tf_session_helper.cc"
 
 %include "carrays.i"
 %array_class(long long, Long_long);

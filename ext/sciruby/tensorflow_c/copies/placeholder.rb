@@ -1,5 +1,5 @@
 require 'tensorflow'
-graph = Tensorflow::Graph2.new
+graph = Tensorflow::Graph.new
 tensor_1 = Tensorflow::Tensor.new([[2,23,10,6]])
 tensor_2 = Tensorflow::Tensor.new([[22,3,7,12]])
 placeholder_1 = graph.placeholder("m1", tensor_1.type_num)

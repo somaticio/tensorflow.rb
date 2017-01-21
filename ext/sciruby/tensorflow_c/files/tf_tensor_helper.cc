@@ -14,8 +14,6 @@ limitations under the License.
 #include <stdlib.h>
 #include <string.h>
 
-#include "tf_session_helper.h"
-
 namespace tensorflow {
 
 TF_Tensor* TF_NewTensor_wrapper(TF_DataType dtype, long long* dims, int num_dims,

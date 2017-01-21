@@ -1,10 +1,9 @@
 class Tensorflow::Output
-    attr_accessor :index, :operation
-    def c
-      return Tensorflow::input(self.operation.c, self.index)
-    end
+  attr_accessor :index, :operation
+  def c
+    Tensorflow.input(operation.c, index)
+  end
 end
-
 
 # Operation that has been added to the graph.
 class Tensorflow::Operation
@@ -14,19 +13,24 @@ class Tensorflow::Operation
   # @!attribute g
   # A reference to the Graph to prevent it from being GCed while the Operation is still alive.
 
+  def initialize(c_representation, graph)
+    self.c = c_representation
+    self.g = graph
+  end
+
   def name
-     # May need to convert this to a ruby string
-     return Tensorflow::TF_OperationName(op)
+    # May need to convert this to a ruby string
+    Tensorflow::TF_OperationName(op)
   end
 
   def type
     # May need to convert this to a ruby string
-    return Tensorflow::TF_OperationOpType(op)
+    Tensorflow::TF_OperationOpType(op)
   end
 
   def num_outputs
     # May need to convert this to ruby int
-    return Tensorflow::TF_OperationNumOutputs(op)
+    Tensorflow::TF_OperationNumOutputs(op)
   end
 
   # OutputListSize returns the size of the list of Outputs that is produced by a
@@ -39,19 +43,19 @@ class Tensorflow::Operation
   def output_list_size(output)
     cname = CString(output)
     status = Tensorflow::Status.new
-    return Tensorflow::TF_OperationOutputListLength(op, cname, status.c)
+    Tensorflow::TF_OperationOutputListLength(op, cname, status.c)
   end
 
   def output(i)
     out = Tensorflow::Output.new
     out.operation = self
     out.index = i
-    return out
+    out
   end
 end
 
 class Tensorflow::Input
-    attr_accessor :Index, :Operations
-    def initialize
-    end
+  attr_accessor :Index, :Operations
+  def initialize
+  end
 end

@@ -3,32 +3,35 @@ require 'spec_helper'
 describe "Math" do
   it "Add two tensors." do
     graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_DOUBLE, [2,3])
-    input2 = graph.placeholder('input2', Tensorflow::TF_DOUBLE, [2,3])
-    graph.define_op("Add", 'output', [input1, input2], "",nil)
+    tensor_1 = Tensorflow::Tensor.new([[2,23,10,6]])
+    tensor_2 = Tensorflow::Tensor.new([[22,3,7,12]])
+    placeholder_1 = graph.placeholder("m1", tensor_1.type_num)
+    placeholder_2 = graph.placeholder("m2", tensor_2.type_num)
+    opspec = Tensorflow::OpSpec.new("Addition_of_tensors", "Add", nil, [placeholder_1, placeholder_2])
 
-    session = Tensorflow::Session.new
-    session.extend_graph(graph)
-
-    input1 = Tensorflow::Tensor.new([[1.0,3.0, 5.0],[2.0,4.0, 7.0]])
-    input2 = Tensorflow::Tensor.new([[-5.0,1.2,4.5],[8.0,2.3, 3.1]])
-    result = session.run({"input1" => input1.tensor, "input2" => input2.tensor},["output"],nil)
-    expect(result[0]).to match_array([[-4.0, 4.2, 9.5], [10.0, 6.3, 10.1]])
+    op = graph.AddOperation(opspec)
+    session_op = Tensorflow::Session_options.new
+    session = Tensorflow::Session.new(graph, session_op)
+    hash = Hash.new()
+    hash[placeholder_1] = tensor_1
+    hash[placeholder_2] = tensor_2
+    out_tensor = session.run(hash,[op.output(0)],[])
+    expect(out_tensor[0]).to match_array([[24, 26, 17, 18]])
   end
 
   it "Add two complex tensors." do
-    graph = Tensorflow::Graph.new
-    input1 = graph.placeholder('input1', Tensorflow::TF_COMPLEX128, [1])
-    input2 = graph.placeholder('input2', Tensorflow::TF_COMPLEX128, [1])
-    graph.define_op("Add",'output',[input1,input2],"",nil)
-
-    session = Tensorflow::Session.new
-    session.extend_graph(graph)
-
-    input1 = Tensorflow::Tensor.new([Complex(23,42)])
-    input2 = Tensorflow::Tensor.new([Complex(214,42)])
-    result = session.run({"input1" => input1.tensor, "input2" => input2.tensor},["output"],nil)
-    expect(result[0]).to all_be_close([(237.0+84.0i)])
+     graph = Tensorflow::Graph.new
+     tensor_1 = Tensorflow::Tensor.new([Complex(23,42)])
+     tensor_2 = Tensorflow::Tensor.new([Complex(214,42)])
+     placeholder_1 = graph.placeholder("m1", tensor_1.type_num)
+     placeholder_2 = graph.placeholder("m2", tensor_2.type_num)
+     opspec = Tensorflow::OpSpec.new("Addition_of_complex_tensors", "Add", nil, [placeholder_1, placeholder_2])
+     op = graph.AddOperation(opspec)
+     session_op = Tensorflow::Session_options.new
+     session = Tensorflow::Session.new(graph, session_op)
+     hash = {placeholder_1 => tensor_1, placeholder_2 => tensor_2}
+     result = session.run(hash,[op.output(0)],[])
+     expect(result[0]).to all_be_close([(237.0+84.0i)])
   end
 
   it "Subtract two tensors." do

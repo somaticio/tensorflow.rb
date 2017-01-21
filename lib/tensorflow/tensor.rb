@@ -2,7 +2,8 @@
 # A tensor has a rank, and a shape.
 # A Tensor is a symbolic handle to one of the outputs of an Operation. It does not hold the values of that
 # operation's output, but instead provides a means of computing those values in a TensorFlow Session.
-# Official documentation of {tensor}[https://www.tensorflow.org/versions/r0.9/api_docs/python/framework.html#Tensor].
+# It holds a multi-dimensional array of elements of a single data type.
+# Official documentation of {tensor}[https://www.tensorflow.org/api_docs/python/framework/core_graph_data_structures#Tensor].
 # This class has two primary purposes:
 # * *Description* :
 #   - A Tensor can be passed as an input to another Operation. This builds a dataflow connection between
@@ -17,13 +18,13 @@
 #
 # * *Examples* :
 #     input = Tensor.new([[[2,3,4],[2,3,4],[2,3,4]],[[2,3,4],[2,3,4],[2,3,4]]])
-#     input.shape =>  [2, 3, 3]
-#     input.rank       =>  3
-#     input.element_type       =>  Integer
+#     input.shape          =>  [2, 3, 3]
+#     input.rank           =>  3
+#     input.element_type   =>  Integer
 #
 
 class Tensorflow::Tensor
-  attr_accessor :shape, :element_type , :rank, :type_num, :flatten, :tensor_data, :dimension_data, :tensor, :data_size, :tensor_shape_proto
+  attr_accessor :shape, :element_type, :rank, :type_num, :flatten, :tensor_data, :dimension_data, :tensor, :data_size, :tensor_shape_proto
   # @!attribute shape
   #  Return the shape of the tensor in an array.
   # @!attribute element_type
@@ -44,35 +45,36 @@ class Tensorflow::Tensor
     self.rank = shape.size
     self.element_type = type.nil? ? find_type(value) : set_type(type)
     if rank > 1 && type_num == Tensorflow::TF_STRING
-      raise ("Multi-dimensional tensor not supported for string value type.")
+      raise 'Multi-dimensional tensor not supported for string value type.'
     end
     self.flatten = [value].flatten
     self.tensor_data = ruby_array_to_c(flatten, type_num)
     self.dimension_data = ruby_array_to_c(
-      rank.zero? ? [1] : shape, Tensorflow::TF_INT64)
+      rank.zero? ? [1] : shape, Tensorflow::TF_INT64
+    )
     self.tensor = Tensorflow::TF_NewTensor_wrapper(type_num,
-      dimension_data, rank, tensor_data, data_size * flatten.length)
+                                                   dimension_data, rank, tensor_data, data_size * flatten.length)
   end
 
   #
-  # Helper function to set the data type of tensor.
+  # Helper function to automatically set the data type of tensor.
   #
   def set_type(type)
     self.type_num, self.data_size, self.element_type = case type
-    when :float
-      [Tensorflow::TF_FLOAT, 8, Float]
-    when :float64
-      [Tensorflow::TF_DOUBLE, 8, Float]
-    when :int32
-      [Tensorflow::TF_INT32, 4, Integer]
-    when :int64
-      [Tensorflow::TF_INT64, 8, Integer]
-    when :string
-      [Tensorflow::TF_STRING, 8, String]
-    when :complex
-      [Tensorflow::TF_COMPLEX128, 16, Complex]
-    else
-      raise ArgumentError, "Data type #{type} not supported"
+                                                       when :float
+                                                         [Tensorflow::TF_FLOAT, 8, Float]
+                                                       when :float64
+                                                         [Tensorflow::TF_DOUBLE, 8, Float]
+                                                       when :int32
+                                                         [Tensorflow::TF_INT32, 4, Integer]
+                                                       when :int64
+                                                         [Tensorflow::TF_INT64, 8, Integer]
+                                                       when :string
+                                                         [Tensorflow::TF_STRING, 8, String]
+                                                       when :complex
+                                                         [Tensorflow::TF_COMPLEX128, 16, Complex]
+                                                       else
+                                                         raise ArgumentError, "Data type #{type} not supported"
     end
   end
 
@@ -88,23 +90,23 @@ class Tensorflow::Tensor
     first_element = rank.zero? ? data : data.flatten[0]
 
     type, self.type_num, self.data_size = case first_element
-    when Integer
-      [Integer, Tensorflow::TF_INT64, 8]
-    when Float, nil
-      [Float, Tensorflow::TF_DOUBLE, 8]
-    when String
-      [String, Tensorflow::TF_STRING, 8]
-    when Complex
-      [Complex, Tensorflow::TF_COMPLEX128, 16]
-    else
-      raise 'Data type not supported.'
+                                          when Integer
+                                            [Integer, Tensorflow::TF_INT64, 8]
+                                          when Float, nil
+                                            [Float, Tensorflow::TF_DOUBLE, 8]
+                                          when String
+                                            [String, Tensorflow::TF_STRING, 8]
+                                          when Complex
+                                            [Complex, Tensorflow::TF_COMPLEX128, 16]
+                                          else
+                                            raise 'Data type not supported.'
     end
 
     return type if rank == 0
     if type == Integer || type == Float
       float_flag = type == Float ? 1 : 0
       data.flatten.each do |i|
-        raise "Different data types in array." if !(i.is_a?(Float) || i.is_a?(Integer))
+        raise 'Different data types in array.' unless i.is_a?(Float) || i.is_a?(Integer)
         float_flag = 1 if i.is_a?(Float)
       end
       if float_flag == 1
@@ -114,7 +116,7 @@ class Tensorflow::Tensor
       end
     else
       data.flatten.each do |i|
-        raise "Different data types in array." if !(i.is_a?(type))
+        raise 'Different data types in array.' unless i.is_a?(type)
       end
     end
 
@@ -147,11 +149,11 @@ class Tensorflow::Tensor
     when Tensorflow::TF_STRING
       c_array = Tensorflow::String_Vector.new
       array.each_with_index { |value, i| c_array[i] = value }
-      c_array = Tensorflow::string_array_from_string_vector(c_array)
+      c_array = Tensorflow.string_array_from_string_vector(c_array)
     else
       c_array = Tensorflow::Complex_Vector.new
       array.each_with_index { |value, i| c_array[i] = value }
-      c_array = Tensorflow::complex_array_from_complex_vector(c_array)
+      c_array = Tensorflow.complex_array_from_complex_vector(c_array)
     end
     c_array
   end
@@ -166,15 +168,15 @@ class Tensorflow::Tensor
   #   - Value of the element contained in the specified position in the tensor.
   #
   def getval(dimension)
-    raise("Invalid dimension array passed as input.",ShapeError) if dimension.length != shape.length
-    (0..dimension.length-1).each do |i|
-      raise("Invalid dimension array passed as input.",ShapeError) if dimension[i] > shape[i] || dimension[i] < 1 || !(dimension[i].is_a? Integer)
+    raise('Invalid dimension array passed as input.', ShapeError) if dimension.length != shape.length
+    (0..dimension.length - 1).each do |i|
+      raise('Invalid dimension array passed as input.', ShapeError) if dimension[i] > shape[i] || dimension[i] < 1 || !(dimension[i].is_a? Integer)
     end
     sum = dimension.last - 1
     prod = shape.last
     (0..dimension.length - 2).each do |i|
-       sum += (dimension[dimension.length - 2 - i] - 1) * prod
-       prod *= shape[shape.length - 2 - i]
+      sum += (dimension[dimension.length - 2 - i] - 1) * prod
+      prod *= shape[shape.length - 2 - i]
     end
 
     flatten[sum]
@@ -188,7 +190,6 @@ class Tensorflow::Tensor
   # * *Returns* :
   #   - Dimension array `[[2], [4]].shape` => `[2, 1]`
   #
-  # TODO: Handle non-rectangular arrays and raise error if mixed data types
   def self.shape_of(value)
     if value.is_a?(Array)
       if value.any? { |ele| ele.is_a?(Array) }
