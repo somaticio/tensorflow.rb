@@ -1,5 +1,4 @@
 require 'sciruby/Tensorflow'
-require 'narray'
 require 'tensorflow/opspec'
 require 'tensorflow/tensor'
 require 'tensorflow/graph'
