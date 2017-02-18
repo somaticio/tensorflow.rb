@@ -160,6 +160,11 @@ class Tensorflow::Graph
         else
             puts 'This is not working out.'
         end
+        # Shapes can be done, but will require that it be
+        # distinguishable from []int64. Which is fine, it
+        # probably makes sense to define a Shape type anyway,
+        # since that should handle partially known shapes as
+        # well and hide the special meaning of -1?
         [cdesc, status]
     end
 end
