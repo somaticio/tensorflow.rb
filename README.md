@@ -55,6 +55,7 @@ the following steps.
 
 #### Explicit dependencies
 
+- Ruby >= 2.2.0
 - [Bazel](http://www.bazel.io/docs/install.html)
 - [TensorFlow](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/g3doc/get_started/os_setup.md)
 - [Swig](http://www.swig.org/download.html)
@@ -99,8 +100,9 @@ git clone https://github.com/somaticio/tensorflow.rb.git
 cd tensorflow.rb/ext/sciruby/tensorflow_c
 ruby extconf.rb
 make
-make install # Creates ../lib/ruby/site_ruby/X.X.X/<arch>/tf/Tensorflow.bundle (.so Linux)
+make install # Creates ../lib/ruby/site_ruby/X.X.X/<arch>/sciruby/Tensorflow.{bundle, so}
 cd ./../../..
+bundle install
 bundle exec rake install
 ```
 The last command is for installing the gem.
