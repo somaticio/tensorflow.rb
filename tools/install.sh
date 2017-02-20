@@ -259,6 +259,7 @@ ruby extconf.rb
 make
 make install # Creates ../lib/ruby/site_ruby/X.X.X/<arch>/tf/Tensorflow.bundle (.so Linux)
 cd ./../../..
+bundle install
 bundle exec rake install
 
 echo ""
