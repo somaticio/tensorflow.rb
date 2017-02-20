@@ -49,13 +49,13 @@ class Tensorflow::Session
   def extend_graph(graph)
     graph.graph_def_raw = graph.graph_def.serialize_to_string
     self.status = Tensorflow::TF_NewStatus()
-    Tensorflow::TF_ExtendGraph(self.session, graph_def_to_c_array(graph.graph_def_raw), graph.graph_def_raw.length, self.status)
+    Tensorflow::TF_ExtendGraph(self.session, Tensorflow::Character.frompointer(graph.graph_def_raw), graph.graph_def_raw.length, self.status)
     self.graph = graph
   end
 
   def intialize_variables_and_extend_graph(graph)
     self.status = Tensorflow::TF_NewStatus()
-    Tensorflow::TF_ExtendGraph(self.session, graph_def_to_c_array(graph.graph_def_raw), graph.graph_def_raw.length, self.status)
+    Tensorflow::TF_ExtendGraph(self.session, Tensorflow::Character.frompointer(graph.graph_def_raw), graph.graph_def_raw.length, self.status)
     self.graph = graph
     self.run(nil, nil, ["init"])
   end
