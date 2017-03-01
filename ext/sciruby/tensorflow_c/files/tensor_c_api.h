@@ -878,6 +878,25 @@ typedef struct TF_Session TF_Session;
 extern TF_Session* TF_NewSession(TF_Graph* graph, const TF_SessionOptions* opts,
                                  TF_Status* status);
 
+// This function creates a new TF_Session (which is created on success) using
+// `session_options`, and then initializes state (restoring tensors and other
+// assets) using `run_options`.
+//
+// Any NULL and non-NULL value combinations for (`run_options, `meta_graph_def`)
+// are valid.
+//
+// - `export_dir` must be set to the path of the exported SavedModel.
+// - `tags` must include the set of tags used to identify one MetaGraphDef in
+//    the SavedModel.
+// - `graph` must be a graph newly allocated with TF_NewGraph().
+//
+// If successful, populates `graph` with the contents of the Graph and
+// `meta_graph_def` with the MetaGraphDef of the loaded model.
+TF_Session* TF_LoadSessionFromSavedModel(
+        const TF_SessionOptions* session_options, const TF_Buffer* run_options,
+        const char* export_dir, const char* const* tags, int tags_len,
+        TF_Graph* graph, TF_Buffer* meta_graph_def, TF_Status* status);
+
 // Close a session.
 //
 // Contacts any other processes associated with the session, if applicable.
@@ -935,7 +954,9 @@ extern void TF_SessionRun(TF_Session* session,
 // Set up the graph with the intended feeds (inputs) and fetches (outputs) for a
 // sequence of partial run calls.
 //
-// On success, returns a handle that is used for subsequent PRun calls.
+// On success, returns a handle that is used for subsequent PRun calls. The
+// handle should be deleted with TF_DeletePRunHandle when it is no longer
+// needed.
 //
 // On failure, out_status contains a tensorflow::Status with an error
 // message.
@@ -969,6 +990,10 @@ extern void TF_SessionPRun(TF_Session*, const char* handle,
                            // Output status
                            TF_Status*);
 
+// Deletes a handle allocated by TF_SessionPRunSetup.
+// Once called, no more calls to TF_SessionPRun should be made.
+extern void TF_DeletePRunHandle(const char* handle);
+
 // --------------------------------------------------------------------------
 // The deprecated session API.  Please switch to the above instead of
 // TF_ExtendGraph(). This deprecated API can be removed at any time without
@@ -991,7 +1016,7 @@ extern void TF_ExtendGraph(TF_DeprecatedSession*, const void* proto,
                            size_t proto_len, TF_Status*);
 
 // See TF_SessionRun() above.
-extern void TF_Run(TF_Session*, const TF_Buffer* run_options,
+extern void TF_Run(TF_DeprecatedSession*, const TF_Buffer* run_options,
                    const char** input_names, TF_Tensor** inputs, int ninputs,
                    const char** output_names, TF_Tensor** outputs, int noutputs,
                    const char** target_oper_names, int ntargets,
