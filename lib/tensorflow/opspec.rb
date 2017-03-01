@@ -1,7 +1,7 @@
 # OpSpec is the specification of an Operation to be added to a Graph
 # (using Graph AddOperation).
 class Tensorflow::OpSpec
-  attr_accessor :type, :name, :input, :attr
+  attr_accessor :type, :name, :input, :attr, :inputlist
   # @!attribute type
   #  Type of the operation (e.g., "Add", "MatMul").
   # @!attribute name
@@ -22,7 +22,7 @@ class Tensorflow::OpSpec
   # Map from attribute name to its value that will be attached to this
   # operation.
   # Other possible fields: Device, ColocateWith, ControlInputs.
-  def initialize(name = nil, type = nil, attribute = nil, input = nil)
+  def initialize(name = nil, type = nil, attribute = nil, input = nil, inputlist = nil)
     self.name = name
     self.type = type
     self.attr = if attribute.nil?
@@ -35,6 +35,12 @@ class Tensorflow::OpSpec
                  else
                    input
                 end
+    self.inputlist = if inputlist.nil?
+                   []
+                 else
+                   inputlist
+                end
+    raise 'The operation specification is either input or inputlist but not both.' if !(input.nil?) and !(inputlist.nil?)
   end
 end
 

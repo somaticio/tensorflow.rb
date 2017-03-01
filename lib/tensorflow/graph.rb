@@ -96,8 +96,16 @@ class Tensorflow::Graph
             opspec.input.each do |name|
                 Tensorflow::TF_AddInput(cdesc, name.c)
             end
-            # TODO: Add inputlist
         end
+
+                unless opspec.inputlist.empty?
+                    c_array = Tensorflow::TF_Output_vector.new
+                    length = opspec.inputlist.length
+                    opspec.inputlist.each_with_index { |value, i| c_array[i] = value.c }
+                    c_array = Tensorflow::TF_Output_array_from_vector(c_array)
+                    cdesc = Tensorflow::input_list_helper(cdesc, c_array, length)
+                    puts "\n\n\n\n\n\n\n\n\n lkrjkwenhrewhnrwe wqklrenkwqj \n\n\n"
+                end
 
         status = Tensorflow::Status.new
         opspec.attr.each do |name, value|

@@ -3,6 +3,10 @@ class Tensorflow::Output
   def c
     Tensorflow.input(operation.c, index)
   end
+
+  def dataType
+   Tensorflow::TF_OperationOutputType(c())
+  end
 end
 
 # Operation that has been added to the graph.
@@ -20,17 +24,17 @@ class Tensorflow::Operation
 
   def name
     # May need to convert this to a ruby string
-    Tensorflow::TF_OperationName(op)
+    Tensorflow::TF_OperationName(self.c)
   end
 
   def type
     # May need to convert this to a ruby string
-    Tensorflow::TF_OperationOpType(op)
+    Tensorflow::TF_OperationOpType(self.c)
   end
 
   def num_outputs
     # May need to convert this to ruby int
-    Tensorflow::TF_OperationNumOutputs(op)
+    Tensorflow::TF_OperationNumOutputs(self.c)
   end
 
   # OutputListSize returns the size of the list of Outputs that is produced by a
@@ -43,7 +47,7 @@ class Tensorflow::Operation
   def output_list_size(output)
     cname = CString(output)
     status = Tensorflow::Status.new
-    Tensorflow::TF_OperationOutputListLength(op, cname, status.c)
+    Tensorflow::TF_OperationOutputListLength(self.c, cname, status.c)
   end
 
   def output(i)
