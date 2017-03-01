@@ -1,17 +1,17 @@
 /* Copyright 2015 The TensorFlow Authors. All Rights Reserved.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+   ==============================================================================*/
 
 #ifndef TENSORFLOW_C_C_API_H_
 #define TENSORFLOW_C_C_API_H_
@@ -86,50 +86,56 @@ extern const char* TF_Version();
 // TF_DataType holds the type for a scalar value.  E.g., one slot in a tensor.
 // The enum values here are identical to corresponding values in types.proto.
 typedef enum {
-  TF_FLOAT = 1,
-  TF_DOUBLE = 2,
-  TF_INT32 = 3,  // Int32 tensors are always in 'host' memory.
-  TF_UINT8 = 4,
-  TF_INT16 = 5,
-  TF_INT8 = 6,
-  TF_STRING = 7,
-  TF_COMPLEX64 = 8,  // Single-precision complex
-  TF_COMPLEX = 8,    // Old identifier kept for API backwards compatibility
-  TF_INT64 = 9,
-  TF_BOOL = 10,
-  TF_QINT8 = 11,     // Quantized int8
-  TF_QUINT8 = 12,    // Quantized uint8
-  TF_QINT32 = 13,    // Quantized int32
-  TF_BFLOAT16 = 14,  // Float32 truncated to 16 bits.  Only for cast ops.
-  TF_QINT16 = 15,    // Quantized int16
-  TF_QUINT16 = 16,   // Quantized uint16
-  TF_UINT16 = 17,
-  TF_COMPLEX128 = 18,  // Double-precision complex
-  TF_HALF = 19,
-  TF_RESOURCE = 20,
+        TF_FLOAT = 1,
+        TF_DOUBLE = 2,
+        TF_INT32 = 3, // Int32 tensors are always in 'host' memory.
+        TF_UINT8 = 4,
+        TF_INT16 = 5,
+        TF_INT8 = 6,
+        TF_STRING = 7,
+        TF_COMPLEX64 = 8, // Single-precision complex
+        TF_COMPLEX = 8, // Old identifier kept for API backwards compatibility
+        TF_INT64 = 9,
+        TF_BOOL = 10,
+        TF_QINT8 = 11, // Quantized int8
+        TF_QUINT8 = 12, // Quantized uint8
+        TF_QINT32 = 13, // Quantized int32
+        TF_BFLOAT16 = 14, // Float32 truncated to 16 bits.  Only for cast ops.
+        TF_QINT16 = 15, // Quantized int16
+        TF_QUINT16 = 16, // Quantized uint16
+        TF_UINT16 = 17,
+        TF_COMPLEX128 = 18, // Double-precision complex
+        TF_HALF = 19,
+        TF_RESOURCE = 20,
 } TF_DataType;
+
+
+// TF_DataTypeSize returns the sizeof() for the underlying type corresponding
+// to the given TF_DataType enum value. Returns 0 for variable length types
+// (eg. TF_STRING) or on failure.
+extern size_t TF_DataTypeSize(TF_DataType dt);
 
 // --------------------------------------------------------------------------
 // TF_Code holds an error code.  The enum values here are identical to
 // corresponding values in error_codes.proto.
 typedef enum {
-  TF_OK = 0,
-  TF_CANCELLED = 1,
-  TF_UNKNOWN = 2,
-  TF_INVALID_ARGUMENT = 3,
-  TF_DEADLINE_EXCEEDED = 4,
-  TF_NOT_FOUND = 5,
-  TF_ALREADY_EXISTS = 6,
-  TF_PERMISSION_DENIED = 7,
-  TF_UNAUTHENTICATED = 16,
-  TF_RESOURCE_EXHAUSTED = 8,
-  TF_FAILED_PRECONDITION = 9,
-  TF_ABORTED = 10,
-  TF_OUT_OF_RANGE = 11,
-  TF_UNIMPLEMENTED = 12,
-  TF_INTERNAL = 13,
-  TF_UNAVAILABLE = 14,
-  TF_DATA_LOSS = 15,
+        TF_OK = 0,
+        TF_CANCELLED = 1,
+        TF_UNKNOWN = 2,
+        TF_INVALID_ARGUMENT = 3,
+        TF_DEADLINE_EXCEEDED = 4,
+        TF_NOT_FOUND = 5,
+        TF_ALREADY_EXISTS = 6,
+        TF_PERMISSION_DENIED = 7,
+        TF_UNAUTHENTICATED = 16,
+        TF_RESOURCE_EXHAUSTED = 8,
+        TF_FAILED_PRECONDITION = 9,
+        TF_ABORTED = 10,
+        TF_OUT_OF_RANGE = 11,
+        TF_UNIMPLEMENTED = 12,
+        TF_INTERNAL = 13,
+        TF_UNAVAILABLE = 14,
+        TF_DATA_LOSS = 15,
 } TF_Code;
 
 // --------------------------------------------------------------------------
@@ -164,10 +170,10 @@ extern const char* TF_Message(const TF_Status* s);
 // By default, TF_Buffer itself does not do any memory management of the
 // pointed-to block.  If need be, users of this struct should specify how to
 // deallocate the block by setting the `data_deallocator` function pointer.
-typedef struct {
-  const void* data;
-  size_t length;
-  void (*data_deallocator)(void* data, size_t length);
+typedef struct TF_Buffer {
+        const void* data;
+        size_t length;
+        void (*data_deallocator)(void* data, size_t length);
 } TF_Buffer;
 
 // Makes a copy of the input and sets an appropriate deallocator.  Useful for
@@ -321,16 +327,14 @@ typedef struct TF_Operation TF_Operation;
 
 // Represents a specific input of an operation.
 typedef struct TF_Input {
-  TF_Operation* oper;
-  int index;  // The index of the input within oper.
+        TF_Operation* oper;
+        int index; // The index of the input within oper.
 } TF_Input;
 
 // Represents a specific output of an operation.
 typedef struct TF_Output {
-  TF_Operation* oper;
-  int index;
-  // The index of the output within oper.
-  // Okay this is weird
+        TF_Operation* oper;
+        int index; // The index of the output within oper.
 } TF_Output;
 
 // Sets the shape of the Tensor referenced by `output` in `graph` to
@@ -588,46 +592,46 @@ extern int TF_OperationGetControlOutputs(TF_Operation* oper,
 
 // TF_AttrType describes the type of the value of an attribute on an operation.
 typedef enum {
-  TF_ATTR_STRING = 0,
-  TF_ATTR_INT = 1,
-  TF_ATTR_FLOAT = 2,
-  TF_ATTR_BOOL = 3,
-  TF_ATTR_TYPE = 4,
-  TF_ATTR_SHAPE = 5,
-  TF_ATTR_TENSOR = 6,
-  TF_ATTR_PLACEHOLDER = 7,
-  TF_ATTR_FUNC = 8,
+        TF_ATTR_STRING = 0,
+        TF_ATTR_INT = 1,
+        TF_ATTR_FLOAT = 2,
+        TF_ATTR_BOOL = 3,
+        TF_ATTR_TYPE = 4,
+        TF_ATTR_SHAPE = 5,
+        TF_ATTR_TENSOR = 6,
+        TF_ATTR_PLACEHOLDER = 7,
+        TF_ATTR_FUNC = 8,
 } TF_AttrType;
 
 // TF_AttrMetadata describes the value of an attribute on an operation.
-typedef struct {
-  // A boolean: 1 if the attribute value is a list, 0 otherwise.
-  unsigned char is_list;
+typedef struct TF_AttrMetadata {
+        // A boolean: 1 if the attribute value is a list, 0 otherwise.
+        unsigned char is_list;
 
-  // Length of the list if is_list is true. Undefined otherwise.
-  long long list_size;
+        // Length of the list if is_list is true. Undefined otherwise.
+        long long list_size;
 
-  // Type of elements of the list if is_list != 0.
-  // Type of the single value stored in the attribute if is_list == 0.
-  TF_AttrType type;
+        // Type of elements of the list if is_list != 0.
+        // Type of the single value stored in the attribute if is_list == 0.
+        TF_AttrType type;
 
-  // Total size the attribute value.
-  // The units of total_size depend on is_list and type.
-  // (1) If type == TF_ATTR_STRING and is_list == 0
-  //     then total_size is the byte size of the string
-  //     valued attribute.
-  // (2) If type == TF_ATTR_STRING and is_list == 1
-  //     then total_size is the cumulative byte size
-  //     of all the strings in the list.
-  // (3) If type == TF_ATTR_SHAPE and is_list == 0
-  //     then total_size is the number of dimensions
-  //     of the shape valued attribute, or -1
-  //     if its rank is unknown.
-  // (4) If type == TF_ATTR_SHAPE and is_list == 1
-  //     then total_size is the cumulative number
-  //     of dimensions of all shapes in the list.
-  // (5) Otherwise, total_size is undefined.
-  long long total_size;
+        // Total size the attribute value.
+        // The units of total_size depend on is_list and type.
+        // (1) If type == TF_ATTR_STRING and is_list == 0
+        //     then total_size is the byte size of the string
+        //     valued attribute.
+        // (2) If type == TF_ATTR_STRING and is_list == 1
+        //     then total_size is the cumulative byte size
+        //     of all the strings in the list.
+        // (3) If type == TF_ATTR_SHAPE and is_list == 0
+        //     then total_size is the number of dimensions
+        //     of the shape valued attribute, or -1
+        //     if its rank is unknown.
+        // (4) If type == TF_ATTR_SHAPE and is_list == 1
+        //     then total_size is the cumulative number
+        //     of dimensions of all shapes in the list.
+        // (5) Otherwise, total_size is undefined.
+        long long total_size;
 } TF_AttrMetadata;
 
 // Returns metadata about the value of the attribute `attr_name` of `oper`.
@@ -790,6 +794,8 @@ extern TF_Operation* TF_GraphNextOperation(TF_Graph* graph, size_t* pos);
 
 // Write out a serialized representation of `graph` (as a GraphDef protocol
 // message) to `output_graph_def` (allocated by TF_NewBuffer()).
+// `output_graph_def`'s underlying buffer will be freed when TF_DeleteBuffer()
+// is called.
 //
 // May fail on very large graphs in the future.
 extern void TF_GraphToGraphDef(TF_Graph* graph, TF_Buffer* output_graph_def,
@@ -807,7 +813,38 @@ extern void TF_DeleteImportGraphDefOptions(TF_ImportGraphDefOptions* opts);
 extern void TF_ImportGraphDefOptionsSetPrefix(TF_ImportGraphDefOptions* opts,
                                               const char* prefix);
 
+// Set any imported nodes with input `src_name:src_index` to have that input
+// replaced with `dst`. `src_name` refers to a node in the graph to be imported,
+// `dst` references a node already existing in the graph being imported into.
+extern void TF_ImportGraphDefOptionsAddInputMapping(
+        TF_ImportGraphDefOptions* opts, const char* src_name, int src_index,
+        TF_Output dst);
+// Cause the imported graph to have a control dependency on `oper`. `oper`
+// should exist in the graph being imported into.
+extern void TF_ImportGraphDefOptionsAddControlDependency(
+        TF_ImportGraphDefOptions* opts, TF_Operation* oper);
+// Add an output in `graph_def` to be returned via the `return_outputs` output
+// parameter of TF_GraphImportGraphDef(). If the output is remapped via an input
+// mapping, the corresponding existing tensor in `graph` will be returned.
+extern void TF_ImportGraphDefOptionsAddReturnOutput(
+        TF_ImportGraphDefOptions* opts, const char* oper_name, int index);
+// Returns the number of return outputs added via
+// TF_ImportGraphDefOptionsAddReturnOutput().
+extern int TF_ImportGraphDefOptionsNumReturnOutputs(
+        const TF_ImportGraphDefOptions* opts);
+
 // Import the graph serialized in `graph_def` into `graph`.
+//
+// `num_return_outputs` must be the number of return outputs added (i.e. the
+// result of TF_ImportGraphDefOptionsNumReturnOutputs()).  If
+// `num_return_outputs` is non-zero, `return_outputs` must be of length
+// `num_return_outputs`. Otherwise it can be null.
+extern void TF_GraphImportGraphDefWithReturnOutputs(
+        TF_Graph* graph, const TF_Buffer* graph_def,
+        const TF_ImportGraphDefOptions* options, TF_Output* return_outputs,
+        int num_return_outputs, TF_Status* status);
+// Import the graph serialized in `graph_def` into `graph`.
+// Convenience function for when no return outputs have been added.
 extern void TF_GraphImportGraphDef(TF_Graph* graph, const TF_Buffer* graph_def,
                                    const TF_ImportGraphDefOptions* options,
                                    TF_Status* status);
