@@ -15,17 +15,19 @@ class Tensorflow::Savedmodel
   # https://www.tensorflow.org/code/tensorflow/python/saved_model/
   def LoadSavedModel(exportDir, tags, options)
     status = Tensorflow::Status.new
-    copt = options.c()
+    if options.nil?
+      copt = Tensorflow::TF_NewSessionOptions()
+     else
+      copt = options.c()
+     end
     cExportDir = CString(exportDir)
     c_array = Tensorflow::String_Vector.new
     tags.each_with_index { |value, i| c_array[i] = value }
     graph = Tensorflow::Graph.new
-    pair = Tensorflow::Pairii.new
-    pair = Tensorflow::Saved_model_helper(copt, cExportDir, tags, graph.c, status.c)
+    cSess = Tensorflow::Saved_model_helper(copt, cExportDir, tags, graph.c, status.c)
     session_op = Tensorflow::Session_options.new
     session = Tensorflow::Session.new(graph, session_op)
-    session.c = pair.first
-    graph.c = pair.second
+    session.c = cSess
     self.session = session
     self.graph = graph
   end

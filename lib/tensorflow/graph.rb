@@ -59,6 +59,7 @@ class Tensorflow::Graph
     # operation is present.
     def operation(name)
         c_operation = Tensorflow::TF_GraphOperationByName(c, CString(name))
+        puts "That was nill" if c_operation.nil?
         return nil if c_operation.nil?
         Tensorflow::Operation.new(c_operation, self)
     end
