@@ -242,23 +242,7 @@ TF_OperationDescription* input_list_helper(TF_OperationDescription* cdesc, TF_Ou
         return cdesc;
 }
 
-TF_Graph* Saved_model_helper(TF_SessionOptions* cOpt, std::string cExportDir, std::vector<std::string> tags, TF_Graph* & (graph_c),TF_Status* status_c){
-        char **tags_array;
-        tags_array = new char*[tags.size()];
-        for(auto i = 0; i < tags.size(); i++) {
-                tags_array[i] = new char[tags[i].length()];
-                for(auto j = 0; j < tags[i].length(); j++) tags_array[i][j] = tags[i][j];
-        }
-        const char* ExportDir = cExportDir.c_str();
-        auto cSess = TF_LoadSessionFromSavedModel(cOpt, NULL, ExportDir,&tags_array[0], tags.size(), graph_c, NULL, status_c);
-        for(auto i = 0; i < tags.size(); i++) {
-                free(tags_array[i]);
-        }
-        TF_DeleteSessionOptions(cOpt);
-        return graph_c;
-}
-
-TF_Session* Saved_model_helper_2(TF_SessionOptions* cOpt, std::string cExportDir, std::vector<std::string> tags, TF_Graph* & (graph_c),TF_Status* status_c){
+TF_Session* Saved_model_helper(TF_SessionOptions* cOpt, std::string cExportDir, std::vector<std::string> tags, TF_Graph* (graph_c),TF_Status* status_c){
         char **tags_array;
         tags_array = new char*[tags.size()];
         for(auto i = 0; i < tags.size(); i++) {

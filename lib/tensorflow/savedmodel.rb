@@ -24,10 +24,10 @@ class Tensorflow::Savedmodel
     c_array = Tensorflow::String_Vector.new
     tags.each_with_index { |value, i| c_array[i] = value }
     graph = Tensorflow::Graph.new
-    cSess = Tensorflow::Saved_model_helper(copt, cExportDir, tags, graph.c, status.c)
+    csess = Tensorflow::Saved_model_helper(copt, cExportDir, tags, graph.c, status.c)
     session_op = Tensorflow::Session_options.new
     session = Tensorflow::Session.new(graph, session_op)
-    session.c = cSess
+    session.c = csess
     self.session = session
     self.graph = graph
   end
