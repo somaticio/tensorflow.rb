@@ -16,11 +16,11 @@ class Tensorflow::Session
     # @!attribute graph
     # A TensorFlow graph is a description of computations. To compute anything, a graph must be launched in a Session. A Session places the graph ops and provides methods to execute them.
 
-    def initialize(graph, _options)
+    def initialize(graph, c_options)
         self.status = Tensorflow::Status.new
-        c_options = Tensorflow::TF_NewSessionOptions() #  To be changed
-        c_session = Tensorflow::TF_NewSession(graph.c, c_options, status.c)
-        Tensorflow::TF_DeleteSessionOptions(c_options)
+        cOpt = c_options.c #  To be changed
+        c_session = Tensorflow::TF_NewSession(graph.c, cOpt, status.c)
+        Tensorflow::TF_DeleteSessionOptions(cOpt)
         # Add error check here
         self.c = c_session
     end

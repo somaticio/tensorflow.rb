@@ -3,6 +3,7 @@
 %include "std_vector.i"
 %include "std_string.i"
 %include "std_complex.i"
+%include "std_pair.i"
 
 %{
 #include "./files/tensor_c_api.h"
@@ -12,6 +13,7 @@
 %}
 
 namespace std {
+   %template(Pairii)              std::pair<TF_Graph*, TF_Session*>;
    %template(String_Vector)       vector<string>;
    %template(Integer_Vector)      vector<long long>;
    %template(Tensor_Vector)       vector<TF_Tensor*>;
