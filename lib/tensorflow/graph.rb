@@ -8,6 +8,7 @@ class Tensorflow::Graph
     #  contains the graph representation.
     def initialize
         self.c = Tensorflow::TF_NewGraph()
+        @number_of_defaults_created = Hash.new(0)
     end
 
     def delete_graph
@@ -40,7 +41,7 @@ class Tensorflow::Graph
         buffer = Tensorflow::TF_NewBuffer()
         Tensorflow.buffer_read(buffer, CString(byte))
         status = Tensorflow::Status.new
-        Tensorflow::TF_GraphImportGraphDef(self.c, buffer, opts, status.c)
+        Tensorflow::TF_GraphImportGraphDef(c, buffer, opts, status.c)
     end
 
     # Loads a graph stored in pb file into a graph def. This way you can define the graph
@@ -75,11 +76,13 @@ class Tensorflow::Graph
 
     # Creates a constant Tensor that is added to the graph with a specified name.
     # Official documentation of {tf.constant}[https://www.tensorflow.org/versions/r0.9/api_docs/python/constant_op.html#constant].
-    def const(name, value)
+    def constant(value, name: nil, dtype: nil)
         # Value is the tensor but for now we can ignore that shit
         # Raise error if name and data type are incorrect in any way
         # we have both datatype and tensor for this.
-        opspec = Tensorflow::OpSpec.new(name, 'Const', 'dtype' => value.type_num, 'value' => value)
+        tensor = Tensorflow::Tensor.new(value, dtype)
+        name ||= default_name('Constant')
+        opspec = Tensorflow::OpSpec.new(name, 'Const', 'dtype' => tensor.type_num, 'value' => tensor)
         operation = AddOperation(opspec)
         operation.output(0)
     end
@@ -183,5 +186,13 @@ class Tensorflow::Graph
         # since that should handle partially known shapes as
         # well and hide the special meaning of -1?
         [cdesc, status]
+    end
+
+    # Returns a default name for a new variable or constant.
+    # The name increments for each one created: Variable:0, Variable:1, and so on.
+    def default_name(type)
+        name = "#{type}_#{@number_of_defaults_created[type]}"
+        @number_of_defaults_created[type] += 1
+        name
     end
 end
