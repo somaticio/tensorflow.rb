@@ -41,7 +41,7 @@ class Tensorflow::Graph
         buffer = Tensorflow::TF_NewBuffer()
         Tensorflow.buffer_read(buffer, CString(byte))
         status = Tensorflow::Status.new
-        Tensorflow::TF_GraphImportGraphDef(c, buffer, opts, status.c)
+        Tensorflow::TF_GraphImportGraphDef(self.c, buffer, opts, status.c)
     end
 
     # Loads a graph stored in pb file into a graph def. This way you can define the graph
