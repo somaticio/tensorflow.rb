@@ -49,8 +49,8 @@ class Tensorflow::Session
         end
 
         outputValues = Tensorflow::Session_run(c, inputPorts, inputValues, outputPorts, cTargets)
-        output_array = []
 
+        output_array = []
         outputValues.each do |value|
             converted_value = convert_value_for_output_array(value)
             output_array.push(converted_value)

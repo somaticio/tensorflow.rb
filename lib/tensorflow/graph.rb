@@ -40,7 +40,7 @@ class Tensorflow::Graph
         buffer = Tensorflow::TF_NewBuffer()
         Tensorflow.buffer_read(buffer, CString(byte))
         status = Tensorflow::Status.new
-        Tensorflow::TF_GraphImportGraphDef(c, buffer, opts, status.c)
+        Tensorflow::TF_GraphImportGraphDef(self.c, buffer, opts, status.c)
     end
 
     # Loads a graph stored in pb file into a graph def. This way you can define the graph
@@ -59,7 +59,6 @@ class Tensorflow::Graph
     # operation is present.
     def operation(name)
         c_operation = Tensorflow::TF_GraphOperationByName(c, CString(name))
-        puts "That was nill" if c_operation.nil?
         return nil if c_operation.nil?
         Tensorflow::Operation.new(c_operation, self)
     end
@@ -89,6 +88,7 @@ class Tensorflow::Graph
     # everything uptil set attributes is okay but then we need reflect equivalent for ruby
     def AddOperation(opspec)
         opspec.name = opspec.type if opspec.name.nil?
+        opspec.name = opspec.type if opspec.name == ''
         cname = CString(opspec.name)
         ctype = CString(opspec.type)
         cdesc = Tensorflow::TF_NewOperation(c, ctype, cname)
@@ -99,14 +99,13 @@ class Tensorflow::Graph
             end
         end
 
-                unless opspec.inputlist.empty?
-                    c_array = Tensorflow::TF_Output_vector.new
-                    length = opspec.inputlist.length
-                    opspec.inputlist.each_with_index { |value, i| c_array[i] = value.c }
-                    c_array = Tensorflow::TF_Output_array_from_vector(c_array)
-                    cdesc = Tensorflow::input_list_helper(cdesc, c_array, length)
-                    puts "\n\n\n\n\n\n\n\n\n lkrjkwenhrewhnrwe wqklrenkwqj \n\n\n"
-                end
+        unless opspec.inputlist.empty?
+            c_array = Tensorflow::TF_Output_vector.new
+            length = opspec.inputlist.length
+            opspec.inputlist.each_with_index { |value, i| c_array[i] = value.c }
+            c_array = Tensorflow::TF_Output_array_from_vector(c_array)
+            cdesc = Tensorflow.input_list_helper(cdesc, c_array, length)
+         end
 
         status = Tensorflow::Status.new
         opspec.attr.each do |name, value|
@@ -120,16 +119,16 @@ class Tensorflow::Graph
             # consider adding a TF_DeleteOperationDescription
             # function to the C API.
         end
-        puts cdesc
         Tensorflow::Operation.new(Tensorflow::TF_FinishOperation(cdesc, status.c), self)
     end
 
-    # How are we using a way to set attributes for string and other types.
-    def setattr(cdesc, status, name, value) # adding extra type for fun
+    def setattr(cdesc, status, name, value)
         cAttrName = CString(name)
-        type = 'DataType'     if name == 'dtype'
-        type = 'Tensor'       if name == 'value'
-
+        type = 'DataType'      if name == 'dtype'
+        type = 'Tensor'        if name == 'value'
+        type = 'int64' if name == 'channels'
+        type = 'DataType'      if name == 'DstT'
+        type = 'int32_array'   if name == 'size/Const'
         case type
         when 'string'
             Tensorflow::TF_SetAttrString(cdesc, cAttrName, CString(value), value.length)
@@ -143,6 +142,15 @@ class Tensorflow::Graph
             end
             c_array = string_array_from_string_vector(c_string_vector)
             Tensorflow::TF_SetAttrString(cdesc, cAttrName, c_array, list, value.length)
+        when 'int32'
+            Tensorflow::TF_SetAttrInt(cdesc, cAttrName, value)
+        when 'int32_array'
+            size = value.length
+            list = Tensorflow::Int.new
+            value.each_with_index do |number, index|
+                c_string_vector[index] = number
+            end
+            Tensorflow::TF_SetAttrIntList(cdesc, cAttrName, list, size)
         when 'int64'
             Tensorflow::TF_SetAttrInt(cdesc, cAttrName, value)
         when 'int64_array'
@@ -167,7 +175,7 @@ class Tensorflow::Graph
             Tensorflow::TF_SetAttrTensor(cdesc, cAttrName, value.tensor, status.c)
         # TODO: Insert Tensor_list, DataType_list, Bool
         else
-            puts 'This is not working out.'
+            puts 'Attribute type not supported.'
         end
         # Shapes can be done, but will require that it be
         # distinguishable from []int64. Which is fine, it

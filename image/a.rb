@@ -30,3 +30,8 @@ require 'tensorflow'
 # - Constructs another TensorFlow graph to normalize the image into a
 #   form suitable for the model (for example, resizing the image)
 # - Creates an executes a Session to obtain a Tensor in this normalized form.
+
+modeldir = ''
+imagefile = ''
+
+graph = TensorFlow::Graph.new
