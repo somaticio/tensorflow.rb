@@ -43,6 +43,15 @@ class Tensorflow::Tensor
     def initialize(value, type = nil)
         self.shape = self.class.shape_of(value)
         self.rank = shape.size
+        if type == 23
+           nflattened = num_elements(self.shape)
+           nbytes = nflattened*8 + byte_size_of_encoded_strings(value)
+           shapePtr = Tensorflow::Long_long.new(0)
+           puts nbytes, value
+           t = Tensorflow::TF_AllocateTensor(Tensorflow::TF_STRING, shapePtr, 0, nbytes)
+           t = Tensorflow::String_encoder(CString([0].pack("Q*")), CString(value), nbytes, nflattened, t)
+           return t
+        end
         self.element_type = type.nil? ? find_type(value) : set_type(type)
         if rank > 1 && type_num == Tensorflow::TF_STRING
             raise 'Multi-dimensional tensor not supported for string value type.'
@@ -54,6 +63,11 @@ class Tensorflow::Tensor
         )
         self.tensor = Tensorflow::TF_NewTensor_wrapper(type_num,
                                                        dimension_data, rank, tensor_data, data_size * flatten.length)
+    end
+
+    def byte_size_of_encoded_strings(value)
+      return Tensorflow::TF_StringEncodedSize(value.length) if value.is_a? String
+      #TODO Add multi-dimensional case
     end
 
     #
@@ -183,6 +197,15 @@ class Tensorflow::Tensor
     end
 
     private
+    # Returns the number of elements contained in the tensor
+    def num_elements(shape)
+        return 1 if shape.nil? || (shape == [])
+        n = 1
+        shape.each do |i|
+            n *= i
+        end
+        n
+    end
 
     #
     # Recursively finds the shape of the input array.

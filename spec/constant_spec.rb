@@ -67,15 +67,6 @@ describe 'Constants' do
             session.run({}, [input], {}).first
         end
 
-        context 'Rank 0 (scalar)' do
-            let!(:input) { graph.constant(-1.0) }
-
-            xit 'fetches rank-0 tensor' do
-                # TODO: this currently returns [-1.0]
-                expect(const_result).to eq -1.0
-            end
-        end
-
         context 'Rank 1 (vector)' do
             let!(:input) { graph.constant([1, 2, 3, 4, 5, 6, 7]) }
 

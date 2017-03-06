@@ -1,3 +1,12 @@
+# Package op defines functions for adding TensorFlow operations to a Graph.
+#
+# Functions for adding an operation to a graph take a Scope object as the
+# first argument. The Scope object encapsulates a graph and a set of
+# properties (such as a name prefix) for all operations being added
+# to the graph.
+#
+# WARNING: The API in this package has not been finalized and can
+# change without notice.
 # Const adds an operation to graph that produces value as output.
 def Const(scope, value, type = nil)
     value = Tensorflow::Tensor.new(value, type)
@@ -15,10 +24,9 @@ end
 #	dtype: The type of elements in the tensor.
 #
 # Returns A placeholder tensor that must be replaced using the feed mechanism.
-def Placeholder(scope, dtype, optionalAttr = nil)
+def Placeholder(scope, dtype)
     optionalAttr = {}
     optionalAttr['dtype'] = dtype
-    # TODO: add checks for additional attributes
     opspec = Tensorflow::OpSpec.new('', 'Placeholder', 'dtype' => dtype)
     scope.AddOperation(opspec).output(0)
 end

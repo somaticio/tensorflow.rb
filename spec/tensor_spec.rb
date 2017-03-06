@@ -10,7 +10,7 @@ describe "Tensorflow::Tensor" do
       input1 = Tensorflow::Tensor.new("Ruby", :string)
       expect(Tensorflow::string_reader(input1.tensor)).to match_array(["Ruby"])
       graph = Tensorflow::Graph.new
-      graph.constant(["Ruby"], dtype: :string)
+      out = graph.constant([[2,4,5],[3,4,1],[2,4,5],[3,4,1]])
     end
   end
 end

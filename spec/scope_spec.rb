@@ -33,11 +33,31 @@ describe 'Scope' do
         graph = s.graph
         file_name = '/home/arafat/Desktop/tensorflow/gotest/mysore_palace.jpg'
         data = File.read(file_name)
-        tensor = Tensorflow::Tensor.new('/home/arafat/Desktop/tensorflow/gotest/mysore_palace.jpg')
-        session_op = Tensorflow::Session_options.new
-        session = Tensorflow::Session.new(graph, session_op)
-        hash = {}
-        hash[input] = tensor
+     #   tensor = Tensorflow::Tensor.new('/home/arafat/Desktop/tensorflow/gotest/mysore_palace.jpg')
+      #  session_op = Tensorflow::Session_options.new
+     #   session = Tensorflow::Session.new(graph, session_op)
+     #   hash = {}
+     #   hash[input] = tensor
         #     out_tensor = session.run(hash, [output], [])
     end
+
+    it 'Addi' do
+     graph = Tensorflow::Graph.new
+     tensor_2 = Tensorflow::Tensor.new("abc", 23)
+   #  no_name1 = graph.constant("abc", name: 'testing_names', dtype: 23)
+    # graph.write_file("abc")
+    # tensor_2 = Tensorflow::Tensor.new("def")
+    # placeholder_1 = graph.placeholder('tensor1', tensor_1.type_num)
+   #  placeholder_2 = graph.placeholder('tensor2', tensor_2.type_num)
+     #opspec = Tensorflow::OpSpec.new('Addition_of_tensors', 'Add', nil, [placeholder_1, placeholder_2])
+
+    # op = graph.AddOperation(opspec)
+   #  session_op = Tensorflow::Session_options.new
+    # session = Tensorflow::Session.new(graph, session_op)
+    # hash = {}
+     #hash[placeholder_1] = tensor_1
+    # hash[placeholder_2] = tensor_2
+    # out_tensor = session.run(hash, [op.output(0)], [])
+     #expect(out_tensor[0]).to match_array("23")
+   end
 end

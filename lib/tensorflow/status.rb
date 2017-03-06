@@ -1,3 +1,5 @@
+# Status holds error information returned by TensorFlow. We
+# can use status to get error and even display the error messages from tensorflow.
 class Tensorflow::Status
     attr_accessor :c
     def initialize
@@ -5,8 +7,7 @@ class Tensorflow::Status
     end
 
     def newstatus
-        s = Tensorflow::TF_NewStatus()
-        s
+        self.c = Tensorflow::TF_NewStatus()
     end
 
     def code
@@ -15,10 +16,5 @@ class Tensorflow::Status
 
     def String
         Tensorflow::TF_Message(c)
-    end
-
-    def err
-        err_code = code
-        puts err_code
     end
 end

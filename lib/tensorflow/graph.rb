@@ -60,7 +60,7 @@ class Tensorflow::Graph
     # operation is present.
     def operation(name)
         c_operation = Tensorflow::TF_GraphOperationByName(c, CString(name))
-        return nil if c_operation.nil?
+        warn("No Operation with the name #{name} exists.") if c_operation.nil?
         Tensorflow::Operation.new(c_operation, self)
     end
 
@@ -82,6 +82,7 @@ class Tensorflow::Graph
         # we have both datatype and tensor for this.
         tensor = Tensorflow::Tensor.new(value, dtype)
         name ||= default_name('Constant')
+        tensor.type_num = Tensorflow::TF_STRING if dtype == 23
         opspec = Tensorflow::OpSpec.new(name, 'Const', 'dtype' => tensor.type_num, 'value' => tensor)
         operation = AddOperation(opspec)
         operation.output(0)
@@ -112,7 +113,7 @@ class Tensorflow::Graph
 
         status = Tensorflow::Status.new
         opspec.attr.each do |name, value|
-            cdesc, status = setattr(cdesc, status, name, value)
+            cdesc, status = set_attributes(cdesc, status, name, value)
             # Memory leak here as the TF_OperationDescription
             # object will not be cleaned up. At the time of this
             # writing, this was next to impossible since it
@@ -125,13 +126,26 @@ class Tensorflow::Graph
         Tensorflow::Operation.new(Tensorflow::TF_FinishOperation(cdesc, status.c), self)
     end
 
-    def setattr(cdesc, status, name, value)
+    # Setting attributes is a complicated process for ruby and could have been much
+    # more convinient and automated if ruby had run-time reflection like golang.
+    # Basically its not possible to differentiate between int32 and int64
+    # or float32 and double(float64). This is why attribute specification has been done in the following way.
+    # Make a hash of Attributes
+    # With the key as the name of the attribute and the value as a has of one object.
+    # The first index of the array is the value itself and the second is the type of the attributes.
+    # You can find the types of the attributes on this link https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/ops/ops.pbtxt
+    #
+    def set_attributes(cdesc, status, name, value)
         cAttrName = CString(name)
+        # Some defaults types for attributes of given name.
         type = 'DataType'      if name == 'dtype'
         type = 'Tensor'        if name == 'value'
-        type = 'int64' if name == 'channels'
+        type = 'int64'         if name == 'channels'
         type = 'DataType'      if name == 'DstT'
         type = 'int32_array'   if name == 'size/Const'
+        if value.is_a?(Hash)
+          value, type = value.first
+        end
         case type
         when 'string'
             Tensorflow::TF_SetAttrString(cdesc, cAttrName, CString(value), value.length)

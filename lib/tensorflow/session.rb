@@ -16,20 +16,23 @@ class Tensorflow::Session
     # @!attribute graph
     # A TensorFlow graph is a description of computations. To compute anything, a graph must be launched in a Session. A Session places the graph ops and provides methods to execute them.
 
-    def initialize(graph, c_options)
+    def initialize(graph, c_options = nil)
+        c_options = Tensorflow::Session_options.new if c_options == nil
         self.status = Tensorflow::Status.new
-        cOpt = c_options.c #  To be changed
+        cOpt = c_options.c
         c_session = Tensorflow::TF_NewSession(graph.c, cOpt, status.c)
         Tensorflow::TF_DeleteSessionOptions(cOpt)
-        # Add error check here
+        raise 'Error in session initialization.' if status.code != 0
         self.c = c_session
     end
 
+    # Run the graph with the associated session starting with the supplied feeds
+    # to compute the value of the requested fetches. Runs, but does not return
+    # Tensors for operations specified in targets.
     #
-    # Runs a session on a given input.
-    # * *Returns* :
-    #   - nil
-    #
+    # On success, returns the fetched Tensors in the same order as supplied in
+    # the fetches argument. If fetches is set to nil, the returned Tensor fetches
+    # is empty.
     def run(inputs, outputs, targets)
         inputPorts = Tensorflow::TF_Output_vector.new
         inputValues = Tensorflow::Tensor_Vector.new
@@ -58,18 +61,13 @@ class Tensorflow::Session
         output_array
     end
 
-    def extend_graph(graph)
-        graph.graph_def_raw = graph.graph_def.serialize_to_string
-        self.status = Tensorflow::TF_NewStatus()
-        Tensorflow::TF_ExtendGraph(session, graph_def_to_c_array(graph.graph_def_raw), graph.graph_def_raw.length, status)
-        self.graph = graph
-    end
-
-    def intialize_variables_and_extend_graph(graph)
-        self.status = Tensorflow::TF_NewStatus()
-        Tensorflow::TF_ExtendGraph(session, graph_def_to_c_array(graph.graph_def_raw), graph.graph_def_raw.length, status)
-        self.graph = graph
-        run(nil, nil, ['init'])
+    def close
+        status = Tensorflow::Status.new
+        Tensorflow::TF_CloseSession(c, status.c)
+        raise 'Error in closing a session.' if status.code != 0
+        Tensorflow::TF_DeleteSession(c, status.c)
+        raise 'Error in closing a session.' if status.code != 0
+        self.c = nil
     end
 
     private
