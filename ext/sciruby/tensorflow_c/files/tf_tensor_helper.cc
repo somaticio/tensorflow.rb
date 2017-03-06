@@ -258,25 +258,21 @@ TF_Session* Saved_model_helper(TF_SessionOptions* cOpt, std::string cExportDir, 
         return cSess;
 }
 
-TF_Tensor* String_encoder(std::string packer,std::string c_string, int nbytes, int nflattened, TF_Tensor* tenso){
+TF_Tensor* String_encoder(std::string c_string, int nbytes, long long *shapePtr, int shapelen, int nflattened){
         const char *src_string = c_string.c_str();
         size_t src_len = c_string.length();
         size_t dst_len = src_len+1;
+        auto tensor = TF_AllocateTensor(TF_STRING, shapePtr, shapelen, nbytes);
 
-        auto cbytes = TF_TensorData(tenso);
-        auto length = TF_TensorByteSize(tenso);
+        auto cbytes = TF_TensorData(tensor);
+        auto length = TF_TensorByteSize(tensor);
         cbytes = new char[length];
-        auto dst_str = (char *) (cbytes+8);
-        auto buffer_data_pointer = (char *) cbytes;
-        for(int i = 0; i < packer.length(); i++)
-                *(char *)(buffer_data_pointer+i) = packer[i];
+        auto dst_str = (char *) (cbytes+8*nflattened);
 
         auto status = TF_NewStatus();
         auto offset_size = TF_StringEncode(src_string, src_len, dst_str, dst_len, status);
 
-        std::cout << "This is packer length " << packer.length() << "\nthis is length " << length  << "\nThis is C string <<  " << c_string << "\nThis is offset "<< offset_size << "  "<< TF_GetCode(status) << "\n\n";
-
-        return tenso;
+        return tensor;
 }
 
 }  // namespace tensorflow
