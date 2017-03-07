@@ -137,7 +137,7 @@ class Tensorflow::Graph
     #
     def set_attributes(cdesc, status, name, value)
         cAttrName = CString(name)
-        # Some defaults types for attributes of given name.
+        # Some defaults types for attributes of given name
         type = 'DataType'      if name == 'dtype'
         type = 'Tensor'        if name == 'value'
         type = 'int64'         if name == 'channels'

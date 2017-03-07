@@ -22,7 +22,7 @@ describe 'Scope' do
 
     it 'Should test subscope naming is correct' do
         s = Tensorflow::Scope.new
-        input = Placeholder(s, 7)
+        input = Const(s, "/home/arafat/Desktop/tensorflow/gotest/mysore_palace.jpg", 23)
         output = input.operation.g.AddOperation(Tensorflow::OpSpec.new('ReadFile', 'ReadFile', nil, [input]))
         output = input.operation.g.AddOperation(Tensorflow::OpSpec.new('DecodeJpeg', 'DecodeJpeg', Hash['channels' => 3], [output.output(0)]))
         output = input.operation.g.AddOperation(Tensorflow::OpSpec.new('Cast', 'Cast', Hash['DstT' => 1], [output.output(0)]))
@@ -33,18 +33,39 @@ describe 'Scope' do
         graph = s.graph
         file_name = '/home/arafat/Desktop/tensorflow/gotest/mysore_palace.jpg'
         data = File.read(file_name)
+        graph.write_file("aaa")
      #   tensor = Tensorflow::Tensor.new('/home/arafat/Desktop/tensorflow/gotest/mysore_palace.jpg')
-      #  session_op = Tensorflow::Session_options.new
-     #   session = Tensorflow::Session.new(graph, session_op)
-     #   hash = {}
+        session_op = Tensorflow::Session_options.new
+        session = Tensorflow::Session.new(graph, session_op)
+        hash = {}
      #   hash[input] = tensor
-        #     out_tensor = session.run(hash, [output], [])
+             out_tensor = session.run(hash, [output], [])
+             b = Tensorflow::Tensor.new(2)
+
+             puts b.shapeee(out_tensor[0]) , "thhh"
+             gr = Tensorflow::Graph.new
+             gr.read_file("/home/arafat/Desktop/tensorflow/tensorflow.rb/spec/ooo/tensorflow_inception_graph.pb")
+             c = Tensorflow::Tensor.new(out_tensor[0], :float)
+             sess = Tensorflow::Session.new(gr)
+             hash = {}
+             hash[gr.operation("input").output(0)] = c
+
+             a = sess.run(hash, [gr.operation("output").output(0)], [])
+             kl =  a.flatten
+             klh = 0
+             kl.each do |i|
+              if i > klh
+               klh = i
+              end
+             end
+             puts klh*100
     end
 
     it 'Addi' do
-     graph = Tensorflow::Graph.new
-     tensor_2 = Tensorflow::Tensor.new("abc", 23)
-   #  no_name1 = graph.constant("abc", name: 'testing_names', dtype: 23)
+    # graph = Tensorflow::Graph.new
+    # tensor_2 = Tensorflow::Tensor.new("abc", 23)
+   #  puts "\n\n",Tensorflow::TF_NumDims(tensor_2.tensor) , "\n\n\n"
+    # no_name1 = graph.constant("This is great / and it workswew ; /wrekw", name: 'testing_names', dtype: 23)
     # graph.write_file("abc")
     # tensor_2 = Tensorflow::Tensor.new("def")
     # placeholder_1 = graph.placeholder('tensor1', tensor_1.type_num)

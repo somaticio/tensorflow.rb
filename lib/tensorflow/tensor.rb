@@ -44,13 +44,9 @@ class Tensorflow::Tensor
         self.shape = self.class.shape_of(value)
         self.rank = shape.size
         if type == 23
-           nflattened = num_elements(self.shape)
-           nbytes = nflattened*8 + byte_size_of_encoded_strings(value)
-           shapePtr = Tensorflow::Long_long.new(0)
-           puts nbytes, value
-           t = Tensorflow::TF_AllocateTensor(Tensorflow::TF_STRING, shapePtr, 0, nbytes)
-           t = Tensorflow::String_encoder(CString([0].pack("Q*")), CString(value), nbytes, nflattened, t)
-           return t
+         puts "encoded stuff"
+         self.tensor = Tensorflow::String_encoder(CString(value), CString([0].pack("Q")) )
+         return  self
         end
         self.element_type = type.nil? ? find_type(value) : set_type(type)
         if rank > 1 && type_num == Tensorflow::TF_STRING
@@ -196,7 +192,7 @@ class Tensorflow::Tensor
         flatten[sum]
     end
 
-    private
+
     # Returns the number of elements contained in the tensor
     def num_elements(shape)
         return 1 if shape.nil? || (shape == [])
@@ -217,6 +213,19 @@ class Tensorflow::Tensor
         if value.is_a?(Array)
             if value.any? { |ele| ele.is_a?(Array) }
                 dim = value.group_by { |ele| ele.is_a?(Array) && shape_of(ele) }.keys
+                [value.size] + dim.first if dim.size == 1 && dim.first
+            else
+                [value.size]
+            end
+        else
+            []
+        end
+    end
+
+    def shapeee(value)
+        if value.is_a?(Array)
+            if value.any? { |ele| ele.is_a?(Array) }
+                dim = value.group_by { |ele| ele.is_a?(Array) && shapeee(ele) }.keys
                 [value.size] + dim.first if dim.size == 1 && dim.first
             else
                 [value.size]

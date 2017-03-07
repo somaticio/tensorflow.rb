@@ -258,20 +258,26 @@ TF_Session* Saved_model_helper(TF_SessionOptions* cOpt, std::string cExportDir, 
         return cSess;
 }
 
-TF_Tensor* String_encoder(std::string c_string, int nbytes, long long *shapePtr, int shapelen, int nflattened){
+
+TF_Tensor* String_encoder(std::string c_string, std::string offset_string){
+        auto num_elements = 1;
+        auto nflattened   = 1;
+        auto nbytes       = nflattened*8 + TF_StringEncodedSize(c_string.length());
+        long long *shapePtr;
+
+        auto tensor = TF_AllocateTensor(TF_STRING, shapePtr, 0, nbytes);
+        auto cbytes = TF_TensorData(tensor);
+        auto length = TF_TensorByteSize(tensor);
+
         const char *src_string = c_string.c_str();
         size_t src_len = c_string.length();
         size_t dst_len = src_len+1;
-        auto tensor = TF_AllocateTensor(TF_STRING, shapePtr, shapelen, nbytes);
-
-        auto cbytes = TF_TensorData(tensor);
-        auto length = TF_TensorByteSize(tensor);
-        cbytes = new char[length];
-        auto dst_str = (char *) (cbytes+8*nflattened);
-
+        auto offset = (cbytes);
+        uint64_t offset_num = std::strtoull(offset_string.c_str(),NULL,0);
+        memcpy(offset, &offset_num, sizeof(offset_num));
+        auto dst_str = (char *)(cbytes+8);
         auto status = TF_NewStatus();
         auto offset_size = TF_StringEncode(src_string, src_len, dst_str, dst_len, status);
-
         return tensor;
 }
 
