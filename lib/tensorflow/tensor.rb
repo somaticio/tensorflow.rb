@@ -43,11 +43,6 @@ class Tensorflow::Tensor
     def initialize(value, type = nil)
         self.shape = self.class.shape_of(value)
         self.rank = shape.size
-        if type == 23
-         puts "encoded stuff"
-         self.tensor = Tensorflow::String_encoder(CString(value), CString([0].pack("Q")) )
-         return  self
-        end
         self.element_type = type.nil? ? find_type(value) : set_type(type)
         if rank > 1 && type_num == Tensorflow::TF_STRING
             raise 'Multi-dimensional tensor not supported for string value type.'
@@ -57,13 +52,12 @@ class Tensorflow::Tensor
         self.dimension_data = ruby_array_to_c(
             rank.zero? ? [1] : shape, Tensorflow::TF_INT64
         )
+        if type_num == Tensorflow::TF_STRING
+         self.tensor = Tensorflow::String_encoder(CString(value), CString([0].pack("Q")) )
+         return self
+        end
         self.tensor = Tensorflow::TF_NewTensor_wrapper(type_num,
                                                        dimension_data, rank, tensor_data, data_size * flatten.length)
-    end
-
-    def byte_size_of_encoded_strings(value)
-      return Tensorflow::TF_StringEncodedSize(value.length) if value.is_a? String
-      #TODO Add multi-dimensional case
     end
 
     #
@@ -192,9 +186,11 @@ class Tensorflow::Tensor
         flatten[sum]
     end
 
+private
 
     # Returns the number of elements contained in the tensor
-    def num_elements(shape)
+    def num_elements
+        shape = self.shape
         return 1 if shape.nil? || (shape == [])
         n = 1
         shape.each do |i|
@@ -213,19 +209,6 @@ class Tensorflow::Tensor
         if value.is_a?(Array)
             if value.any? { |ele| ele.is_a?(Array) }
                 dim = value.group_by { |ele| ele.is_a?(Array) && shape_of(ele) }.keys
-                [value.size] + dim.first if dim.size == 1 && dim.first
-            else
-                [value.size]
-            end
-        else
-            []
-        end
-    end
-
-    def shapeee(value)
-        if value.is_a?(Array)
-            if value.any? { |ele| ele.is_a?(Array) }
-                dim = value.group_by { |ele| ele.is_a?(Array) && shapeee(ele) }.keys
                 [value.size] + dim.first if dim.size == 1 && dim.first
             else
                 [value.size]

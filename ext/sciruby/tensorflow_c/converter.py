@@ -39,5 +39,5 @@ if (os.path.isdir(directory)):
     shutil.rmtree(directory)
 
 # Name of the file to be converted
-filename = 'abc'
+filename = 'image_int64.pb'
 graphdef_to_pbtxt(filename)

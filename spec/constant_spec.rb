@@ -112,7 +112,6 @@ describe 'Constants' do
             it { expect { subject.new([nil]).shape }.to raise_error(RuntimeError) }
             it { expect(subject.new([1, 2, 3]).shape).to eq [3] }
             it { expect(subject.new([-1.0, 2.0, 3e9, 1000]).shape).to eq [4] }
-            it { expect(subject.new(%w(str1 str2)).shape).to eq [2] }
         end
 
         context '2D' do
@@ -121,7 +120,6 @@ describe 'Constants' do
                 expect(subject.new([[-1.0, 2.0], [3e9, 1000]]).shape)
                     .to eq [2, 2]
             end
-            it { expect(subject.new(%w(str1 str2)).shape).to eq [2] }
         end
 
         context '3D' do

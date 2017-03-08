@@ -17,4 +17,15 @@ describe 'Graph' do
         out_tensor = session.run(hash, [op.output(0)], [])
         expect(out_tensor[0]).to match_array([[-4, 4, 9], [10, 6, 10]])
     end
+
+    it 'Addition of strings' do
+        graph = Tensorflow::Graph.new
+        constant_1 = graph.constant('Tensorflow', name: 'const1')
+        constant_2 = graph.constant('Ruby', name: 'const2')
+        opspec = Tensorflow::OpSpec.new('Addition_of_tensors', 'Add', nil, [constant_1, constant_2])
+        op = graph.AddOperation(opspec)
+        session = Tensorflow::Session.new(graph)
+        out_tensor = session.run({}, [op.output(0)], [])
+        expect(out_tensor[0]).to eq('TensorflowRuby')
+    end
 end

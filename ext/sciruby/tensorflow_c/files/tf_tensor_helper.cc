@@ -19,20 +19,6 @@ namespace tensorflow {
 TF_Tensor* TF_NewTensor_wrapper(TF_DataType dtype, long long* dims, int num_dims,
                                 void* data, size_t len) {
 
-        if(dtype == TF_STRING) {
-                std::string* tensorData = (std::string*)data;
-                long long tensorDim = dims[0];
-                size_t lengthOfAllStrings = 0;
-
-                for(auto i=0; i<tensorDim; ++i) {
-                        lengthOfAllStrings += tensorData[i].length();
-                }
-
-                // roughly estimated from http://stackoverflow.com/questions/29868622/memory-consumed-by-a-string-vector-in-c
-                size_t completeLength = lengthOfAllStrings + sizeof(std::string) * tensorDim;
-                len = completeLength;
-        }
-
         void* cData = malloc(len);
         memcpy(cData, data, len);
 
@@ -273,12 +259,27 @@ TF_Tensor* String_encoder(std::string c_string, std::string offset_string){
         size_t src_len = c_string.length();
         size_t dst_len = src_len+1;
         auto offset = (cbytes);
+
         uint64_t offset_num = std::strtoull(offset_string.c_str(),NULL,0);
         memcpy(offset, &offset_num, sizeof(offset_num));
         auto dst_str = (char *)(cbytes+8);
         auto status = TF_NewStatus();
         auto offset_size = TF_StringEncode(src_string, src_len, dst_str, dst_len, status);
         return tensor;
+}
+
+std::string String_decoder(TF_Tensor* input_tensor){
+        auto cbytes = TF_TensorData(input_tensor);
+        auto length = TF_TensorByteSize(input_tensor);
+        auto offset_st = (char *) cbytes;
+        auto src = (char *)(cbytes + 8);
+        const char *dst_str;
+        size_t dst_len;
+        auto status = TF_NewStatus();
+        auto offset_size = TF_StringDecode(src, length, &dst_str, &dst_len, status);
+        std::string out_string;
+        out_string += (char *) (dst_str);
+        return out_string;
 }
 
 }  // namespace tensorflow

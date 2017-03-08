@@ -1,6 +1,7 @@
 # Tensorboard
 Using Tensorboard with Tensorflow.rb is very easy. To make use of tensorboard. First, please make sure that you have installed [tensorflow](https://www.tensorflow.org/install/) completely and tensorflow.rb is working on your system.
-I will walk you through a very simple example.    Consider the function
+I will walk you through a very simple example.    
+Consider the function
 
 ```
 require 'tensorflow'

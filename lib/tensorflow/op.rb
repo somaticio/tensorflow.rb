@@ -10,8 +10,7 @@
 # Const adds an operation to graph that produces value as output.
 def Const(scope, value, type = nil)
     value = Tensorflow::Tensor.new(value, type)
-    value.type_num = 7 if type == 23
-    opspec = Tensorflow::OpSpec.new('', 'Const', 'dtype' => value.type_num, 'value' => value)
+    opspec = Tensorflow::OpSpec.new('', 'Const', 'dtype' => {value.type_num => 'DataType' }, 'value' => {value => 'tensor'})
     scope.AddOperation(opspec).output(0)
 end
 
@@ -28,6 +27,6 @@ end
 def Placeholder(scope, dtype)
     optionalAttr = {}
     optionalAttr['dtype'] = dtype
-    opspec = Tensorflow::OpSpec.new('', 'Placeholder', 'dtype' => dtype)
+    opspec = Tensorflow::OpSpec.new('', 'Placeholder', 'dtype' => {dtype => 'DataType' })
     scope.AddOperation(opspec).output(0)
 end

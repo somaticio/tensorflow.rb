@@ -17,7 +17,7 @@ class Tensorflow::Session
     # A TensorFlow graph is a description of computations. To compute anything, a graph must be launched in a Session. A Session places the graph ops and provides methods to execute them.
 
     def initialize(graph, c_options = nil)
-        c_options = Tensorflow::Session_options.new if c_options == nil
+        c_options = Tensorflow::Session_options.new if c_options.nil?
         self.status = Tensorflow::Status.new
         cOpt = c_options.c
         c_session = Tensorflow::TF_NewSession(graph.c, cOpt, status.c)
@@ -64,9 +64,9 @@ class Tensorflow::Session
     def close
         status = Tensorflow::Status.new
         Tensorflow::TF_CloseSession(c, status.c)
-        raise 'Error in closing a session.' if status.code != 0
+        raise 'Error in closing session.' if status.code != 0
         Tensorflow::TF_DeleteSession(c, status.c)
-        raise 'Error in closing a session.' if status.code != 0
+        raise 'Error in deleting session.' if status.code != 0
         self.c = nil
     end
 
@@ -110,6 +110,10 @@ class Tensorflow::Session
     end
 
     def convert_value_for_output_array(value)
+        type = Tensorflow::TF_TensorType(value)
+        if type == Tensorflow::TF_STRING
+            return Tensorflow::String_decoder(value)
+        end
         size = Tensorflow.tensor_size(value)
         c_array = construct_c_array(value, size)
         length_by_dimension = length_by_dimension(value)

@@ -69,7 +69,7 @@ class Tensorflow::Graph
     # Notice that this does not have the shape parameter.
     # Official documentation of {tf.placeholder}[https://www.tensorflow.org/api_docs/python/io_ops/placeholders#placeholder].
     def placeholder(name, type_enum)
-        opspec = Tensorflow::OpSpec.new(name, 'Placeholder', 'dtype' => type_enum)
+        opspec = Tensorflow::OpSpec.new(name, 'Placeholder', 'dtype' => {type_enum => 'DataType'})
         operation = AddOperation(opspec)
         operation.output(0)
     end
@@ -82,8 +82,7 @@ class Tensorflow::Graph
         # we have both datatype and tensor for this.
         tensor = Tensorflow::Tensor.new(value, dtype)
         name ||= default_name('Constant')
-        tensor.type_num = Tensorflow::TF_STRING if dtype == 23
-        opspec = Tensorflow::OpSpec.new(name, 'Const', 'dtype' => tensor.type_num, 'value' => tensor)
+        opspec = Tensorflow::OpSpec.new(name, 'Const', 'dtype' => {tensor.type_num => 'DataType' }, 'value' => {tensor => 'tensor'})
         operation = AddOperation(opspec)
         operation.output(0)
     end
@@ -131,18 +130,23 @@ class Tensorflow::Graph
     # Basically its not possible to differentiate between int32 and int64
     # or float32 and double(float64). This is why attribute specification has been done in the following way.
     # Make a hash of Attributes
-    # With the key as the name of the attribute and the value as a has of one object.
+    # With the key as the name of the attribute and the value as a hash of one object.
     # The first index of the array is the value itself and the second is the type of the attributes.
     # You can find the types of the attributes on this link https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/ops/ops.pbtxt
+    # This API is Currently being improved feel free to raise an issue or ask clarification about any query regarding this.
     #
     def set_attributes(cdesc, status, name, value)
         cAttrName = CString(name)
         # Some defaults types for attributes of given name
+        if value.is_a?(Hash)
+           value, type = value.first
+        end
         type = 'DataType'      if name == 'dtype'
         type = 'Tensor'        if name == 'value'
         type = 'int64'         if name == 'channels'
         type = 'DataType'      if name == 'DstT'
         type = 'int32_array'   if name == 'size/Const'
+
         if value.is_a?(Hash)
           value, type = value.first
         end
@@ -192,7 +196,7 @@ class Tensorflow::Graph
             Tensorflow::TF_SetAttrTensor(cdesc, cAttrName, value.tensor, status.c)
         # TODO: Insert Tensor_list, DataType_list, Bool
         else
-            puts 'Attribute type not supported.'
+            raise 'Attribute type not supported or attribute type not specififed properly. Please look into the documentation for set_attributes in the graph class for more information.'
         end
         # Shapes can be done, but will require that it be
         # distinguishable from []int64. Which is fine, it
