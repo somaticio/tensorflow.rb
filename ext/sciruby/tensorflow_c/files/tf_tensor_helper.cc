@@ -244,7 +244,6 @@ TF_Session* Saved_model_helper(TF_SessionOptions* cOpt, std::string cExportDir, 
         return cSess;
 }
 
-
 TF_Tensor* String_encoder(std::string c_string, std::string offset_string){
         auto num_elements = 1;
         auto nflattened   = 1;

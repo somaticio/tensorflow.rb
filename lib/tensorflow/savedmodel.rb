@@ -20,11 +20,11 @@ class Tensorflow::Savedmodel
                else
                    options.c
                 end
-        cExportDir = CString(exportDir)
+        c_export_dir = CString(exportDir)
         c_array = Tensorflow::String_Vector.new
         tags.each_with_index { |value, i| c_array[i] = value }
         graph = Tensorflow::Graph.new
-        csess = Tensorflow::Saved_model_helper(copt, cExportDir, tags, graph.c, status.c)
+        csess = Tensorflow::Saved_model_helper(copt, c_export_dir, tags, graph.c, status.c)
         session_op = Tensorflow::Session_options.new
         session = Tensorflow::Session.new(graph, session_op)
         session.c = csess

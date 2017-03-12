@@ -10,7 +10,7 @@
 # Const adds an operation to graph that produces value as output.
 def Const(scope, value, type = nil)
     value = Tensorflow::Tensor.new(value, type)
-    opspec = Tensorflow::OpSpec.new('', 'Const', 'dtype' => {value.type_num => 'DataType' }, 'value' => {value => 'tensor'})
+    opspec = Tensorflow::OpSpec.new('', 'Const', 'dtype' => {value.type_num => 'DataType'}, 'value' => {value => 'tensor'})
     scope.AddOperation(opspec).output(0)
 end
 
@@ -27,6 +27,13 @@ end
 def Placeholder(scope, dtype)
     optionalAttr = {}
     optionalAttr['dtype'] = dtype
-    opspec = Tensorflow::OpSpec.new('', 'Placeholder', 'dtype' => {dtype => 'DataType' })
+    opspec = Tensorflow::OpSpec.new('', 'Placeholder', 'dtype' => {dtype => 'DataType'})
     scope.AddOperation(opspec).output(0)
+end
+
+# A simple makeshift function to convert a ruby string to C++ string
+def CString(string)
+    vector = Tensorflow::String_Vector.new
+    vector[0] = string
+    vector[0]
 end

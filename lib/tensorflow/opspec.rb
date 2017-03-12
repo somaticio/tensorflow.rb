@@ -43,10 +43,3 @@ class Tensorflow::OpSpec
         raise 'The operation specification is either input or inputlist but not both.' if !input.nil? && !inputlist.nil?
     end
 end
-
-# A simple makeshift function to convert a ruby string to C++ string
-def CString(string)
-    vector = Tensorflow::String_Vector.new
-    vector[0] = string
-    vector[0]
-end

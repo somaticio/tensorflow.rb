@@ -125,6 +125,7 @@ class Tensorflow::Graph
         Tensorflow::Operation.new(Tensorflow::TF_FinishOperation(cdesc, status.c), self)
     end
 
+private
     # Setting attributes is a complicated process for ruby and could have been much
     # more convinient and automated if ruby had run-time reflection like golang.
     # Basically its not possible to differentiate between int32 and int64
@@ -137,10 +138,10 @@ class Tensorflow::Graph
     #
     def set_attributes(cdesc, status, name, value)
         cAttrName = CString(name)
-        # Some defaults types for attributes of given name
         if value.is_a?(Hash)
            value, type = value.first
         end
+        # Some defaults types for attributes of given name
         type = 'DataType'      if name == 'dtype'
         type = 'Tensor'        if name == 'value'
         type = 'int64'         if name == 'channels'
