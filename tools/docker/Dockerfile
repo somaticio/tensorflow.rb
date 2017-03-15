@@ -27,11 +27,32 @@ RUN apt-get upgrade -y bazel
 # Install tensorflow
 RUN /bin/mkdir /repos
 RUN cd /repos && git clone --recurse-submodules https://github.com/tensorflow/tensorflow
+RUN cd /repos/tensorflow && git checkout r1.0
+
+# We need gcc-4.8 otherwise we get segmentation fault
+# Error:
+# ./tensorflow/core/framework/tensor.h:574:6: internal compiler error: Segmentation fault
+#  void Tensor::FillDimsAndValidateCompatibleShape(
+#      ^
+# gcc: internal compiler error: Segmentation fault (program cc1plus)
+RUN apt-get install -y gcc-4.8 g++-4.8
+# Set priority to use gcc-4.8
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 50 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8
+
+# Required for tensorflow bazel build 
+# NOTE: We cannot use python3 because later the ./configure script will
+#       it will use /usr/bin/python3 but some bazel stuff still
+#       calls /usr/bin/python, which does not link to anything
+# RUN apt-get install -y --fix-missing python3-numpy python3-dev python3-pip python3-wheel
+RUN apt-get install -y --fix-missing python-numpy python-dev python-pip python-wheel
+
 # For info about why '--jobs'
 # * https://github.com/tensorflow/tensorflow/issues/349
 # For why we use '--batch'
 # * https://github.com/bazelbuild/bazel/issues/418
-RUN cd /repos/tensorflow && bazel --batch build --jobs=10 --spawn_strategy=standalone --genrule_strategy=standalone //tensorflow:libtensorflow.so
+RUN cd /repos/tensorflow && yes "" | ./configure
+RUN cd /repos/tensorflow && bazel --batch build -c opt --jobs=10 --spawn_strategy=standalone --genrule_strategy=standalone //tensorflow:libtensorflow.so
 RUN cp /repos/tensorflow/bazel-bin/tensorflow/libtensorflow.so /usr/lib/
 
 # Required by ruby-tensorflow
@@ -58,7 +79,7 @@ RUN /bin/bash -l -c "gem install bundle --no-rdoc --no-ri"
 RUN /bin/bash -l -c "rvm gemset create ruby-tensorflow"
 
 # Install ruby-tensorflow
-RUN cd /repos && git clone https://github.com/somaticio/tensorflow.rb
+RUN cd /repos && git clone https://github.com/Arafatk/tensorflow.rb
 RUN cd /repos/tensorflow.rb && /bin/bash -l -c "rvm --ruby-version use 2.2.4@ruby-tensorflow"
 
 RUN cd /repos/tensorflow.rb && /bin/bash -l -c "bundle install"
