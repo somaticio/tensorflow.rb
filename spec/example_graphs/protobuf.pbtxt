@@ -1,0 +1,70 @@
+node {
+  name: "tensor1"
+  op: "Placeholder"
+  attr {
+    key: "_class"
+    value {
+      list {
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT64
+    }
+  }
+  attr {
+    key: "shape"
+    value {
+      shape {
+      }
+    }
+  }
+}
+node {
+  name: "tensor2"
+  op: "Placeholder"
+  attr {
+    key: "_class"
+    value {
+      list {
+      }
+    }
+  }
+  attr {
+    key: "dtype"
+    value {
+      type: DT_INT64
+    }
+  }
+  attr {
+    key: "shape"
+    value {
+      shape {
+      }
+    }
+  }
+}
+node {
+  name: "Addition_of_tensors"
+  op: "Add"
+  input: "tensor1"
+  input: "tensor2"
+  attr {
+    key: "T"
+    value {
+      type: DT_INT64
+    }
+  }
+  attr {
+    key: "_class"
+    value {
+      list {
+      }
+    }
+  }
+}
+versions {
+  producer: 21
+}
