@@ -2,7 +2,9 @@
 
 # Global Configurations
 TENSORFLOW_GPU_ENABLED="n"
-
+pip install --upgrade pip
+apt-get install python-pip python-dev
+pip install tensorflow
 # Change dir to shell script dir
 cd $(dirname $0)
 
@@ -26,7 +28,7 @@ PKG_CONFIG="http://pkgconfig.freedesktop.org/releases/pkg-config-0.28.tar.gz"
 
 # Bazel Source
 BAZEL_ROOT="https://github.com/bazelbuild/bazel/releases/download"
-BAZEL_VERS="0.4.4"
+BAZEL_VERS="0.4.5"
 PKG_BAZEL="$BAZEL_ROOT/$BAZEL_VERS/bazel-$BAZEL_VERS-installer-$platform-x86_64.sh"
 
 # TensorFlow source
@@ -225,7 +227,7 @@ if hash bazel 2>/dev/null; then
 else
 	install_shell $PKG_BAZEL
 fi
-
+export PATH=$PATH:$HOME/bin
 # 
 # Clone TensorFlow Repo
 clone $TENSORFLOW "tensorflow"
@@ -236,7 +238,7 @@ cd "tensorflow"
 # Configure TensorFlow (with/without GPU)
 echo ""
 echo "= Configuring TensorFlow (GPU: $TENSORFLOW_GPU_ENABLED)"
-./configure <<< "n"
+./configure
 
 # Compile TensorFlow
 echo ""
@@ -246,7 +248,7 @@ echo "= Compiling TensorFlow"
 # If you are behind a proxy then you need to define proxy here to work with bazel.
 # export http_proxy=http:// 
 # export https_proxy=https:// 
-bazel --batch build --jobs=10 --spawn_strategy=standalone --genrule_strategy=standalone //tensorflow:libtensorflow.so
+bazel  build -c opt //tensorflow:libtensorflow.so --local_resources 2048,.5,1.0
 cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
 
 #moving out of tensorflow clone
