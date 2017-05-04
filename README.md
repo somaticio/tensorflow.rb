@@ -22,6 +22,9 @@ You can also generate docs by
 
 ## Installation
 
+### Install Script
+I have made a make shift install script in tools directory. You are free to use it, but it still needs some work and there is a chance that you might face some issues with it and if you do face some issues, you can use the instructions below. You are welcome to make improvements to the script.
+
 ### Docker
 
 It's easiest to get started using the prebuilt Docker container.
@@ -112,9 +115,6 @@ The last command is for installing the gem.
 bundle exec rake spec
 ```
 This command is to run the tests.
-
-### Install Script
-I have also made a make shift install script in tools directory. You are free to use it, but it still needs some work and its best if you follow the installation procedure above or use docker. You are welcome to make improvements to the script.
 
 ## Tensorboard
 You can run tensorboard on tensorflow.rb too.    Just take a look at tensorboard.md file.
