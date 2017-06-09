@@ -3,11 +3,11 @@
 class Tensorflow::Status
     attr_accessor :c
     def initialize
-        self.c = Tensorflow::TF_NewStatus()
+        self.c = Tensorflow::new_status()
     end
 
     def newstatus
-        self.c = Tensorflow::TF_NewStatus()
+        self.c = Tensorflow::new_status()
     end
 
     def code

@@ -53,11 +53,11 @@ class Tensorflow::Tensor
             rank.zero? ? [1] : shape, Tensorflow::TF_INT64
         )
         if type_num == Tensorflow::TF_STRING
-         self.tensor = Tensorflow::String_encoder(CString(value), CString([0].pack("Q")) )
+         self.tensor = Tensorflow::String_encoder(value, [0].pack("Q"))
          return self
         end
-        self.tensor = Tensorflow::TF_NewTensor_wrapper(type_num,
-                                                       dimension_data, rank, tensor_data, data_size * flatten.length)
+        self.tensor = TensorflowAPI.new_tensor(type_num,
+                                                       dimension_data, rank, tensor_data, data_size * flatten.length, nil, nil)
     end
 
     #
@@ -148,12 +148,11 @@ class Tensorflow::Tensor
             c_array = Tensorflow::Int.new(array.length)
             array.each_with_index { |value, i| c_array[i] = value }
         when Tensorflow::TF_INT64
-            c_array = Tensorflow::Long_long.new(array.length)
-            array.each_with_index { |value, i| c_array[i] = value }
+            c_array = FFI::MemoryPointer.new(:long_long, array.size)
+            array.each_with_index { |value, i| c_array.put_long_long i, value }
         when Tensorflow::TF_STRING
-            c_array = Tensorflow::String_Vector.new
-            array.each_with_index { |value, i| c_array[i] = value }
-            c_array = Tensorflow.string_array_from_string_vector(c_array)
+            c_array = FFI::MemoryPointer.new(:pointer, array.size)
+            array.each_with_index { |value, i| c_array.put_pointer i, FFI::MemoryPointer.from_string(value) }
         else
             c_array = Tensorflow::Complex_Vector.new
             array.each_with_index { |value, i| c_array[i] = value }
