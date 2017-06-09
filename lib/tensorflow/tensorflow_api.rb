@@ -365,7 +365,7 @@ module TensorflowAPI
   # @param [Status] status 
   # @return [Integer] 
   # @scope class
-  attach_function :string_encode, :TF_StringEncode, [:string, :ulong, :string, :ulong, Status], :ulong
+  attach_function :string_encode, :TF_StringEncode, [:string, :ulong, :pointer, :ulong, Status], :ulong
   
   # Does not read memory more than `src_len` bytes beyond `src`.
   # 
