@@ -33,6 +33,9 @@ class Tensorflow::Session
     # On success, returns the fetched Tensors in the same order as supplied in
     # the fetches argument. If fetches is set to nil, the returned Tensor fetches
     # is empty.
+    #
+    # Note that the caller maintains responsibility for the input tensors, so 
+    # the caller should still call tensor.delete() on each input tensor
     def run(inputs, outputs, targets)
         inputPorts = Tensorflow::TF_Output_vector.new
         inputValues = Tensorflow::Tensor_Vector.new
@@ -57,6 +60,9 @@ class Tensorflow::Session
         outputValues.each do |value|
             converted_value = convert_value_for_output_array(value)
             output_array.push(converted_value)
+            # Since we're returning the results as an array, there's no point keeping
+            # the output tensor, so we delete it. 
+            Tensorflow::TF_DeleteTensor(value)
         end
         output_array
     end
