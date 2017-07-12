@@ -22,6 +22,13 @@ void tensor_deallocator(void* data, size_t len, void* arg){
     free(data);
 }
 
+// Callback function for deallocating the data buffer that's created for 
+// importing a graph with buffer_read
+void buffer_deallocator(void* data, size_t length)
+{
+        delete[] data;
+}
+
 TF_Tensor* TF_NewTensor_wrapper(TF_DataType dtype, long long* dims, int num_dims,
                                 void* data, size_t len) {
         void* cData = malloc(len);
@@ -40,7 +47,10 @@ long long tensor_size(TF_Tensor* tensor)
 
 void buffer_read(TF_Buffer* tf_buffer, std::string file_string){
         int length = file_string.length();
+        (*tf_buffer).data_deallocator = &buffer_deallocator;
         (*tf_buffer).length = (size_t)length;
+        // This data is cleaned in the buffer_deallocator that's called when 
+        // TF_DeleteBuffer is called
         (*tf_buffer).data = new char[length];
         auto buffer_data_pointer = (*tf_buffer).data;
         for(int i = 0; i < length; i++) {
