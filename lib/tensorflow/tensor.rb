@@ -60,6 +60,13 @@ class Tensorflow::Tensor
                                                        dimension_data, rank, tensor_data, data_size * flatten.length)
     end
 
+    # Deletes the tensor which will also ensure that the tensor_deallocator function is called
+    # and the C++ memory is freed properly. A memory leak will occur anytime the ruby garbage collector
+    # deletes a tensor before this function is called.
+    def delete()
+        Tensorflow::TF_DeleteTensor(@tensor)
+    end
+
     #
     # Helper function to automatically set the data type of tensor.
     #

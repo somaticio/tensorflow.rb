@@ -16,14 +16,18 @@
 
 namespace tensorflow {
 
+// Callback function for deallocating the data buffer of a tensor when
+// TF_DeleteTensor is called.
+void tensor_deallocator(void* data, size_t len, void* arg){
+    free(data);
+}
+
 TF_Tensor* TF_NewTensor_wrapper(TF_DataType dtype, long long* dims, int num_dims,
                                 void* data, size_t len) {
-
         void* cData = malloc(len);
         memcpy(cData, data, len);
 
-        return TF_NewTensor(dtype, dims, num_dims, cData, len, [] (void *cData, size_t len, void* arg){
-                            }, nullptr);
+        return TF_NewTensor(dtype, dims, num_dims, cData, len, &tensor_deallocator, nullptr);
 };
 
 long long tensor_size(TF_Tensor* tensor)
@@ -201,10 +205,18 @@ std::vector<TF_Tensor *> Session_run(TF_Session* graph_session, std::vector<TF_O
 
         TF_SessionRun(graph_session, NULL, &inputPorts_array[0], &inputValues_array[0], inputPorts.size(), &outputPorts_array[0], &outputValues_array[0], outputPorts.size(), &cTargets_array[0], cTargets.size(), NULL, status);
 
+
         array_length = outputPorts.size();
         std::vector<TF_Tensor *> TF_Tensor_vector;
         for (auto i = 0; i < array_length; ++i)
                 TF_Tensor_vector.push_back(outputValues_array[i]);
+
+        delete[] inputPorts_array;
+        delete[] outputPorts_array;
+        delete[] inputValues_array;
+        delete[] outputValues_array;
+        delete[] cTargets_array;
+        TF_DeleteStatus(status);
 
         return TF_Tensor_vector;
 };
