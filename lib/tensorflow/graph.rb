@@ -7,12 +7,12 @@ class Tensorflow::Graph
     # @!attribute c
     #  contains the graph representation.
     def initialize
-        self.c = Tensorflow::TF_NewGraph()
+        self.c = TensorflowAPI::new_graph()
         @number_of_defaults_created = Hash.new(0)
     end
 
     def delete_graph
-        Tensorflow::TF_DeleteGraph(c)
+        Tensorflow::delete_graph(c)
     end
 
     # write_to writes out a serialized representation of graph in binary wire format.
@@ -94,11 +94,11 @@ class Tensorflow::Graph
         opspec.name = opspec.type if opspec.name == ''
         cname = CString(opspec.name)
         ctype = CString(opspec.type)
-        cdesc = Tensorflow::TF_NewOperation(c, ctype, cname)
+        cdesc = TensorflowAPI::new_operation(c, ctype, cname)
 
         unless opspec.input.empty?
             opspec.input.each do |name|
-                Tensorflow::TF_AddInput(cdesc, name.c)
+                Tensorflow::add_input(cdesc, name.c)
             end
         end
 
@@ -110,7 +110,7 @@ class Tensorflow::Graph
             cdesc = Tensorflow.input_list_helper(cdesc, c_array, length)
          end
 
-        status = Tensorflow::Status.new
+        status = TensorflowAPI::Status.new
         opspec.attr.each do |name, value|
             cdesc, status = set_attributes(cdesc, status, name, value)
             # Memory leak here as the TF_OperationDescription
@@ -122,7 +122,7 @@ class Tensorflow::Graph
             # consider adding a TF_DeleteOperationDescription
             # function to the C API.
         end
-        Tensorflow::Operation.new(Tensorflow::TF_FinishOperation(cdesc, status.c), self)
+        Tensorflow::Operation.new(Tensorflow::finish_operation(cdesc, status.c), self)
     end
 
 private
@@ -192,9 +192,9 @@ private
             end
             Tensorflow::TF_SetAttrFloatList(cdesc, cAttrName, list, size)
         when 'DataType'
-            Tensorflow::TF_SetAttrType(cdesc, cAttrName, value)
+            TensorflowAPI::set_attr_type(cdesc, cAttrName, value)
         when 'Tensor'
-            Tensorflow::TF_SetAttrTensor(cdesc, cAttrName, value.tensor, status.c)
+            TensorflowAPI::set_attr_tensor(cdesc, cAttrName, value.tensor, status)
         # TODO: Insert Tensor_list, DataType_list, Bool
         else
             raise 'Attribute type not supported or attribute type not specififed properly. Please look into the documentation for set_attributes in the graph class for more information.'

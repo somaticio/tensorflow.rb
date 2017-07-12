@@ -1,4 +1,4 @@
-require 'sciruby/Tensorflow'
+require 'tensorflow/tensorflow_wrap'
 require 'tensorflow/opspec'
 require 'tensorflow/tensor'
 require 'tensorflow/graph'
