@@ -33,7 +33,5 @@ end
 
 # A simple makeshift function to convert a ruby string to C++ string
 def CString(string)
-    vector = Tensorflow::String_Vector.new
-    vector[0] = string
-    vector[0]
+    String.new(string)
 end
