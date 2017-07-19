@@ -62,8 +62,12 @@ class Tensorflow::Graph
     # operation is present.
     def operation(name)
         c_operation = Tensorflow::TF_GraphOperationByName(c, CString(name))
-        warn("No Operation with the name #{name} exists.") if c_operation.nil?
-        Tensorflow::Operation.new(c_operation, self)
+        if c_operation.nil?
+            warn("No Operation with the name #{name} exists.")
+            nil
+        else
+            Tensorflow::Operation.new(c_operation, self)
+        end
     end
 
     # Adds a placeholder to the Graph, a placeholder is an
