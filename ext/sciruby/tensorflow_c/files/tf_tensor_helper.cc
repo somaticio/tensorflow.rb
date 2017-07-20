@@ -306,8 +306,7 @@ std::string String_decoder(TF_Tensor* input_tensor){
         size_t dst_len;
         auto status = TF_NewStatus();
         auto offset_size = TF_StringDecode(src, length, &dst_str, &dst_len, status);
-        std::string out_string;
-        out_string += (char *) (dst_str);
+        std::string out_string(dst_str, dst_len);
         return out_string;
 }
 
