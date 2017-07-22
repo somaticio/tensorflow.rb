@@ -182,6 +182,7 @@ std::vector<TF_Tensor *> TF_Tensor_vector_from_array(TF_Tensor** TF_Tensor_array
         return TF_Tensor_vector;
 };
 
+// Throws a SWIGValueError Exception if the call to run fails.  This will translate to a rb_eArgError exception in Ruby.
 std::vector<TF_Tensor *> Session_run(TF_Session* graph_session, std::vector<TF_Output > inputPorts, std::vector<TF_Tensor *> inputValues, std::vector<TF_Output > outputPorts, std::vector<TF_Operation *> cTargets)
 {
         auto status = TF_NewStatus();
@@ -226,7 +227,14 @@ std::vector<TF_Tensor *> Session_run(TF_Session* graph_session, std::vector<TF_O
         delete[] inputValues_array;
         delete[] outputValues_array;
         delete[] cTargets_array;
+        TF_Code status_code = TF_GetCode(status);
+        const char *message = TF_Message(status);
         TF_DeleteStatus(status);
+
+        if(status_code != TF_OK)
+        {
+           SWIG_exception(SWIG_ValueError, message);
+        }
 
         return TF_Tensor_vector;
 };
@@ -298,8 +306,7 @@ std::string String_decoder(TF_Tensor* input_tensor){
         size_t dst_len;
         auto status = TF_NewStatus();
         auto offset_size = TF_StringDecode(src, length, &dst_str, &dst_len, status);
-        std::string out_string;
-        out_string += (char *) (dst_str);
+        std::string out_string(dst_str, dst_len);
         return out_string;
 }
 

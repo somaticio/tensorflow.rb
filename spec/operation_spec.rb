@@ -31,5 +31,11 @@ describe 'Operation' do
         const_1 = graph.constant(1.232, name: 'const1')
         expect(const_1.dataType).to match(2)   # TF_DOUBLE => 2
     end
+
+    it 'Should Test Nil Operation' do
+        graph = Tensorflow::Graph.new
+        operation = graph.operation('DOES_NOT_EXIST')
+        expect(operation).to match(nil)
+    end
     # TODO: Add Shape method and tests.
 end
