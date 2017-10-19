@@ -12,6 +12,7 @@
 import tensorflow as tf
 import shutil
 import os
+import sys
 from google.protobuf import text_format
 from tensorflow.python.platform import gfile
 
@@ -34,7 +35,10 @@ def graphdef_to_board(filename, directory):
 
 
 # A simple check to remove the directory if its already present.
-directory = "/home/arafat/Desktop/test"
+if sys.argv[1]:
+    directory = sys.argv[1]
+else:
+    directory = "/home/arafat/Desktop/test"
 if (os.path.isdir(directory)):
     shutil.rmtree(directory)
 
