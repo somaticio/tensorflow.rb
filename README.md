@@ -60,7 +60,7 @@ the following steps.
 
 - Ruby >= 2.2.0
 - [Bazel](http://www.bazel.io/docs/install.html)
-- [TensorFlow](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/g3doc/get_started/os_setup.md)
+- [TensorFlow](https://www.tensorflow.org/install/)
 - [Swig](http://www.swig.org/download.html)
 
 #### Implicit dependencies (No Action Required)
