@@ -27,7 +27,7 @@ RUN apt-get upgrade -y bazel
 # Install tensorflow
 RUN /bin/mkdir /repos
 RUN cd /repos && git clone --recurse-submodules https://github.com/tensorflow/tensorflow
-RUN cd /repos/tensorflow && git checkout r1.0
+RUN cd /repos/tensorflow && git checkout r1.3
 
 # We need gcc-4.8 otherwise we get segmentation fault
 # Error:
