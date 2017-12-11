@@ -28,7 +28,7 @@ PKG_CONFIG="http://pkgconfig.freedesktop.org/releases/pkg-config-0.28.tar.gz"
 
 # Bazel Source
 BAZEL_ROOT="https://github.com/bazelbuild/bazel/releases/download"
-BAZEL_VERS="0.4.5"
+BAZEL_VERS="0.8.0"
 PKG_BAZEL="$BAZEL_ROOT/$BAZEL_VERS/bazel-$BAZEL_VERS-installer-$platform-x86_64.sh"
 
 # TensorFlow source
