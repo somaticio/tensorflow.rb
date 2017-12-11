@@ -250,6 +250,7 @@ echo "= Compiling TensorFlow"
 # export https_proxy=https:// 
 bazel  build -c opt //tensorflow:libtensorflow.so --local_resources 2048,.5,1.0
 cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
+cp bazel-bin/tensorflow/libtensorflow_framework.so /usr/lib   
 
 #moving out of tensorflow clone
 cd ./..
