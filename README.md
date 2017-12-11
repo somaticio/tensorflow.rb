@@ -89,6 +89,7 @@ This command takes in the order of 10-15 minutes to run and creates a shared lib
 ```
 # Linux
 sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/lib/
+sudo cp bazel-bin/tensorflow/libtensorflow_framework.so /usr/lib   
 
 # OSX
 sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/local/lib
