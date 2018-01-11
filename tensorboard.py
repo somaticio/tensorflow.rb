@@ -39,8 +39,8 @@ if sys.argv[1]:
     directory = sys.argv[1]
 else:
     directory = "/home/arafat/Desktop/test"
-if (os.path.isdir(directory)):
-    shutil.rmtree(directory)
+# if (os.path.isdir(directory)):
+#    shutil.rmtree(directory)
 
 # Name of the file to be converted
 filename = 'a.pb'
