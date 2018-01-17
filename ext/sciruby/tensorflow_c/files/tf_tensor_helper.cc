@@ -22,7 +22,7 @@ void tensor_deallocator(void* data, size_t len, void* arg){
     free(data);
 }
 
-// Callback function for deallocating the data buffer that's created for 
+// Callback function for deallocating the data buffer that's created for
 // importing a graph with buffer_read
 void buffer_deallocator(void* data, size_t length)
 {
@@ -49,12 +49,12 @@ void buffer_read(TF_Buffer* tf_buffer, std::string file_string){
         int length = file_string.length();
         (*tf_buffer).data_deallocator = &buffer_deallocator;
         (*tf_buffer).length = (size_t)length;
-        // This data is cleaned in the buffer_deallocator that's called when 
+        // This data is cleaned in the buffer_deallocator that's called when
         // TF_DeleteBuffer is called
         (*tf_buffer).data = new char[length];
         auto buffer_data_pointer = (*tf_buffer).data;
         for(int i = 0; i < length; i++) {
-                *(char *)(buffer_data_pointer+i) = file_string[i];
+                *((char *)(buffer_data_pointer) + i)= file_string[i];
         }
 }
 
@@ -63,7 +63,7 @@ std::string buffer_write(TF_Buffer* tf_buffer){
         auto buffer_data_pointer = (*tf_buffer).data;
         std::string buffer;
         for(int i = 0; i < length; i++) {
-                buffer += *(char *)(buffer_data_pointer+i);
+                buffer += *((char *)(buffer_data_pointer) + i);
         }
         return buffer;
 }
@@ -291,7 +291,7 @@ TF_Tensor* String_encoder(std::string c_string, std::string offset_string){
 
         uint64_t offset_num = std::strtoull(offset_string.c_str(),NULL,0);
         memcpy(offset, &offset_num, sizeof(offset_num));
-        auto dst_str = (char *)(cbytes+8);
+        auto dst_str = (char *)(cbytes) + 8;
         auto status = TF_NewStatus();
         auto offset_size = TF_StringEncode(src_string, src_len, dst_str, dst_len, status);
         return tensor;
@@ -301,7 +301,7 @@ std::string String_decoder(TF_Tensor* input_tensor){
         auto cbytes = TF_TensorData(input_tensor);
         auto length = TF_TensorByteSize(input_tensor);
         auto offset_st = (char *) cbytes;
-        auto src = (char *)(cbytes + 8);
+        auto src = (char *)(cbytes ) + 8;
         const char *dst_str;
         size_t dst_len;
         auto status = TF_NewStatus();
