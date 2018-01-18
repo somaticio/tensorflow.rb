@@ -93,6 +93,7 @@ sudo cp bazel-bin/tensorflow/libtensorflow_framework.so /usr/lib
 
 # OSX
 sudo cp bazel-bin/tensorflow/libtensorflow.so /usr/local/lib
+sudo cp bazel-bin/tensorflow/libtensorflow_framework.so /usr/lib
 export LIBRARY_PATH=$PATH:/usr/local/lib (may be required)
 ```
 
