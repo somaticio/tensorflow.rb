@@ -19,7 +19,7 @@ namespace tensorflow {
 // Callback function for deallocating the data buffer of a tensor when
 // TF_DeleteTensor is called.
 void tensor_deallocator(void* data, size_t len, void* arg){
-    free(data);
+        free(data);
 }
 
 // Callback function for deallocating the data buffer that's created for
@@ -233,7 +233,7 @@ std::vector<TF_Tensor *> Session_run(TF_Session* graph_session, std::vector<TF_O
 
         if(status_code != TF_OK)
         {
-           SWIG_exception(SWIG_ValueError, message);
+                SWIG_exception(SWIG_ValueError, message);
         }
 
         return TF_Tensor_vector;
@@ -286,7 +286,7 @@ TF_Tensor* String_encoder(std::string c_string, std::string offset_string){
 
         const char *src_string = c_string.c_str();
         size_t src_len = c_string.length();
-        size_t dst_len = src_len+1;
+        size_t dst_len = src_len+10000; // Extra Space Might be needed for UTF-8 Character conversions
         auto offset = (cbytes);
 
         uint64_t offset_num = std::strtoull(offset_string.c_str(),NULL,0);
