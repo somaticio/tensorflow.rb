@@ -1,4 +1,5 @@
 # tensorflow.rb
+(NOTE: this doesn't work anymore)
 
 ## Description
 This repository contains a Ruby API for utilizing [TensorFlow](https://github.com/tensorflow/tensorflow).
